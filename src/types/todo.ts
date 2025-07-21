@@ -3,7 +3,7 @@ import { Priority } from "@prisma/client";
 export interface Todo {
   id: number;
   title: string;
-  description?: string;
+  description?: string | null;
   completed: boolean;
   priority: Priority;
   createdAt: Date;
