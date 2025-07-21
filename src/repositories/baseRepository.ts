@@ -35,7 +35,7 @@ export interface IPaginatedRepository<
 
 export interface IFilterableRepository<
   T,
-  Filters = any,
+  Filters = Record<string, unknown>,
   CreateData = Partial<T>,
   UpdateData = Partial<T>
 > extends IRepository<T, CreateData, UpdateData> {

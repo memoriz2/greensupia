@@ -86,7 +86,7 @@ export class TodoRepository
 
   async findByFilters(filters: TodoFilters): Promise<Todo[]> {
     try {
-      const where: any = {};
+      const where: Record<string, unknown> = {};
 
       if (filters.completed !== undefined) {
         where.completed = filters.completed;
