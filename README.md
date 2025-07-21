@@ -38,18 +38,21 @@
 - **SQL Injection 방지** (Prisma ORM 사용)
 - **XSS 방지** (Next.js 기본 보안)
 - **에러 핸들링** 체계화 (Repository Pattern)
+- **SSL 인증서** 자동 설정 (Let's Encrypt)
 
 ### 📈 **확장성 및 유지보수성**
 
 - **모듈화된 타입 시스템** (types 폴더)
 - **재사용 가능한 Repository** 패턴
 - **일관된 코딩 컨벤션** (TypeScript)
+- **표준화된 API 응답** 형식
 
 ### 🚀 **성능 최적화**
 
 - **Next.js App Router** 사용
 - **Prisma** 효율적인 데이터베이스 쿼리
 - **모듈화된 구조**로 번들 크기 최적화
+- **PM2** 프로세스 관리로 안정성 확보
 
 ## 🏗️ 아키텍처
 
@@ -94,13 +97,15 @@ User, Post, Category, Comment, Project, Guestbook
 - Todo 데이터베이스 스키마
 - 타입 시스템 구축
 - API 응답 타입 정의
+- Repository Pattern 구현
+- Service Layer 구현 (진행 중)
 - 기본 파일 구조 생성
 - GitHub 저장소 설정
+- 가비아 서버 배포 및 SSL 설정
 
 ### 🔄 진행 중
 
-- ⏳ Repository Pattern 구현
-- ⏳ Service Layer 구현
+- ⏳ Service Layer 구현 (기본 CRUD 메서드 완료)
 - ⏳ Todo CRUD API 구현
 - ⏳ 프론트엔드 컴포넌트 개발
 
@@ -220,19 +225,89 @@ npm run dev
 - **에러 처리**: Repository Pattern에서 체계적 에러 핸들링
 - **코드 구조**: 확장 가능한 모듈화된 구조
 - **데이터베이스**: Prisma ORM으로 안전한 데이터 접근
+- **API 응답**: 표준화된 응답 형식으로 일관성 확보
+
+### 🏗️ **현재 구현된 실무급 패턴**
+
+#### **Repository Pattern 예시**
+
+```typescript
+// src/repositories/todoRepository.ts
+export class TodoRepository
+  implements IFilterableRepository<Todo, TodoFilters>
+{
+  async findAll(): Promise<Todo[]> {
+    return await prisma.todo.findMany({ orderBy: { createdAt: "desc" } });
+  }
+
+  async findByFilters(filters: TodoFilters): Promise<Todo[]> {
+    // 복잡한 필터링 로직을 Repository에서 처리
+  }
+}
+```
+
+#### **Service Layer 예시**
+
+```typescript
+// src/services/todoService.ts
+export class TodoService {
+  async getAllTodos(): Promise<ApiResponse<Todo[]>> {
+    try {
+      const todos = await this.todoRepository.findAll();
+      return {
+        success: true,
+        data: todos,
+        message: "Todos retrieved successfully",
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: `Failed to retrieve todos: ${error}`,
+      };
+    }
+  }
+}
+```
+
+#### **타입 안전성 예시**
+
+```typescript
+// src/types/todo.ts
+export interface Todo {
+  id: number;
+  title: string;
+  description?: string | null;
+  completed: boolean;
+  priority: Priority;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// src/types/api.ts
+export interface ApiResponse<T = unknown> {
+  success: boolean;
+  data?: T;
+  error?: string;
+  message?: string;
+}
+```
 
 ## 📝 커밋 히스토리
 
 - `초기 커밋: Next.js 블로그 프로젝트 설정 (Prisma + MySQL)`
+- `Repository Pattern 구현: TodoRepository 및 기본 인터페이스 추가`
+- `Service Layer 구현: TodoService 기본 CRUD 메서드 추가`
+- `서버 배포: 가비아 호스팅 환경 설정 및 SSL 인증서 적용`
 
 ## 🔗 링크
 
 - **GitHub**: https://github.com/memoriz2/blog.git
-- **배포 예정**: 가비아 호스팅
+- **배포**: https://jseo.shop (가비아 호스팅)
+- **관리자**: https://portal.jseo.shop
 
 ## 📞 문의
 
-프로젝트 관련 문의사항이 있으시면 GitHub Issues를 이용해주세요.
+ahndjds@gmail.com
 
 ---
 
