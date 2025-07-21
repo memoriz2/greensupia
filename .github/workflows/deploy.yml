@@ -1,0 +1,52 @@
+name: Deploy to Gabia
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DOMAIN_URL: ${{ secrets.DOMAIN_URL }}
+
+      - name: Deploy to Gabia
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.GABIA_HOST }}
+          username: ${{ secrets.GABIA_USERNAME }}
+          password: ${{ secrets.GABIA_PASSWORD }}
+          script: |
+            cd /home/blog
+            git pull origin main
+            npm install
+            npm run build
+            pm2 restart blog
+            echo "🚀 Deployed successfully!"
+            echo "🌐 Domain: ${{ secrets.DOMAIN_URL }}"
+            echo "📅 Deploy time: $(date)"
+
+      - name: Notify deployment
+        run: |
+          echo "✅ Deployment completed!"
+          echo "🔗 Website: ${{ secrets.DOMAIN_URL }}"
+          echo "📊 Build time: ${{ github.run_duration }}s"

@@ -1,7 +1,21 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  env: {
+    DOMAIN_URL: process.env.DOMAIN_URL,
+    MAIN_DOMAIN: "jseo.shop",
+    WWW_DOMAIN: "www.jseo.shop",
+    ADMIN_DOMAIN: "portal.jseo.shop",
+  },
+  // 가비아 호스팅을 위한 설정
+  output: "standalone", // 독립 실행 가능한 빌드
+  experimental: {
+    // 최신 기능 활성화
+  },
+  // 이미지 최적화 설정
+  images: {
+    domains: ["localhost", "jseo.shop", "www.jseo.shop", "portal.jseo.shop"], // 이미지 도메인 허용
+  },
 };
 
 export default nextConfig;
