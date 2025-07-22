@@ -30,7 +30,7 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Build application
-        run: npm run build -- --build-arg DATABASE_URL=$DATABASE_URL
+        run: npm run build
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           DOMAIN_URL: ${{ secrets.DOMAIN_URL }}
