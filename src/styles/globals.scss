@@ -1,1 +1,76 @@
- 
+// CSS 변수 정의
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+// 다크 모드 지원
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+// 기본 HTML 요소 스타일
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.6;
+}
+
+// 전역 리셋
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+// 링크 스타일
+a {
+  color: inherit;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+// 다크 모드 HTML 설정
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+}
+
+// Todo 캘린더 페이지 스타일
+.todo-calendar-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+
+  h1 {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: var(--foreground);
+  }
+}
+
+// 컴포넌트 스타일 import
+@import "components/home";
+@import "components/calendar";
+@import "components/calendar-day";
+@import "components/calendar-header";
+@import "components/todo-donut-chart";
+@import "components/todo-modal";
+@import "components/error";
+@import "components/loading";

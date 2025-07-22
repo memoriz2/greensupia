@@ -1,0 +1,57 @@
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 0 20px;
+
+  .current-month {
+    font-size: 24px;
+    font-weight: 600;
+    color: #111827;
+    margin: 0;
+  }
+
+  .month-nav-button {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 6px;
+    color: #6b7280;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: #f3f4f6;
+      color: #374151;
+    }
+
+    &:focus {
+      outline: 2px solid #3b82f6;
+      outline-offset: 2px;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}
+
+// 반응형 디자인
+@media (max-width: 768px) {
+  .calendar-header {
+    padding: 0 10px;
+    margin-bottom: 15px;
+
+    .current-month {
+      font-size: 20px;
+    }
+
+    .month-nav-button {
+      font-size: 18px;
+      padding: 6px 10px;
+    }
+  }
+}

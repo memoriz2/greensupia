@@ -1,0 +1,155 @@
+.home {
+  padding: 2rem;
+  text-align: center;
+  font-family: Arial, sans-serif;
+  max-width: 800px;
+  margin: 0 auto;
+
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: #333;
+
+    @media (max-width: 768px) {
+      font-size: 2rem;
+    }
+  }
+
+  > p {
+    font-size: 1.2rem;
+    color: #666;
+    margin-bottom: 2rem;
+
+    @media (max-width: 768px) {
+      font-size: 1rem;
+    }
+  }
+}
+
+.navigation {
+  margin: 2rem 0;
+
+  h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: #333;
+
+    @media (max-width: 768px) {
+      font-size: 1.3rem;
+    }
+  }
+}
+
+.navButtons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+.navButton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  text-decoration: none;
+  border-radius: 12px;
+  min-width: 200px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+  }
+
+  .icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .text {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+  }
+
+  .description {
+    font-size: 0.9rem;
+    opacity: 0.9;
+  }
+
+  @media (max-width: 768px) {
+    min-width: 250px;
+    padding: 1.25rem;
+
+    .icon {
+      font-size: 1.75rem;
+    }
+
+    .text {
+      font-size: 1.1rem;
+    }
+
+    .description {
+      font-size: 0.85rem;
+    }
+  }
+}
+
+.features {
+  margin-top: 2rem;
+
+  h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #333;
+
+    @media (max-width: 768px) {
+      font-size: 1.3rem;
+    }
+  }
+}
+
+.featureList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  li {
+    padding: 0.5rem 0;
+    font-size: 1rem;
+    color: #555;
+    border-bottom: 1px solid #eee;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    @media (max-width: 768px) {
+      font-size: 0.9rem;
+      padding: 0.4rem 0;
+    }
+  }
+}
+
+.status {
+  margin-top: 2rem;
+  color: #666;
+
+  p {
+    font-style: italic;
+    font-size: 0.9rem;
+
+    @media (max-width: 768px) {
+      font-size: 0.8rem;
+    }
+  }
+}

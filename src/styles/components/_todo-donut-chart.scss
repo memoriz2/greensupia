@@ -1,0 +1,51 @@
+.donut-chart {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  margin: 0; // figure 기본 마진 제거
+
+  svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  .donut-background {
+    // 배경 원 스타일
+  }
+
+  .donut-progress {
+    // 진행률 원 스타일
+    transition: stroke-dashoffset 0.3s ease;
+  }
+
+  .donut-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 8px;
+    font-weight: 600;
+    color: #374151;
+    text-align: center;
+    line-height: 1;
+    margin: 0; // figcaption 기본 마진 제거
+  }
+}
+
+// 반응형
+@media (max-width: 768px) {
+  .donut-chart {
+    width: 25px;
+    height: 25px;
+
+    svg {
+      width: 25px;
+      height: 25px;
+    }
+
+    .donut-text {
+      font-size: 7px;
+    }
+  }
+}

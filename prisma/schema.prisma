@@ -20,6 +20,7 @@ model Todo {
   description String?
   completed   Boolean  @default(false)
   priority    Priority @default(MEDIUM)
+  dueDate     DateTime? // 추가: 마감일
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
