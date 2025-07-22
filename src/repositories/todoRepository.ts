@@ -39,12 +39,18 @@ export class TodoRepository
 
   async create(data: CreateTodoRequest): Promise<Todo> {
     try {
+      const createData: any = {
+        title: data.title,
+        description: data.description,
+        priority: data.priority || "MEDIUM",
+      };
+
+      if (data.dueDate) {
+        createData.dueDate = data.dueDate;
+      }
+
       return await prisma.todo.create({
-        data: {
-          title: data.title,
-          description: data.description,
-          priority: data.priority || "MEDIUM",
-        },
+        data: createData,
       });
     } catch (error) {
       throw new Error(`Failed to create todo: ${error}`);
