@@ -16,6 +16,26 @@ const nextConfig: NextConfig = {
   images: {
     domains: ["localhost", "jseo.shop", "www.jseo.shop", "portal.jseo.shop"], // 이미지 도메인 허용
   },
+  // 서버 설정 - IPv4 강제 사용
+  serverRuntimeConfig: {
+    hostname: "0.0.0.0",
+    port: 3000,
+  },
+  // CSP 설정 추가
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          {
+            key: "Content-Security-Policy",
+            value:
+              "default-src 'self' http: https: data: blob: 'unsafe-inline' 'unsafe-eval'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline';",
+          },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;
