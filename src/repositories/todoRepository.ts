@@ -44,7 +44,6 @@ export class TodoRepository
           title: data.title,
           description: data.description,
           priority: data.priority || "MEDIUM",
-          dueDate: data.dueDate,
         },
       });
     } catch (error) {
