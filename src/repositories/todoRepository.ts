@@ -39,7 +39,7 @@ export class TodoRepository
 
   async create(data: CreateTodoRequest): Promise<Todo> {
     try {
-      const createData: any = {
+      const createData: Record<string, unknown> = {
         title: data.title,
         description: data.description,
         priority: data.priority || "MEDIUM",
@@ -50,7 +50,7 @@ export class TodoRepository
       }
 
       return await prisma.todo.create({
-        data: createData,
+        data: createData as Parameters<typeof prisma.todo.create>[0]["data"],
       });
     } catch (error) {
       throw new Error(`Failed to create todo: ${error}`);
