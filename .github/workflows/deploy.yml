@@ -30,7 +30,7 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Build application
-        run: npm run build
+        run: npm run build -- --build-arg DATABASE_URL=$DATABASE_URL
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           DOMAIN_URL: ${{ secrets.DOMAIN_URL }}
@@ -46,6 +46,8 @@ jobs:
             git pull origin main
             rm -rf .next
             npm install
+            export DATABASE_URL="${{ secrets.DATABASE_URL }}"
+            export DOMAIN_URL="${{ secrets.DOMAIN_URL }}"
             npm run build
             pm2 restart blog
             echo "🚀 Deployed successfully!"
