@@ -21,21 +21,6 @@ const nextConfig: NextConfig = {
     hostname: "0.0.0.0",
     port: 3000,
   },
-  // CSP 설정 추가
-  async headers() {
-    return [
-      {
-        source: "/(.*)",
-        headers: [
-          {
-            key: "Content-Security-Policy",
-            value:
-              "default-src 'self' http: https: data: blob: 'unsafe-inline' 'unsafe-eval'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline';",
-          },
-        ],
-      },
-    ];
-  },
 };
 
 export default nextConfig;
