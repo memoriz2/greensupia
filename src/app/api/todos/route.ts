@@ -4,7 +4,7 @@ import { CreateTodoRequest } from "@/types/todo";
 
 const todoService = new TodoService();
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const result = await todoService.getAllTodos();
 

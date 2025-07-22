@@ -6,16 +6,17 @@ const todoService = new TodoService();
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
-    const id = parseInt(params.id);
+    const todoId = parseInt(id);
 
-    if (isNaN(id)) {
+    if (isNaN(todoId)) {
       return NextResponse.json({ error: "Invalid ID format" }, { status: 400 });
     }
 
-    const result = await todoService.getTodoById(id);
+    const result = await todoService.getTodoById(todoId);
 
     if (!result.success) {
       return NextResponse.json({ error: result.error }, { status: 404 });
@@ -32,18 +33,19 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
-    const id = parseInt(params.id);
+    const todoId = parseInt(id);
 
-    if (isNaN(id)) {
+    if (isNaN(todoId)) {
       return NextResponse.json({ error: "Invalid ID format" }, { status: 400 });
     }
 
     const body: UpdateTodoRequest = await request.json();
 
-    const result = await todoService.updateTodo(id, body);
+    const result = await todoService.updateTodo(todoId, body);
 
     if (!result.success) {
       return NextResponse.json({ error: result.error }, { status: 404 });
@@ -60,16 +62,17 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
-    const id = parseInt(params.id);
+    const todoId = parseInt(id);
 
-    if (isNaN(id)) {
+    if (isNaN(todoId)) {
       return NextResponse.json({ error: "Invalid ID format" }, { status: 400 });
     }
 
-    const result = await todoService.deleteTodo(id);
+    const result = await todoService.deleteTodo(todoId);
 
     if (!result.success) {
       return NextResponse.json({ error: result.error }, { status: 404 });
