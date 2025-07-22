@@ -38,6 +38,7 @@ jobs:
           script: |
             cd /home/blog
             git pull origin main
+            sudo rm -rf .next
             npm install
             npm run build
             pm2 restart blog
