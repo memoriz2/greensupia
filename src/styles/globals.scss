@@ -66,11 +66,11 @@ a {
 }
 
 // 컴포넌트 스타일 import
-@import "components/home.module";
-@import "components/calendar";
-@import "components/calendar-day";
-@import "components/calendar-header";
-@import "components/todo-donut-chart";
-@import "components/todo-modal";
-@import "components/error";
-@import "components/loading";
+@use "components/home.module";
+@use "components/calendar";
+@use "components/calendar-day";
+@use "components/calendar-header";
+@use "components/todo-donut-chart";
+@use "components/todo-modal";
+@use "components/error";
+@use "components/loading";
