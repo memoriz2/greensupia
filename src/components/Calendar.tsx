@@ -64,54 +64,58 @@ const Calendar = React.memo(
     }, [todos]);
 
     return (
-      <section className="calendar" aria-label="월간 Todo 달력">
-        <CalendarHeader
-          currentDate={currentDate}
-          onPrevious={onPreviousMonth}
-          onNext={onNextMonth}
-        />
+      <div className="calendar-container">
+        <section className="calendar" aria-label="월간 Todo 달력">
+          <CalendarHeader
+            currentDate={currentDate}
+            onPrevious={onPreviousMonth}
+            onNext={onNextMonth}
+          />
 
-        <table
-          className="calendar-grid"
-          role="grid"
-          aria-label={`${currentDate.getFullYear()}년 ${
-            currentDate.getMonth() + 1
-          }월 달력`}
-        >
-          <thead>
-            <tr>
-              {["일", "월", "화", "수", "목", "금", "토"].map((day) => (
-                <th key={day} scope="col" className="calendar-day-header">
-                  {day}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {Array.from(
-              { length: CALENDAR_CONFIG.WEEKS_TO_SHOW },
-              (_, weekIndex) => (
-                <tr key={weekIndex}>
-                  {calendarDays
-                    .slice(weekIndex * 7, (weekIndex + 1) * 7)
-                    .map((date, dayIndex) => (
-                      <td key={dayIndex} className="calendar-day-cell">
-                        <CalendarDay
-                          date={date}
-                          todos={todosByDate[getDateKey(date)] || []}
-                          isCurrentMonth={
-                            date.getMonth() === currentDate.getMonth()
-                          }
-                          onClick={() => onDayClick(date)}
-                        />
-                      </td>
-                    ))}
+          <div className="calendar-table-wrapper">
+            <table
+              className="calendar-grid"
+              role="grid"
+              aria-label={`${currentDate.getFullYear()}년 ${
+                currentDate.getMonth() + 1
+              }월 달력`}
+            >
+              <thead>
+                <tr>
+                  {["일", "월", "화", "수", "목", "금", "토"].map((day) => (
+                    <th key={day} scope="col" className="calendar-day-header">
+                      {day}
+                    </th>
+                  ))}
                 </tr>
-              )
-            )}
-          </tbody>
-        </table>
-      </section>
+              </thead>
+              <tbody>
+                {Array.from(
+                  { length: CALENDAR_CONFIG.WEEKS_TO_SHOW },
+                  (_, weekIndex) => (
+                    <tr key={weekIndex}>
+                      {calendarDays
+                        .slice(weekIndex * 7, (weekIndex + 1) * 7)
+                        .map((date, dayIndex) => (
+                          <td key={dayIndex} className="calendar-day-cell">
+                            <CalendarDay
+                              date={date}
+                              todos={todosByDate[getDateKey(date)] || []}
+                              isCurrentMonth={
+                                date.getMonth() === currentDate.getMonth()
+                              }
+                              onClick={() => onDayClick(date)}
+                            />
+                          </td>
+                        ))}
+                    </tr>
+                  )
+                )}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
     );
   }
 );
