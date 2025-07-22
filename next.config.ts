@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
     MAIN_DOMAIN: "jseo.shop",
     WWW_DOMAIN: "www.jseo.shop",
     ADMIN_DOMAIN: "portal.jseo.shop",
+    DATABASE_URL: process.env.DATABASE_URL,
   },
   // 가비아 호스팅을 위한 설정
   output: "standalone", // 독립 실행 가능한 빌드
