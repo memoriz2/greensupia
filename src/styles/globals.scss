@@ -1,3 +1,13 @@
+// 컴포넌트 스타일 import
+@use "components/home.module";
+@use "components/calendar";
+@use "components/calendar-day";
+@use "components/calendar-header";
+@use "components/todo-donut-chart";
+@use "components/todo-modal";
+@use "components/error";
+@use "components/loading";
+
 // CSS 변수 정의
 :root {
   --background: #ffffff;
@@ -64,13 +74,3 @@ a {
     color: var(--foreground);
   }
 }
-
-// 컴포넌트 스타일 import
-@use "components/home.module";
-@use "components/calendar";
-@use "components/calendar-day";
-@use "components/calendar-header";
-@use "components/todo-donut-chart";
-@use "components/todo-modal";
-@use "components/error";
-@use "components/loading";
