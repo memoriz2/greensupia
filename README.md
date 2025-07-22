@@ -299,6 +299,197 @@ export interface ApiResponse<T = unknown> {
 - `Service Layer 구현: TodoService 기본 CRUD 메서드 추가`
 - `서버 배포: 가비아 호스팅 환경 설정 및 SSL 인증서 적용`
 
+# Next.js Todo App 배포 및 문제 해결 가이드
+
+이 README는 Next.js 앱 배포 중 만난 문제(서버 시작 에러, 정적 파일 404, MIME 타입 에러, Prisma DB 연결 실패 등)와 해결법. 가비아 클라우드에서 Nginx, PM2, GitHub Actions 사용 기반으로 설명
+
+## 1. 서버 시작 에러 (EINVAL: invalid argument fe80::d00d:f4ff:febe:556b:3000)
+
+### 문제
+
+- Next.js가 IPv6 주소로 바인딩하려다 실패, PM2 로그에 "Failed to start server" 에러.
+
+### 해결법
+
+- package.json에 start 스크립트 수정 (IPv4로 강제):
+  ```
+  "scripts": {
+    "start": "next start -H 0.0.0.0 -p 3000"
+  }
+  ```
+- PM2 재시작:
+  ```bash
+  pm2 restart blog
+  ```
+- IPv6 비활성화 (서버 전체):
+  ```bash
+  sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1
+  ```
+- 결과: 서버 정상 시작, "Ready in 947ms" 로그 출력.
+
+## 2. 정적 파일 404 & MIME 타입 에러
+
+### 문제
+
+- /\_next/static/css/... .css 파일 404, MIME 타입 'text/html'로 반환 (404 HTML 페이지 때문).
+
+### 해결법
+
+- Nginx 설정 수정 (/etc/nginx/conf.d/www.jseo.shop.conf 생성):
+  ```
+  server {
+      listen 80;
+      server_name www.jseo.shop;
+      root /home/blog;
+      location /_next/static/ {
+          alias /home/blog/.next/static/;
+          expires 1y;
+          add_header Cache-Control "public, immutable";
+          types {
+              text/css css;
+              application/javascript js;
+              font/woff2 woff2;
+          }
+      }
+      location / {
+          proxy_pass http://localhost:3000;
+          proxy_http_version 1.1;
+          proxy_set_header Upgrade $http_upgrade;
+          proxy_set_header Connection 'upgrade';
+          proxy_set_header Host $host;
+          proxy_cache_bypass $http_upgrade;
+      }
+  }
+  ```
+- 기본 server 블록 주석 처리 (/etc/nginx/nginx.conf):
+  ```
+  # server {
+  #     listen 80 default_server;
+  #     listen [::]:80 default_server;
+  #     server_name _;
+  #     root /usr/share/nginx/html;
+  #     ...
+  # }
+  ```
+- Nginx 재시작:
+  ```bash
+  sudo nginx -t  # 문법 확인
+  sudo systemctl restart nginx
+  ```
+- 결과: 정적 파일 200 OK, MIME 타입 정상 (text/css 등).
+
+## 3. Prisma DB 연결 실패 (500 Internal Server Error)
+
+### 문제
+
+- /api/todos 500 에러, Prisma가 "Can't reach database server at `139.150.73.107:3306`"라고 함 (공인 IP 사용).
+
+### 해결법
+
+- `prisma.ts` 수정 (런타임에 DATABASE_URL 동적으로 읽기):
+
+  ```
+  import { PrismaClient } from "@prisma/client";
+
+  const globalForPrisma = globalThis as unknown as {
+    prisma: PrismaClient | undefined;
+  };
+
+  export const prisma =
+    globalForPrisma.prisma ??
+    new PrismaClient({
+      datasources: {
+        db: {
+          url: process.env.DATABASE_URL || "mysql://blog_user:Qmffhrm_db89@localhost:3306/blog_db",
+        },
+      },
+    });
+
+  if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+  ```
+
+- next.config.ts에 env 추가 (빌드 시점에 반영):
+  ```
+  env: {
+    DOMAIN_URL: process.env.DOMAIN_URL,
+    MAIN_DOMAIN: "jseo.shop",
+    WWW_DOMAIN: "www.jseo.shop",
+    ADMIN_DOMAIN: "portal.jseo.shop",
+    DATABASE_URL: process.env.DATABASE_URL,
+  },
+  ```
+- 캐시 지우기:
+  ```bash
+  rm -rf .next node_modules/.cache node_modules/@prisma/client
+  npm install
+  npx prisma generate
+  ```
+- 빌드 & 재시작:
+  ```bash
+  export DATABASE_URL="mysql://blog_user:Qmffhrm_db89@localhost:3306/blog_db"
+  npm run build
+  pm2 restart blog
+  ```
+- 결과: API 200 OK, Todo 데이터 출력.
+
+## 4. GitHub Actions 자동 배포 설정
+
+### 문제
+
+- 배포 시 빌드 실패 (EACCES 권한 에러, .next 폴더 삭제 안 됨).
+
+### 해결법
+
+- deploy.yml 수정 ( .next 삭제 추가):
+  ```
+  script: |
+    cd /home/blog
+    git pull origin main
+    rm -rf .next  # sudo 없이 삭제
+    npm install
+    npm run build
+    pm2 restart blog
+    echo "🚀 Deployed successfully!"
+    echo "🌐 Domain: ${{ secrets.DOMAIN_URL }}"
+    echo "📅 Deploy time: $(date)"
+  ```
+- Secrets 추가:
+
+  - `DATABASE_URL`: "mysql://blog_user:Qmffhrm_db89@localhost:3306/blog_db"
+  - `SSH_HOST`: 139.150.73.107
+  - `SSH_USERNAME`: blog
+  - `SSH_PRIVATE_KEY`: SSH 키 내용
+
+- 결과: 푸시 시 자동 배포, 에러 없이 성공.
+
+## 5. Sass @import Deprecation Warning
+
+### 문제
+
+- 빌드 시 Sass @import deprecated 경고.
+
+### 해결법
+
+- globals.scss에서 @import를 @use로 바꾸고 맨 위로 옮김:
+
+  ```
+  @use "components/home.module";
+  @use "components/calendar";
+  @use "components/calendar-day";
+  @use "components/calendar-header";
+  @use "components/todo-donut-chart";
+
+  // 나머지 스타일
+  ```
+
+- 결과: 경고 사라짐.
+
+## 6. 기타 팁
+
+- **로그 확인**: pm2 logs blog --lines 100
+- **DB 확인**: sudo systemctl status mysql
+- **테스트**: curl http://localhost:3000/api/todos
+
 ## 🔗 링크
 
 - **GitHub**: https://github.com/memoriz2/blog.git
