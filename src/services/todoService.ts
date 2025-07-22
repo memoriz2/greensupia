@@ -5,7 +5,7 @@ import {
   UpdateTodoRequest,
   TodoFilters,
 } from "@/types/todo";
-import { ApiResponse, TodoResponse, TodoListResponse } from "@/types/api";
+import { ApiResponse } from "@/types/api";
 import { Id } from "@/types/utils";
 
 export class TodoService {

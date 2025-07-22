@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { TodoService } from "@/services/todoService";
 import { UpdateTodoRequest } from "@/types/todo";
-import { error } from "console";
 
 const todoService = new TodoService();
 
@@ -23,7 +22,7 @@ export async function GET(
     }
 
     return NextResponse.json(result.data, { status: 200 });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -51,7 +50,7 @@ export async function PUT(
     }
 
     return NextResponse.json(result.data, { status: 200 });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -80,7 +79,7 @@ export async function DELETE(
       { message: "Todo deleted successfully" },
       { status: 200 }
     );
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

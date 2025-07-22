@@ -6,9 +6,6 @@ const todoService = new TodoService();
 
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const filters = Object.fromEntries(searchParams.entries());
-
     const result = await todoService.getAllTodos();
 
     if (!result.success) {
@@ -16,7 +13,7 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json(result.data, { status: 200 });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -38,7 +35,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(result.data, { status: 201 });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

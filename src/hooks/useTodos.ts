@@ -17,11 +17,11 @@ export const useTodos = () => {
       }
       const data = await response.json();
       setTodos(
-        data.map((todo: any) => ({
+        data.map((todo: Record<string, unknown>) => ({
           ...todo,
-          dueDate: todo.dueDate ? new Date(todo.dueDate) : null,
-          createdAt: new Date(todo.createdAt),
-          updatedAt: new Date(todo.updatedAt),
+          dueDate: todo.dueDate ? new Date(todo.dueDate as string) : null,
+          createdAt: new Date(todo.createdAt as string),
+          updatedAt: new Date(todo.updatedAt as string),
         }))
       );
     } catch (err) {
