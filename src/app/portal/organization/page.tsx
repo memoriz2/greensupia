@@ -8,8 +8,8 @@ import { usePagination } from "@/hooks/usePagination";
 
 export default function OrganizationPage() {
   const [organizationCharts, setOrganizationCharts] = useState<
-    OrganizationChart[]
-  >([]);
+    OrganizationChart[] | null
+  >(null);
   const [activeChart, setActiveChart] = useState<OrganizationChart | null>(
     null
   );
@@ -44,6 +44,7 @@ export default function OrganizationPage() {
       setError(
         err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다."
       );
+      setOrganizationCharts([]);
     } finally {
       setLoading(false);
     }
@@ -120,7 +121,7 @@ export default function OrganizationPage() {
     setCurrentPage,
     goToPage,
   } = usePagination({
-    items: organizationCharts,
+    items: organizationCharts || [],
     itemsPerPage,
   });
 
@@ -292,7 +293,7 @@ export default function OrganizationPage() {
             </div>
 
             {/* 페이지네이션 */}
-            {organizationCharts.length > 0 && (
+            {organizationCharts && organizationCharts.length > 0 && (
               <Pagination
                 currentPage={currentPage}
                 totalPages={totalPages}
@@ -303,7 +304,7 @@ export default function OrganizationPage() {
               />
             )}
 
-            {organizationCharts.length === 0 && (
+            {(!organizationCharts || organizationCharts.length === 0) && (
               <div className="text-center py-12">
                 <div className="text-6xl mb-4">📊</div>
                 <h3 className="text-lg font-medium text-gray-900 mb-2">
@@ -363,16 +364,18 @@ export default function OrganizationPage() {
       <div className="organization-stats">
         {[
           {
-            number: organizationCharts.length,
+            number: organizationCharts?.length || 0,
             label: "전체 조직도",
           },
           {
-            number: organizationCharts.filter((chart) => chart.isActive).length,
+            number:
+              organizationCharts?.filter((chart) => chart.isActive).length || 0,
             label: "활성 조직도",
           },
           {
-            number: organizationCharts.filter((chart) => !chart.isActive)
-              .length,
+            number:
+              organizationCharts?.filter((chart) => !chart.isActive).length ||
+              0,
             label: "비활성 조직도",
           },
         ].map((stat, index) => (

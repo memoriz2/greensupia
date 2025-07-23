@@ -5,7 +5,7 @@ import Image from "next/image";
 import { BannerNews } from "@/types/bannerNews";
 
 export default function PublicHomePage() {
-  const [bannerNews, setBannerNews] = useState<BannerNews[]>([]);
+  const [bannerNews, setBannerNews] = useState<BannerNews[] | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -13,9 +13,10 @@ export default function PublicHomePage() {
       try {
         const response = await fetch("/api/banner-news?action=active");
         const data = await response.json();
-        setBannerNews(data);
+        setBannerNews(data || []);
       } catch (error) {
         console.error("배너 뉴스 로딩 실패:", error);
+        setBannerNews([]);
       } finally {
         setLoading(false);
       }
@@ -63,7 +64,7 @@ export default function PublicHomePage() {
       </section>
 
       {/* 배너 뉴스 섹션 */}
-      {!loading && bannerNews.length > 0 && (
+      {!loading && bannerNews && bannerNews.length > 0 && (
         <section
           className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
           aria-labelledby="news-heading"
@@ -78,7 +79,7 @@ export default function PublicHomePage() {
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
             role="list"
           >
-            {bannerNews.slice(0, 3).map((news) => (
+            {bannerNews?.slice(0, 3).map((news) => (
               <article
                 key={news.id}
                 className="bg-white rounded-lg shadow-sm border overflow-hidden hover:shadow-md transition-shadow"
