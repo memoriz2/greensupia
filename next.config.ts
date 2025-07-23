@@ -15,7 +15,32 @@ const nextConfig: NextConfig = {
   },
   // 이미지 최적화 설정
   images: {
-    domains: ["localhost", "jseo.shop", "www.jseo.shop", "portal.jseo.shop"], // 이미지 도메인 허용
+    remotePatterns: [
+      {
+        protocol: "http",
+        hostname: "localhost",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "jseo.shop",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "www.jseo.shop",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "portal.jseo.shop",
+        port: "",
+        pathname: "/**",
+      },
+    ],
   },
   // 서버 설정 - IPv4 강제 사용
   serverRuntimeConfig: {

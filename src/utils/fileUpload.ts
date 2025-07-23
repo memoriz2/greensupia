@@ -66,8 +66,9 @@ export function deleteImage(filePath: string): void {
   try {
     const fullPath = join(process.cwd(), "public", filePath.replace(/^\//, ""));
     if (existsSync(fullPath)) {
-      const { unlink } = require("fs/promises");
-      unlink(fullPath).catch(console.error);
+      import("fs/promises").then(({ unlink }) => {
+        unlink(fullPath).catch(console.error);
+      });
     }
   } catch (error) {
     console.error("파일 삭제 에러:", error);

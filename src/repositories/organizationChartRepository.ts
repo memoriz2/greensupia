@@ -60,7 +60,10 @@ export class OrganizationChartRepository {
     data: UpdateOrganizationChartRequest
   ): Promise<OrganizationChart> {
     try {
-      const updateData: any = {};
+      const updateData: Partial<{
+        imageUrl: string;
+        isActive: boolean;
+      }> = {};
       if (data.imageUrl !== undefined) {
         updateData.imageUrl = data.imageUrl;
       }

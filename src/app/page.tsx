@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { BannerNews } from "@/types/bannerNews";
 
 export default function PublicHomePage() {
@@ -85,11 +86,13 @@ export default function PublicHomePage() {
               >
                 {news.imageUrl && (
                   <figure className="h-32 bg-gray-200">
-                    <img
+                    <Image
                       src={news.imageUrl}
                       alt={news.title}
+                      width={400}
+                      height={128}
                       className="w-full h-full object-cover"
-                      loading="lazy"
+                      priority={false}
                     />
                   </figure>
                 )}

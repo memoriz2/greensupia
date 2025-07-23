@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import { OrganizationChart } from "@/types/organization";
 import Pagination from "@/components/Pagination";
 import { usePagination } from "@/hooks/usePagination";
@@ -237,10 +238,13 @@ export default function OrganizationPage() {
                   <div className="organization-list__content">
                     <div className="organization-list__info">
                       <div className="organization-thumbnail">
-                        <img
+                        <Image
                           src={chart.imageUrl}
                           alt="조직도 미리보기"
+                          width={80}
+                          height={60}
                           className="organization-thumbnail__image"
+                          priority={false}
                         />
                       </div>
                       <div className="organization-list__details">
@@ -333,10 +337,13 @@ export default function OrganizationPage() {
               <div className="organization-preview-section__content">
                 <div className="organization-preview__container">
                   <div className="organization-preview__image-wrapper">
-                    <img
+                    <Image
                       src={activeChart.imageUrl}
                       alt="조직도"
+                      width={400}
+                      height={300}
                       className="organization-preview__image"
+                      priority={false}
                     />
                   </div>
                   <div className="organization-preview-section__date">

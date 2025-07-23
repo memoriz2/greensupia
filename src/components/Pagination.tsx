@@ -21,6 +21,8 @@ export default function Pagination({
   showPageNumbers = true,
   maxPageNumbers = 5,
 }: PaginationProps) {
+  // hoveredPage는 향후 호버 효과 구현을 위해 유지
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [hoveredPage, setHoveredPage] = useState<number | null>(null);
 
   if (totalPages <= 1) {

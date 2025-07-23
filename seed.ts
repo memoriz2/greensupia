@@ -27,29 +27,20 @@ async function main() {
     skipDuplicates: true,
   });
 
-  // 조직도 샘플 데이터
+  // 조직도 샘플 데이터 (로컬 이미지 파일 사용)
   await prisma.organizationChart.createMany({
     data: [
       {
-        name: "김철수",
-        position: "CEO",
-        department: "경영진",
-        level: 0,
-        parentId: null,
+        imageUrl: "/organization-charts/1753300508151_jzi5joe6ht.png",
+        isActive: true,
       },
       {
-        name: "이영희",
-        position: "CTO",
-        department: "기술팀",
-        level: 1,
-        parentId: 1,
+        imageUrl: "/organization-charts/1753300613828_byl2zm1anff.png",
+        isActive: false,
       },
       {
-        name: "박민수",
-        position: "개발팀장",
-        department: "개발팀",
-        level: 2,
-        parentId: 2,
+        imageUrl: "/organization-charts/1753300622563_h8lndpn9xao.png",
+        isActive: false,
       },
     ],
     skipDuplicates: true,
@@ -77,25 +68,25 @@ async function main() {
     skipDuplicates: true,
   });
 
-  // 배너뉴스 샘플 데이터
+  // 배너뉴스 샘플 데이터 (로컬 이미지 파일 사용)
   await prisma.bannerNews.createMany({
     data: [
       {
         title: "새로운 서비스 출시",
         content: "AI 기반 분석 서비스가 출시되었습니다.",
-        imageUrl: "https://via.placeholder.com/400x200",
+        imageUrl: "/organization-charts/1753300627007_csgmkkq317e.png",
         isActive: true,
       },
       {
         title: "채용 공고",
         content: "우수한 개발자를 모집합니다.",
-        imageUrl: "https://via.placeholder.com/400x200",
+        imageUrl: "/organization-charts/1753304682482_1bxy4buexz8.png",
         isActive: true,
       },
       {
         title: "연말 이벤트",
         content: "연말 감사 이벤트를 진행합니다.",
-        imageUrl: "https://via.placeholder.com/400x200",
+        imageUrl: "/organization-charts/1753304690335_9a2o9nyue7.png",
         isActive: false,
       },
     ],
