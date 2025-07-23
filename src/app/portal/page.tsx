@@ -125,21 +125,23 @@ export default function AdminDashboard() {
           <div className="stat-number">{stats.organization.total}</div>
           <div className="stat-label">조직 구성원</div>
           <div className="mt-2 text-sm text-gray-500">
-            부서: {stats.organization.departments.length}개
+            부서: {stats.organization.departments?.length || 0}개
           </div>
           <div className="mt-2">
             <div className="flex flex-wrap gap-1">
-              {stats.organization.departments.slice(0, 3).map((dept, index) => (
-                <span
-                  key={index}
-                  className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full"
-                >
-                  {dept}
-                </span>
-              ))}
-              {stats.organization.departments.length > 3 && (
+              {stats.organization.departments
+                ?.slice(0, 3)
+                .map((dept, index) => (
+                  <span
+                    key={index}
+                    className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full"
+                  >
+                    {dept}
+                  </span>
+                ))}
+              {(stats.organization.departments?.length || 0) > 3 && (
                 <span className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full">
-                  +{stats.organization.departments.length - 3}
+                  +{(stats.organization.departments?.length || 0) - 3}
                 </span>
               )}
             </div>
