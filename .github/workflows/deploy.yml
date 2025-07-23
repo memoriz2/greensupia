@@ -29,6 +29,11 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
+      - name: Push database schema
+        run: npx prisma db push
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
       - name: Build application
         run: npm run build
         env:
@@ -48,6 +53,8 @@ jobs:
             npm install
             export DATABASE_URL="${{ secrets.DATABASE_URL }}"
             export DOMAIN_URL="${{ secrets.DOMAIN_URL }}"
+            npx prisma generate
+            npx prisma db push
             npm run build
             pm2 restart blog
             echo "🚀 Deployed successfully!"
