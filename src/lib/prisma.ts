@@ -9,9 +9,7 @@ const prisma =
   new PrismaClient({
     datasources: {
       db: {
-        url:
-          process.env.DATABASE_URL ||
-          "mysql://blog_user:Qmffhrm_db89@localhost:3306/blog_db",
+        url: process.env.DATABASE_URL!,
       },
     },
   });
