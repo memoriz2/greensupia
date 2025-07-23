@@ -161,6 +161,6 @@
 // 다크 모드 로고 처리
 @media (prefers-color-scheme: dark) {
   .logo {
-    filter: invert();
+    filter: invert(1);
   }
 }

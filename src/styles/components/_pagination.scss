@@ -1,0 +1,175 @@
+// 페이징 컴포넌트 스타일
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-lg) 0;
+  border-top: 1px solid var(--border);
+
+  &__info {
+    flex-shrink: 0;
+  }
+
+  &__controls {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+  }
+
+  &__numbers {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+  }
+
+  &__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.5rem;
+    height: 2.5rem;
+    padding: 0 var(--spacing-sm);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: white;
+    color: var(--foreground);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all var(--transition-fast);
+    cursor: pointer;
+    user-select: none;
+
+    &:hover:not(:disabled) {
+      background: var(--primary-light);
+      border-color: var(--primary);
+      color: var(--primary);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    &--active {
+      background: var(--gradient-primary);
+      border-color: var(--primary);
+      color: white;
+      box-shadow: var(--shadow-md);
+
+      &:hover {
+        background: var(--gradient-primary);
+        color: white;
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-lg);
+      }
+    }
+
+    &--disabled {
+      background: var(--background);
+      border-color: var(--border);
+      color: var(--muted-foreground);
+      cursor: not-allowed;
+      opacity: 0.5;
+
+      &:hover {
+        background: var(--background);
+        border-color: var(--border);
+        color: var(--muted-foreground);
+        transform: none;
+        box-shadow: none;
+      }
+    }
+
+    &--prev,
+    &--next {
+      font-size: 1.25rem;
+      font-weight: 600;
+      min-width: 2.5rem;
+    }
+
+    &--ellipsis {
+      cursor: default;
+      border: none;
+      background: transparent;
+      min-width: auto;
+      padding: 0 var(--spacing-xs);
+
+      &:hover {
+        background: transparent;
+        border: none;
+        color: var(--foreground);
+        transform: none;
+        box-shadow: none;
+      }
+    }
+  }
+}
+
+// 반응형 디자인
+@media (max-width: 640px) {
+  .pagination {
+    flex-direction: column;
+    gap: var(--spacing-md);
+    align-items: center;
+
+    &__controls {
+      gap: var(--spacing-xs);
+    }
+
+    &__button {
+      min-width: 2.25rem;
+      height: 2.25rem;
+      font-size: 0.75rem;
+
+      &--prev,
+      &--next {
+        font-size: 1rem;
+        min-width: 2.25rem;
+      }
+    }
+  }
+}
+
+// 다크 모드 지원
+@media (prefers-color-scheme: dark) {
+  .pagination {
+    border-top-color: var(--border);
+
+    &__button {
+      background: var(--background);
+      border-color: var(--border);
+      color: var(--foreground);
+
+      &:hover:not(:disabled) {
+        background: var(--primary-light);
+        border-color: var(--primary);
+        color: var(--primary);
+      }
+
+      &--disabled {
+        background: var(--background);
+        border-color: var(--border);
+        color: var(--muted-foreground);
+      }
+
+      &--ellipsis {
+        background: transparent;
+        border: none;
+
+        &:hover {
+          background: transparent;
+          border: none;
+          color: var(--foreground);
+        }
+      }
+    }
+  }
+}

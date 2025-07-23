@@ -1,0 +1,165 @@
+// 조직도 관리 페이지 스타일
+.organization {
+  // 2열 가로 배치 레이아웃
+  &-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+
+    @media (max-width: 1023px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  // 왼쪽: 조직도 목록
+  &-list-section {
+    width: 100%;
+  }
+
+  // 오른쪽: 활성 조직도 미리보기
+  &-preview-section-wrapper {
+    margin-left: auto;
+    width: 100%;
+  }
+  &-thumbnail {
+    width: 32px;
+    height: 32px;
+    background-color: var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    flex-shrink: 0;
+    min-width: 32px;
+    min-height: 32px;
+
+    &__image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  &-preview {
+    &__container {
+      max-width: 28rem; // max-w-xl
+      margin: 0 auto;
+    }
+
+    &__image-wrapper {
+      width: 100%;
+      max-width: 24rem; // max-w-md
+    }
+
+    &__image {
+      width: 100%;
+      height: auto;
+      max-height: 200px; // 적절한 크기로 조정
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      object-fit: contain;
+    }
+  }
+
+  &-list {
+    &__item {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-md);
+      transition: background-color var(--transition-fast);
+
+      &:hover {
+        background-color: var(--background);
+      }
+    }
+
+    &__content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    &__info {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+    }
+
+    &__details {
+      .title {
+        font-weight: 500;
+        font-size: 0.875rem; // text-sm
+      }
+
+      .date {
+        font-size: 0.75rem; // text-xs
+        color: var(--muted-foreground);
+      }
+    }
+
+    &__actions {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+    }
+  }
+
+  &-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-xl);
+    margin-top: var(--spacing-2xl);
+
+    @media (min-width: 768px) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+}
+
+// 조직도 업로드 관련 스타일
+.organization-upload {
+  &__input {
+    display: none;
+  }
+
+  &__error {
+    color: var(--error);
+    background-color: var(--error-light);
+    padding: var(--spacing-md);
+    border-radius: var(--radius);
+    margin-bottom: var(--spacing-lg);
+  }
+}
+
+// 조직도 미리보기 섹션
+.organization-preview-section {
+  margin-bottom: var(--spacing-2xl);
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-lg);
+  }
+
+  &__title {
+    font-size: 1.25rem; // text-xl
+    font-weight: 600;
+  }
+
+  &__content {
+    background-color: var(--background);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+  }
+
+  &__image-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: var(--spacing-md);
+  }
+
+  &__date {
+    text-align: center;
+    font-size: 0.875rem; // text-sm
+    color: var(--muted-foreground);
+  }
+}
