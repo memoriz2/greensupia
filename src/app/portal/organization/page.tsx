@@ -141,7 +141,7 @@ export default function OrganizationPage() {
 
       // 현재 페이지의 마지막 아이템을 삭제했고, 이전 페이지가 있다면 이전 페이지로 이동
       const newTotalPages = Math.ceil(
-        (organizationCharts.length - 1) / itemsPerPage
+        ((organizationCharts?.length || 0) - 1) / itemsPerPage
       );
       if (currentPage > newTotalPages && newTotalPages > 0) {
         setCurrentPage(newTotalPages);
@@ -229,7 +229,7 @@ export default function OrganizationPage() {
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-semibold">조직도 목록</h2>
               <div className="text-sm text-gray-500">
-                총 {organizationCharts.length}개
+                총 {organizationCharts?.length || 0}개
               </div>
             </div>
 
