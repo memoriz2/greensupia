@@ -58,10 +58,17 @@ export async function POST(request: NextRequest) {
     }
 
     // 이미지 업로드
-    const uploadedFile = await uploadImage(imageFile, "organization-charts");
+    const uploadResult = await uploadImage(imageFile);
+    
+    if (!uploadResult.success) {
+      return NextResponse.json(
+        { error: uploadResult.error || "이미지 업로드에 실패했습니다." },
+        { status: 500 }
+      );
+    }
 
     const result = await organizationChartService.createOrganizationChart({
-      imageUrl: uploadedFile.filePath,
+      imageUrl: uploadResult.imageUrl || "",
       isActive,
     });
 

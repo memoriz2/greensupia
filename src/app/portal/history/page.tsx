@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { History } from "@/types/history";
+// import { History } from "@/types/history";
 import ToggleSwitch from "@/components/ToggleSwitch";
 import Modal from "@/components/Modal";
 
