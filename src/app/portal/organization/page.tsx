@@ -246,6 +246,7 @@ export default function OrganizationPage() {
                           height={60}
                           className="organization-thumbnail__image"
                           priority={false}
+                          unoptimized={true}
                         />
                       </div>
                       <div className="organization-list__details">
@@ -345,6 +346,7 @@ export default function OrganizationPage() {
                       height={300}
                       className="organization-preview__image"
                       priority={false}
+                      unoptimized={true}
                     />
                   </div>
                   <div className="organization-preview-section__date">
