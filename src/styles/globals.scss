@@ -13,19 +13,19 @@
 @use "components/organization";
 @use "components/pagination";
 
-// CSS 변수 정의 - 모던한 CMS 색상 팔레트
+// CSS 변수 정의 - 백조 브랜드 컬러 팔레트
 :root {
   // 기본 색상
-  --background: #fafbfc;
-  --foreground: #1a202c;
-  --muted: #718096;
-  --muted-foreground: #a0aec0;
+  --background: #f7f7f7;
+  --foreground: #2e2e2e;
+  --muted: #aaaaaa;
+  --muted-foreground: #aaaaaa;
 
-  // 브랜드 색상
-  --primary: #667eea;
-  --primary-hover: #5a67d8;
-  --primary-light: #e6fffa;
-  --primary-dark: #4c51bf;
+  // 브랜드 색상 (백조에서 영감받은 골드톤)
+  --primary: #f8c300;
+  --primary-hover: #ffd886;
+  --primary-light: #fff5d7;
+  --primary-dark: #e6b800;
 
   // 상태 색상
   --success: #48bb78;
@@ -38,9 +38,9 @@
   --info-light: #ebf8ff;
 
   // 중성 색상
-  --border: #e2e8f0;
-  --border-hover: #cbd5e0;
-  --border-focus: #667eea;
+  --border: #e0e0e0;
+  --border-hover: #d0d0d0;
+  --border-focus: #f8c300;
 
   // 그림자
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
@@ -52,11 +52,11 @@
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
     0 10px 10px -5px rgba(0, 0, 0, 0.04);
 
-  // 그라데이션
-  --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-  --gradient-success: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-  --gradient-warning: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+  // 그라데이션 (백조 브랜드 컬러 기반)
+  --gradient-primary: linear-gradient(135deg, #f8c300 0%, #ffd886 100%);
+  --gradient-secondary: linear-gradient(135deg, #fff5d7 0%, #f8c300 100%);
+  --gradient-success: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+  --gradient-warning: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
 
   // 애니메이션
   --transition-fast: 0.15s ease-in-out;
@@ -187,7 +187,7 @@ button {
 
   // 헤더 스타일
   header {
-    background: white;
+    background: var(--primary-light);
     border-bottom: 1px solid var(--border);
     box-shadow: var(--shadow-sm);
     backdrop-filter: blur(10px);
@@ -197,10 +197,7 @@ button {
 
     nav {
       .text-xl {
-        background: var(--gradient-primary);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        color: var(--primary);
         font-weight: 700;
       }
     }
@@ -208,7 +205,7 @@ button {
 
   // 사이드바 스타일
   aside {
-    background: white;
+    background: var(--primary-light);
     border-right: 1px solid var(--border);
     box-shadow: var(--shadow-sm);
 
@@ -230,8 +227,8 @@ button {
             }
 
             &.active {
-              background: var(--gradient-primary);
-              color: white;
+              background: var(--primary);
+              color: var(--foreground);
               box-shadow: var(--shadow-md);
             }
           }
@@ -249,10 +246,7 @@ button {
       font-size: 2rem;
       font-weight: 700;
       margin-bottom: var(--spacing-sm);
-      background: var(--gradient-primary);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: var(--primary);
     }
 
     p {
@@ -298,11 +292,12 @@ button {
     }
 
     &.btn-primary {
-      background: var(--gradient-primary);
-      color: white;
+      background: var(--primary);
+      color: var(--foreground);
       box-shadow: var(--shadow-md);
 
       &:hover {
+        background: var(--primary-hover);
         transform: translateY(-2px);
         box-shadow: var(--shadow-lg);
       }
@@ -332,6 +327,13 @@ button {
         background: var(--primary-light);
         border-color: var(--primary);
         color: var(--primary);
+      }
+
+      &:disabled {
+        background: #e0e0e0;
+        color: #aaaaaa;
+        border-color: #e0e0e0;
+        cursor: not-allowed;
       }
     }
 
@@ -371,7 +373,7 @@ button {
 
   // 카드 스타일 시스템
   .card {
-    background: white;
+    background: var(--primary-light);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
     padding: var(--spacing-xl);
@@ -387,7 +389,7 @@ button {
       left: 0;
       right: 0;
       height: 4px;
-      background: var(--gradient-primary);
+      background: var(--primary);
     }
 
     &:hover {
@@ -401,10 +403,7 @@ button {
       .stat-number {
         font-size: 2.5rem;
         font-weight: 700;
-        background: var(--gradient-primary);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        color: var(--primary);
         margin-bottom: var(--spacing-sm);
       }
 
@@ -436,8 +435,8 @@ button {
 
     th {
       font-weight: 600;
-      background: var(--gradient-primary);
-      color: white;
+      background: var(--primary);
+      color: var(--foreground);
       text-transform: uppercase;
       letter-spacing: 0.05em;
       font-size: 0.75rem;
