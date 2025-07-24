@@ -46,23 +46,32 @@ async function main() {
     skipDuplicates: true,
   });
 
-  // 히스토리 샘플 데이터
+  // 히스토리 샘플 데이터 (새로운 스키마)
   await prisma.history.createMany({
     data: [
       {
-        title: "회사 설립",
-        content: "JSEO 회사 설립",
-        year: 2020,
+        year: "2020",
+        description: "JSEO 회사 설립 - 혁신적인 기술 솔루션으로 시작",
+        sortOrder: 1,
+        isActive: true,
       },
       {
-        title: "시리즈 A 투자",
-        content: "10억원 시리즈 A 투자 유치",
-        year: 2022,
+        year: "2022",
+        description: "10억원 시리즈 A 투자 유치 - 급속한 성장의 시작",
+        sortOrder: 2,
+        isActive: true,
       },
       {
-        title: "해외 진출",
-        content: "동남아시아 시장 진출",
-        year: 2023,
+        year: "2023",
+        description: "동남아시아 시장 진출 - 글로벌 확장의 첫 걸음",
+        sortOrder: 3,
+        isActive: true,
+      },
+      {
+        year: "2024",
+        description: "AI 기술 도입 및 서비스 고도화 - 미래 기술 선도",
+        sortOrder: 4,
+        isActive: true,
       },
     ],
     skipDuplicates: true,

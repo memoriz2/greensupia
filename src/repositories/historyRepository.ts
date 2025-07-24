@@ -90,14 +90,17 @@ export class HistoryRepository
         where.year = filters.year;
       }
 
+      if (filters.isActive !== undefined) {
+        where.isActive = filters.isActive;
+      }
+
       if (filters.search) {
         where.OR = [
-          { title: { contains: filters.search, mode: "insensitive" } },
-          { content: { contains: filters.search, mode: "insensitive" } },
+          { description: { contains: filters.search, mode: "insensitive" } },
         ];
       }
 
-      let orderBy: { [key: string]: "asc" | "desc" } = { year: "desc" };
+      let orderBy: { [key: string]: "asc" | "desc" } = { sortOrder: "asc" };
       if (filters.sortBy) {
         orderBy = { [filters.sortBy]: filters.sortOrder || "desc" };
       }
@@ -112,8 +115,8 @@ export class HistoryRepository
   }
 
   async findByYearRange(
-    startYear: number,
-    endYear: number
+    startYear: string,
+    endYear: string
   ): Promise<History[]> {
     try {
       return await prisma.history.findMany({
@@ -123,7 +126,7 @@ export class HistoryRepository
             lte: endYear,
           },
         },
-        orderBy: { year: "desc" },
+        orderBy: { sortOrder: "asc" },
       });
     } catch (error) {
       throw new Error(`Failed to fetch histories by year range: ${error}`);

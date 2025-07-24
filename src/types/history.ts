@@ -1,28 +1,32 @@
 export interface History {
   id: number;
-  year: number;
-  title: string;
-  content: string;
+  year: string;
+  description: string;
+  sortOrder: number;
+  isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
 
 export interface CreateHistoryRequest {
-  year: number;
-  title: string;
-  content: string;
+  year: string;
+  description: string;
+  sortOrder?: number;
+  isActive?: boolean;
 }
 
 export interface UpdateHistoryRequest {
-  year?: number;
-  title?: string;
-  content?: string;
+  year?: string;
+  description?: string;
+  sortOrder?: number;
+  isActive?: boolean;
 }
 
 export interface HistoryFilters {
-  year?: number;
+  year?: string;
   search?: string;
-  sortBy?: "createdAt" | "updatedAt" | "year" | "title";
+  isActive?: boolean;
+  sortBy?: "createdAt" | "updatedAt" | "year" | "sortOrder";
   sortOrder?: "asc" | "desc";
 }
 

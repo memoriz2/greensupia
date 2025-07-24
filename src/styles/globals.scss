@@ -12,6 +12,8 @@
 @use "components/header";
 @use "components/organization";
 @use "components/pagination";
+@use "components/toggle-switch";
+@use "components/modal";
 
 // CSS 변수 정의 - 백조 브랜드 컬러 팔레트
 :root {

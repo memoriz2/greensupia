@@ -141,8 +141,8 @@ export class HistoryService {
   }
 
   async getHistoriesByYearRange(
-    startYear: number,
-    endYear: number
+    startYear: string,
+    endYear: string
   ): Promise<ApiResponse<History[]>> {
     try {
       const histories = await this.historyRepository.findByYearRange(
@@ -165,8 +165,8 @@ export class HistoryService {
   async getHistoryStats(): Promise<
     ApiResponse<{
       total: number;
-      yearRange: { min: number; max: number };
-      yearStats: { [key: number]: number };
+      yearRange: { min: string; max: string };
+      yearStats: { [key: string]: number };
       recentHistories: History[];
     }>
   > {
@@ -176,11 +176,11 @@ export class HistoryService {
       const total = allHistories.length;
       const years = allHistories.map((history) => history.year);
       const yearRange = {
-        min: Math.min(...years),
-        max: Math.max(...years),
+        min: years.reduce((min, year) => (year < min ? year : min), years[0]),
+        max: years.reduce((max, year) => (year > max ? year : max), years[0]),
       };
 
-      const yearStats: { [key: number]: number } = {};
+      const yearStats: { [key: string]: number } = {};
       years.forEach((year) => {
         yearStats[year] = (yearStats[year] || 0) + 1;
       });

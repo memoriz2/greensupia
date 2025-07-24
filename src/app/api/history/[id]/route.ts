@@ -4,55 +4,37 @@ import { UpdateHistoryRequest } from "@/types/history";
 
 const historyService = new HistoryService();
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  const { id } = await params;
-  try {
-    const historyId = parseInt(id);
-
-    if (isNaN(historyId)) {
-      return NextResponse.json({ error: "Invalid ID format" }, { status: 400 });
-    }
-
-    const result = await historyService.getHistoryById(historyId);
-
-    if (!result.success) {
-      return NextResponse.json({ error: result.error }, { status: 404 });
-    }
-
-    return NextResponse.json(result.data, { status: 200 });
-  } catch {
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
-  }
-}
-
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
-  const { id } = await params;
   try {
-    const historyId = parseInt(id);
-
-    if (isNaN(historyId)) {
-      return NextResponse.json({ error: "Invalid ID format" }, { status: 400 });
+    const id = parseInt(params.id);
+    if (isNaN(id)) {
+      return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
     }
 
     const body: UpdateHistoryRequest = await request.json();
 
-    const result = await historyService.updateHistory(historyId, body);
+    // 연도 유효성 검사
+    if (body.year) {
+      const yearPattern = /^(19|20)\d{2}$/;
+      if (!yearPattern.test(body.year)) {
+        return NextResponse.json(
+          { error: "Valid year is required (1900-2099)" },
+          { status: 400 }
+        );
+      }
+    }
 
+    const result = await historyService.updateHistory(id, body);
     if (!result.success) {
-      return NextResponse.json({ error: result.error }, { status: 404 });
+      return NextResponse.json({ error: result.error }, { status: 500 });
     }
 
     return NextResponse.json(result.data, { status: 200 });
-  } catch {
+  } catch (error) {
+    console.error("History update error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -62,27 +44,25 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
-  const { id } = await params;
   try {
-    const historyId = parseInt(id);
-
-    if (isNaN(historyId)) {
-      return NextResponse.json({ error: "Invalid ID format" }, { status: 400 });
+    const id = parseInt(params.id);
+    if (isNaN(id)) {
+      return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
     }
 
-    const result = await historyService.deleteHistory(historyId);
-
+    const result = await historyService.deleteHistory(id);
     if (!result.success) {
-      return NextResponse.json({ error: result.error }, { status: 404 });
+      return NextResponse.json({ error: result.error }, { status: 500 });
     }
 
     return NextResponse.json(
       { message: "History deleted successfully" },
       { status: 200 }
     );
-  } catch {
+  } catch (error) {
+    console.error("History delete error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

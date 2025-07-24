@@ -23,8 +23,8 @@ export async function GET(request: NextRequest) {
     const endYear = searchParams.get("endYear");
     if (startYear && endYear) {
       const result = await historyService.getHistoriesByYearRange(
-        parseInt(startYear),
-        parseInt(endYear)
+        startYear,
+        endYear
       );
       if (!result.success) {
         return NextResponse.json({ error: result.error }, { status: 500 });
@@ -40,10 +40,10 @@ export async function GET(request: NextRequest) {
 
     if (year || search || sortBy || sortOrder) {
       const filters = {
-        ...(year && { year: parseInt(year) }),
+        ...(year && { year }),
         ...(search && { search }),
         ...(sortBy && {
-          sortBy: sortBy as "year" | "createdAt" | "updatedAt" | "title",
+          sortBy: sortBy as "year" | "createdAt" | "updatedAt" | "sortOrder",
         }),
         ...(sortOrder && { sortOrder: sortOrder as "asc" | "desc" }),
       };
@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: result.error }, { status: 500 });
     }
 
-    return NextResponse.json(result.data, { status: 200 });
+    return NextResponse.json({ data: result.data }, { status: 200 });
   } catch (error) {
     console.error("History API 에러: ", error);
     return NextResponse.json(
@@ -74,32 +74,42 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body: CreateHistoryRequest = await request.json();
+    console.log("POST 요청 받은 데이터:", body);
 
-    if (!body.title || body.title.trim().length === 0) {
-      return NextResponse.json({ error: "Title is required" }, { status: 400 });
+    if (!body.year || body.year.trim().length === 0) {
+      console.log("연도 누락 에러");
+      return NextResponse.json({ error: "Year is required" }, { status: 400 });
     }
 
-    if (!body.content || body.content.trim().length === 0) {
+    if (!body.description || body.description.trim().length === 0) {
+      console.log("설명 누락 에러");
       return NextResponse.json(
-        { error: "Content is required" },
+        { error: "Description is required" },
         { status: 400 }
       );
     }
 
-    if (body.year === undefined || body.year < 1900 || body.year > 2100) {
+    // 연도 유효성 검사 (문자열로 처리)
+    const yearPattern = /^(19|20)\d{2}$/;
+    if (!yearPattern.test(body.year)) {
+      console.log("연도 형식 에러:", body.year);
       return NextResponse.json(
-        { error: "Valid year is required (1900-2100)" },
+        { error: "Valid year is required (1900-2099)" },
         { status: 400 }
       );
     }
 
+    console.log("유효성 검사 통과, 서비스 호출");
     const result = await historyService.createHistory(body);
     if (!result.success) {
+      console.log("서비스 에러:", result.error);
       return NextResponse.json({ error: result.error }, { status: 500 });
     }
 
+    console.log("생성 성공:", result.data);
     return NextResponse.json(result.data, { status: 201 });
-  } catch {
+  } catch (error) {
+    console.error("POST 요청 처리 중 에러:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
