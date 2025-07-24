@@ -23,11 +23,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 파일 크기 검증 (5MB 제한)
-    const maxSize = 5 * 1024 * 1024; // 5MB
+    // 파일 크기 검증 (50MB 제한)
+    const maxSize = 50 * 1024 * 1024; // 50MB
     if (file.size > maxSize) {
       return NextResponse.json(
-        { error: "파일 크기는 5MB 이하여야 합니다." },
+        { error: "파일 크기는 50MB 이하여야 합니다." },
         { status: 400 }
       );
     }

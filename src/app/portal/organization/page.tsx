@@ -60,6 +60,21 @@ export default function OrganizationPage() {
       setUploading(true);
       setUploadError(null);
 
+      // 새 조직도를 활성화하려는 경우, 기존 활성 조직도들을 모두 비활성화
+      const activeCharts =
+        organizationCharts?.filter((chart) => chart.isActive) || [];
+      for (const activeChart of activeCharts) {
+        await fetch(`/api/organization/${activeChart.id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            isActive: false,
+          }),
+        });
+      }
+
       const formData = new FormData();
       formData.append("imageFile", file);
       formData.append("isActive", "true");
@@ -90,6 +105,24 @@ export default function OrganizationPage() {
 
   const handleToggleActive = async (id: number, currentActive: boolean) => {
     try {
+      // 비활성 상태에서 활성화하려는 경우, 기존 활성 조직도들을 모두 비활성화
+      if (!currentActive) {
+        const activeCharts =
+          organizationCharts?.filter((chart) => chart.isActive) || [];
+        for (const activeChart of activeCharts) {
+          await fetch(`/api/organization/${activeChart.id}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              isActive: false,
+            }),
+          });
+        }
+      }
+
+      // 현재 조직도 토글
       const response = await fetch(`/api/organization/${id}`, {
         method: "PUT",
         headers: {

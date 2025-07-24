@@ -63,3 +63,37 @@ model BannerNews {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+// 추가 모델들
+model Video {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?  @db.Text
+  videoUrl    String   @db.Text
+  thumbnailUrl String?
+  duration    Int?     // 초 단위
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Banner {
+  id        Int      @id @default(autoincrement())
+  title     String
+  imageUrl  String   @db.Text
+  linkUrl   String?
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Greeting {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String   @db.LongText // HTML 콘텐츠를 위한 LongText
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

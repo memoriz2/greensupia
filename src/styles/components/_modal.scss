@@ -113,11 +113,34 @@
       &::placeholder {
         color: #9ca3af;
       }
+
+      &.error {
+        border-color: #ef4444;
+        box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+
+        &:focus {
+          border-color: #ef4444;
+          box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+        }
+      }
     }
 
     textarea {
       resize: vertical;
       min-height: 100px;
+    }
+
+    .error-message {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #ef4444;
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+
+      .error-icon {
+        font-size: 1rem;
+      }
     }
 
     .help-text {

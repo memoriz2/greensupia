@@ -39,6 +39,15 @@ export default function AdminLayout({
                 <a href="/portal">📊 대시보드</a>
               </li>
               <li>
+                <a href="/portal/videos">🎥 비디오 관리</a>
+              </li>
+              <li>
+                <a href="/portal/banners">🖼️ 배너 관리</a>
+              </li>
+              <li>
+                <a href="/portal/greetings">💬 인사말 관리</a>
+              </li>
+              <li>
                 <a href="/portal/organization">🏢 조직도 관리</a>
               </li>
               <li>

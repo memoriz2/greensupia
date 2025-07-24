@@ -528,7 +528,7 @@ export default function BannerNewsPage() {
                         <div className="upload-icon">📷</div>
                         <span>이미지를 클릭하여 업로드</span>
                         <span className="upload-hint">
-                          JPG, PNG, GIF (최대 5MB)
+                          JPG, PNG, GIF (최대 50MB)
                         </span>
                       </>
                     )}

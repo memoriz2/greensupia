@@ -50,10 +50,10 @@ export const validateImageFile = (file: File): string | null => {
     return "이미지 파일만 업로드 가능합니다.";
   }
 
-  // 파일 크기 검증 (5MB 제한)
-  const maxSize = 5 * 1024 * 1024; // 5MB
+  // 파일 크기 검증 (50MB 제한)
+  const maxSize = 50 * 1024 * 1024; // 50MB
   if (file.size > maxSize) {
-    return "파일 크기는 5MB 이하여야 합니다.";
+    return "파일 크기는 50MB 이하여야 합니다.";
   }
 
   return null;
