@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE `bannernews` ADD COLUMN `endDate` DATETIME(3) NULL,
+    ADD COLUMN `linkUrl` VARCHAR(191) NULL,
+    ADD COLUMN `sortOrder` INTEGER NOT NULL DEFAULT 0,
+    ADD COLUMN `startDate` DATETIME(3) NULL;

@@ -495,6 +495,28 @@ button {
       border-bottom: 1px solid var(--border);
     }
 
+    // 테이블 내 이미지 크기 제한
+    img {
+      max-width: 60px;
+      max-height: 45px;
+      width: 60px;
+      height: 45px;
+      object-fit: cover;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+    }
+
+    // 컬럼 너비 조정
+    .thumbnail-column {
+      width: 80px;
+      min-width: 80px;
+    }
+
+    .content-column {
+      max-width: 300px;
+      word-wrap: break-word;
+    }
+
     th {
       font-weight: 600;
       background: var(--primary);

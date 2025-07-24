@@ -1,76 +1,78 @@
-import { writeFile, mkdir } from "fs/promises";
-import { join } from "path";
-import { existsSync } from "fs";
-
 export interface UploadedFile {
   fileName: string;
   filePath: string;
   fileSize: number;
 }
 
-export async function uploadImage(
-  file: File,
-  folder: string = "uploads"
-): Promise<UploadedFile> {
+export interface UploadResponse {
+  success: boolean;
+  imageUrl?: string;
+  fileName?: string;
+  error?: string;
+}
+
+export const uploadImage = async (file: File): Promise<UploadResponse> => {
   try {
-    // 파일 확장자 검증
-    const allowedTypes = [
-      "image/jpeg",
-      "image/jpg",
-      "image/png",
-      "image/gif",
-      "image/webp",
-    ];
-    if (!allowedTypes.includes(file.type)) {
-      throw new Error(
-        "지원하지 않는 파일 형식입니다. (JPEG, PNG, GIF, WebP만 지원)"
-      );
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await fetch("/api/upload", {
+      method: "POST",
+      body: formData,
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return {
+        success: false,
+        error: data.error || "업로드 중 오류가 발생했습니다.",
+      };
     }
-
-    // 파일 크기 검증 (10MB 제한)
-    const maxSize = 10 * 1024 * 1024; // 10MB
-    if (file.size > maxSize) {
-      throw new Error("파일 크기가 너무 큽니다. (최대 10MB)");
-    }
-
-    // 업로드 디렉토리 생성
-    const uploadDir = join(process.cwd(), "public", folder);
-    if (!existsSync(uploadDir)) {
-      await mkdir(uploadDir, { recursive: true });
-    }
-
-    // 파일명 생성 (중복 방지)
-    const timestamp = Date.now();
-    const randomString = Math.random().toString(36).substring(2, 15);
-    const extension = file.name.split(".").pop();
-    const fileName = `${timestamp}_${randomString}.${extension}`;
-    const filePath = join(uploadDir, fileName);
-
-    // 파일 저장
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-    await writeFile(filePath, buffer);
 
     return {
-      fileName: file.name,
-      filePath: `/${folder}/${fileName}`,
-      fileSize: file.size,
+      success: true,
+      imageUrl: data.imageUrl,
+      fileName: data.fileName,
     };
   } catch (error) {
-    console.error("파일 업로드 에러:", error);
-    throw error;
+    console.error("이미지 업로드 오류:", error);
+    return {
+      success: false,
+      error: "네트워크 오류가 발생했습니다.",
+    };
   }
-}
+};
 
-export function deleteImage(filePath: string): void {
+export const validateImageFile = (file: File): string | null => {
+  // 파일 타입 검증
+  if (!file.type.startsWith("image/")) {
+    return "이미지 파일만 업로드 가능합니다.";
+  }
+
+  // 파일 크기 검증 (5MB 제한)
+  const maxSize = 5 * 1024 * 1024; // 5MB
+  if (file.size > maxSize) {
+    return "파일 크기는 5MB 이하여야 합니다.";
+  }
+
+  return null;
+};
+
+export const deleteImage = async (filePath: string): Promise<boolean> => {
   try {
-    const fullPath = join(process.cwd(), "public", filePath.replace(/^\//, ""));
-    if (existsSync(fullPath)) {
-      import("fs/promises").then(({ unlink }) => {
-        unlink(fullPath).catch(console.error);
-      });
-    }
+    const response = await fetch("/api/upload/delete", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ filePath }),
+    });
+
+    const data = await response.json();
+    return data.success || false;
   } catch (error) {
     console.error("파일 삭제 에러:", error);
+    return false;
   }
-}
+};

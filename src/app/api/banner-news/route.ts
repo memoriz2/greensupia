@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: result.error }, { status: 500 });
     }
 
-    return NextResponse.json(result.data, { status: 200 });
+    return NextResponse.json({ data: result.data }, { status: 200 });
   } catch (error) {
     console.error("Banner News API 에러: ", error);
     return NextResponse.json(
@@ -68,6 +68,8 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body: CreateBannerNewsRequest = await request.json();
+
+    console.log("POST 요청 받은 데이터:", body);
 
     if (!body.title || body.title.trim().length === 0) {
       return NextResponse.json({ error: "Title is required" }, { status: 400 });
@@ -86,7 +88,8 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(result.data, { status: 201 });
-  } catch {
+  } catch (error) {
+    console.error("BannerNews POST error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
