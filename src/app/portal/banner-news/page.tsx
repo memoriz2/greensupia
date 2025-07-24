@@ -54,10 +54,12 @@ export default function BannerNewsPage() {
       const data = await response.json();
       console.log("배너뉴스 데이터 응답:", data);
       setBannerNews(data.data || []);
-      } catch (error) {
-    setError(
-      error instanceof Error ? error.message : "알 수 없는 오류가 발생했습니다."
-    );
+    } catch (error) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : "알 수 없는 오류가 발생했습니다."
+      );
     } finally {
       setLoading(false);
     }
@@ -340,22 +342,22 @@ export default function BannerNewsPage() {
                   <td className="thumbnail-column">
                     {news.imageUrl ? (
                       <div className="flex items-center">
-                                               <Image
-                         src={news.imageUrl}
-                         alt={news.title}
-                         width={50}
-                         height={50}
-                         className="object-cover rounded"
-                         onError={(e) => {
-                           const target = e.currentTarget as HTMLImageElement;
-                           target.style.display = "none";
-                           const errorSpan =
-                             target.nextElementSibling as HTMLElement;
-                           if (errorSpan) {
-                             errorSpan.classList.remove("hidden");
-                           }
-                         }}
-                       />
+                        <Image
+                          src={news.imageUrl}
+                          alt={news.title}
+                          width={50}
+                          height={50}
+                          className="object-cover rounded"
+                          onError={(e) => {
+                            const target = e.currentTarget as HTMLImageElement;
+                            target.style.display = "none";
+                            const errorSpan =
+                              target.nextElementSibling as HTMLElement;
+                            if (errorSpan) {
+                              errorSpan.classList.remove("hidden");
+                            }
+                          }}
+                        />
                         <span className="text-red-500 text-xs ml-1 hidden">
                           이미지 로드 실패
                         </span>
@@ -487,13 +489,13 @@ export default function BannerNewsPage() {
               <div className="image-preview-area">
                 {formData.imageUrl ? (
                   <div className="image-preview">
-                                         <Image
-                       src={formData.imageUrl}
-                       alt="미리보기"
-                       width={200}
-                       height={150}
-                       className="preview-image object-cover"
-                     />
+                    <Image
+                      src={formData.imageUrl}
+                      alt="미리보기"
+                      width={200}
+                      height={150}
+                      className="preview-image object-cover"
+                    />
                     <div className="image-actions">
                       <button
                         type="button"

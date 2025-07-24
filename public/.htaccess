@@ -1,0 +1,58 @@
+# Next.js 정적 파일 MIME 타입 설정
+<IfModule mod_mime.c>
+    AddType text/css .css
+    AddType font/woff2 .woff2
+    AddType font/woff .woff
+    AddType application/javascript .js
+    AddType image/svg+xml .svg
+    AddType image/png .png
+    AddType image/jpeg .jpg .jpeg
+    AddType image/gif .gif
+    AddType image/webp .webp
+</IfModule>
+
+# 정적 파일 캐싱 설정
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css "access plus 1 year"
+    ExpiresByType font/woff2 "access plus 1 year"
+    ExpiresByType font/woff "access plus 1 year"
+    ExpiresByType application/javascript "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
+</IfModule>
+
+# Next.js 정적 파일 경로 설정
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # _next/static 파일들에 대한 MIME 타입 강제 설정
+    RewriteRule ^_next/static/css/(.*)\.css$ - [E=CONTENT_TYPE:text/css]
+    RewriteRule ^_next/static/media/(.*)\.woff2$ - [E=CONTENT_TYPE:font/woff2]
+    
+    # Next.js 라우팅
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ /index.html [L]
+</IfModule>
+
+# 보안 헤더 설정
+<IfModule mod_headers.c>
+    # CSS 파일에 대한 Content-Type 헤더 강제 설정
+    <FilesMatch "\.css$">
+        Header set Content-Type "text/css; charset=utf-8"
+    </FilesMatch>
+    
+    # 폰트 파일에 대한 Content-Type 헤더 강제 설정
+    <FilesMatch "\.(woff|woff2)$">
+        Header set Content-Type "font/woff2; charset=utf-8"
+    </FilesMatch>
+    
+    # CORS 설정
+    Header always set Access-Control-Allow-Origin "*"
+    Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+    Header always set Access-Control-Allow-Headers "Content-Type, Authorization"
+</IfModule> 

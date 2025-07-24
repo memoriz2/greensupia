@@ -13,6 +13,29 @@ const nextConfig: NextConfig = {
   experimental: {
     // 최신 기능 활성화
   },
+  // 정적 파일 서빙 설정
+  async headers() {
+    return [
+      {
+        source: "/_next/static/css/:path*",
+        headers: [
+          {
+            key: "Content-Type",
+            value: "text/css; charset=utf-8",
+          },
+        ],
+      },
+      {
+        source: "/_next/static/media/:path*",
+        headers: [
+          {
+            key: "Content-Type",
+            value: "font/woff2; charset=utf-8",
+          },
+        ],
+      },
+    ];
+  },
   // 이미지 최적화 설정
   images: {
     remotePatterns: [
