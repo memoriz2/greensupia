@@ -209,6 +209,84 @@ npm run dev
 - `PUT /api/todos/[id]` - Todo 수정
 - `DELETE /api/todos/[id]` - Todo 삭제
 
+## 🎨 브랜드 컬러 팔레트
+
+### 백조 컨셉 브랜드 색상
+
+현재 프로젝트는 **백조에서 영감받은 골드톤과 차콜의 조화**를 기반으로 한 브랜드 컬러 팔레트를 사용합니다.
+
+#### 🎨 **메인 컬러**
+
+- **Primary**: `#F8C300` (백조 부리 골드톤)
+- **Primary Hover**: `#FFD886` (따뜻한 옐로우)
+- **Primary Light**: `#FFF5D7` (햇살 번진 감성 배경)
+- **Primary Dark**: `#E6B800` (진한 골드)
+
+#### 🎨 **배경 컬러**
+
+- **Background**: `#F7F7F7` (백조 깃털 순백톤)
+- **Foreground**: `#2E2E2E` (구조적 차콜 톤)
+- **Muted**: `#AAAAAA` (중성 회색)
+
+#### 🎨 **UI 컴포넌트 색상**
+
+- **Header**: `#2C3E50` (차콜) 배경 + `#F8C300` (골드) 글씨
+- **Sidebar**: `#2C3E50` (차콜) 배경 + `#F7F7F7` (순백톤) 글씨
+- **Card Background**: `#F7F7F7` (백조 깃털 순백톤)
+- **Card Hover**: `#FFF5D7` (햇살 번진 감성 배경)
+- **Organization List Item**: `#F7F7F7` 배경 + `#FFF5D7` 호버
+
+#### 🎨 **상태 색상**
+
+- **Success**: `#48BB78` (성공 그린)
+- **Warning**: `#ED8936` (경고 오렌지)
+- **Error**: `#F56565` (에러 레드)
+- **Info**: `#4299E1` (정보 블루)
+
+#### 🎨 **그라데이션**
+
+- **Primary Gradient**: `linear-gradient(135deg, #F8C300 0%, #FFD886 100%)`
+- **Secondary Gradient**: `linear-gradient(135deg, #FFF5D7 0%, #F8C300 100%)`
+
+### 🎨 **색상 적용 예시**
+
+```scss
+// CSS 변수 정의
+:root {
+  --primary: #f8c300;
+  --primary-hover: #ffd886;
+  --primary-light: #fff5d7;
+  --background: #f7f7f7;
+  --foreground: #2e2e2e;
+  --sidebar-bg: #2c3e50;
+  --sidebar-text: #f7f7f7;
+}
+
+// 컴포넌트별 적용
+.admin-portal {
+  header {
+    background: var(--sidebar-bg); // 차콜
+    color: var(--primary); // 골드
+  }
+
+  aside {
+    background: var(--sidebar-bg); // 차콜
+    color: var(--sidebar-text); // 순백톤
+  }
+
+  .card {
+    background: #f7f7f7; // 백조 깃털 순백톤
+  }
+}
+```
+
+### 🎨 **디자인 철학**
+
+- **백조의 우아함**: 깔끔하고 세련된 골드톤으로 브랜드 아이덴티티 표현
+- **차콜의 안정감**: 헤더와 사이드바에 차콜을 사용하여 전문적이고 신뢰감 있는 느낌
+- **순백톤의 깔끔함**: 메인 배경과 카드에 순백톤을 사용하여 가독성과 시각적 편안함 제공
+- **햇살톤의 따뜻함**: 호버 효과에 햇살톤을 사용하여 사용자 경험 향상
+
 ## 🎨 실무 개발 원칙
 
 ### 💼 **엔터프라이즈 개발 철학**

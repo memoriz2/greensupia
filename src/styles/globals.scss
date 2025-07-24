@@ -21,11 +21,13 @@
   --muted: #aaaaaa;
   --muted-foreground: #aaaaaa;
 
-  // 브랜드 색상 (백조에서 영감받은 골드톤)
+  // 브랜드 색상 (백조 컨셉 - 골드 + 차콜 조화)
   --primary: #f8c300;
   --primary-hover: #ffd886;
   --primary-light: #fff5d7;
   --primary-dark: #e6b800;
+  --sidebar-bg: #2c3e50;
+  --sidebar-text: #f7f7f7;
 
   // 상태 색상
   --success: #48bb78;
@@ -184,43 +186,91 @@ button {
 .admin-portal {
   min-height: 100vh;
   background: var(--background);
+  display: flex;
+  flex-direction: column;
 
   // 헤더 스타일
   header {
-    background: var(--primary-light);
+    background: var(--sidebar-bg);
     border-bottom: 1px solid var(--border);
     box-shadow: var(--shadow-sm);
     backdrop-filter: blur(10px);
     position: sticky;
     top: 0;
     z-index: 100;
+    height: 64px;
 
     nav {
+      height: 100%;
+
+      .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 100%;
+        padding: 0 var(--spacing-xl);
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .header-left {
+        display: flex;
+        align-items: center;
+      }
+
+      .header-right {
+        display: flex;
+        align-items: center;
+      }
+
       .text-xl {
         color: var(--primary);
         font-weight: 700;
+        font-size: 1.25rem;
+        margin: 0;
+        padding: 0;
+      }
+
+      .user-info {
+        color: var(--sidebar-text);
+        font-size: 0.875rem;
+        font-weight: 500;
       }
     }
   }
 
   // 사이드바 스타일
   aside {
-    background: var(--primary-light);
+    background: var(--sidebar-bg);
     border-right: 1px solid var(--border);
     box-shadow: var(--shadow-sm);
+    width: 250px;
+    flex-shrink: 0;
 
     nav {
+      padding: var(--spacing-lg) 0;
+
       ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+
         li {
+          margin: 0;
+
           a {
+            display: block;
             position: relative;
             border-radius: var(--radius);
             margin: var(--spacing-xs) var(--spacing-sm);
+            padding: var(--spacing-sm) var(--spacing-lg);
             font-weight: 500;
             transition: var(--transition-normal);
+            color: var(--sidebar-text);
+            text-decoration: none;
 
             &:hover {
-              background: var(--primary-light);
+              background: rgba(255, 255, 255, 0.1);
               color: var(--primary);
               transform: translateX(4px);
               box-shadow: var(--shadow-sm);
@@ -238,9 +288,19 @@ button {
   }
 
   // 메인 콘텐츠 영역
+  .main-container {
+    display: flex;
+    flex: 1;
+    min-height: calc(
+      100vh - 64px - 60px
+    ); // viewport 높이에서 header와 footer 높이를 뺀 값
+  }
+
   main {
     background: var(--background);
     padding: var(--spacing-xl);
+    flex: 1;
+    overflow-y: auto;
 
     h1 {
       font-size: 2rem;
@@ -373,7 +433,7 @@ button {
 
   // 카드 스타일 시스템
   .card {
-    background: var(--primary-light);
+    background: #f7f7f7;
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
     padding: var(--spacing-xl);
@@ -584,6 +644,40 @@ button {
   .hidden {
     display: none !important;
   }
+
+  // 푸터 스타일
+  footer {
+    background: var(--sidebar-bg);
+    color: var(--sidebar-text);
+    padding: var(--spacing-lg);
+    text-align: center;
+    border-top: 1px solid var(--border);
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    font-weight: 500;
+
+    .footer-content {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+
+      .footer-logo {
+        color: var(--primary);
+        font-weight: 700;
+      }
+
+      .footer-text {
+        color: var(--sidebar-text);
+      }
+
+      .footer-year {
+        color: var(--muted);
+      }
+    }
+  }
 }
 
 // 조직도 관리 페이지 스타일
@@ -647,10 +741,11 @@ button {
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
       padding: var(--spacing-md);
+      background-color: #f7f7f7;
       transition: background-color var(--transition-fast);
 
       &:hover {
-        background-color: var(--background);
+        background-color: #fff5d7;
       }
 
       &__content {

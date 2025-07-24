@@ -64,10 +64,11 @@
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
       padding: var(--spacing-md);
+      background-color: #f7f7f7;
       transition: background-color var(--transition-fast);
 
       &:hover {
-        background-color: var(--background);
+        background-color: #fff5d7;
       }
     }
 
