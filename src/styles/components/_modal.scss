@@ -291,6 +291,24 @@
   }
 }
 
+// 확인 모달 스타일
+.modal-confirm {
+  text-align: center;
+
+  p {
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  .modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+}
+
 @keyframes spin {
   0% {
     transform: rotate(0deg);

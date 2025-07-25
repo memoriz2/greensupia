@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import { Banner } from "@/types/banner";
 import ToggleSwitch from "@/components/ToggleSwitch";
 import Modal from "@/components/Modal";
@@ -408,13 +409,14 @@ export default function BannerManagementPage() {
                   <td>
                     {banner.imageUrl ? (
                       <div className="flex items-center">
-                        <img
+                        <Image
                           src={banner.imageUrl}
                           alt={banner.title}
-                          className="w-16 h-12 object-cover rounded"
-                          onError={(e) => {
-                            const target = e.currentTarget as HTMLImageElement;
-                            target.style.display = "none";
+                          width={64}
+                          height={48}
+                          className="object-cover rounded"
+                          onError={() => {
+                            // 에러 시 이미지 숨김 처리
                           }}
                         />
                       </div>
@@ -546,13 +548,14 @@ export default function BannerManagementPage() {
               )}
               {formData.imageUrl && (
                 <div className="mt-2 w-1/2 h-20 bg-gray-100 rounded border flex items-center justify-center overflow-hidden mx-auto">
-                  <img
+                  <Image
                     src={formData.imageUrl}
                     alt="미리보기"
+                    width={200}
+                    height={80}
                     className="w-full h-full object-cover"
-                    onError={(e) => {
-                      const target = e.currentTarget as HTMLImageElement;
-                      target.style.display = "none";
+                    onError={() => {
+                      // 에러 시 이미지 숨김 처리
                     }}
                   />
                 </div>
@@ -678,13 +681,14 @@ export default function BannerManagementPage() {
               )}
               {formData.imageUrl && (
                 <div className="mt-2 w-1/2 h-20 bg-gray-100 rounded border flex items-center justify-center overflow-hidden mx-auto">
-                  <img
+                  <Image
                     src={formData.imageUrl}
                     alt="미리보기"
+                    width={200}
+                    height={80}
                     className="w-full h-full object-cover"
-                    onError={(e) => {
-                      const target = e.currentTarget as HTMLImageElement;
-                      target.style.display = "none";
+                    onError={() => {
+                      // 에러 시 이미지 숨김 처리
                     }}
                   />
                 </div>

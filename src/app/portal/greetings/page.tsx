@@ -6,6 +6,7 @@ import ToggleSwitch from "@/components/ToggleSwitch";
 import Modal from "@/components/Modal";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import ErrorMessage from "@/components/ErrorMessage";
+import RichTextEditor from "@/components/RichTextEditor";
 
 export default function GreetingManagementPage() {
   const [greetings, setGreetings] = useState<Greeting[]>([]);
@@ -41,6 +42,7 @@ export default function GreetingManagementPage() {
         throw new Error("인사말 목록을 가져오는데 실패했습니다.");
       }
       const data = await response.json();
+      console.log("Greetings API response:", data);
       setGreetings(data.content || []);
     } catch (err) {
       setError(
@@ -55,9 +57,22 @@ export default function GreetingManagementPage() {
     fetchGreetings();
   }, []);
 
-  // 토글 활성화/비활성화
+  // 토글 활성화/비활성화 (활성화는 1개만 가능)
   const handleToggleActive = async (greeting: Greeting) => {
     try {
+      // 활성화하려는 경우, 다른 활성화된 인사말이 있는지 확인
+      if (!greeting.isActive) {
+        const activeGreetings = greetings.filter((g) => g.isActive);
+        if (activeGreetings.length > 0) {
+          showModal(
+            "활성화된 인사말이 이미 존재합니다. 다른 인사말을 비활성화한 후 다시 시도해주세요.",
+            undefined,
+            false
+          );
+          return;
+        }
+      }
+
       const response = await fetch(`/api/greetings/${greeting.id}/toggle`, {
         method: "PUT",
       });
@@ -79,6 +94,19 @@ export default function GreetingManagementPage() {
     if (!formData.title.trim() || !formData.content.trim()) {
       showModal("제목과 내용을 입력해주세요.");
       return;
+    }
+
+    // 활성화하려는 경우, 다른 활성화된 인사말이 있는지 확인
+    if (formData.isActive) {
+      const activeGreetings = greetings.filter((g) => g.isActive);
+      if (activeGreetings.length > 0) {
+        showModal(
+          "활성화된 인사말이 이미 존재합니다. 다른 인사말을 비활성화한 후 다시 시도해주세요.",
+          undefined,
+          false
+        );
+        return;
+      }
     }
 
     try {
@@ -122,6 +150,21 @@ export default function GreetingManagementPage() {
     ) {
       showModal("제목과 내용을 입력해주세요.");
       return;
+    }
+
+    // 활성화하려는 경우, 다른 활성화된 인사말이 있는지 확인 (현재 편집 중인 인사말 제외)
+    if (formData.isActive) {
+      const otherActiveGreetings = greetings.filter(
+        (g) => g.isActive && g.id !== editingGreeting.id
+      );
+      if (otherActiveGreetings.length > 0) {
+        showModal(
+          "활성화된 인사말이 이미 존재합니다. 다른 인사말을 비활성화한 후 다시 시도해주세요.",
+          undefined,
+          false
+        );
+        return;
+      }
     }
 
     try {
@@ -292,130 +335,157 @@ export default function GreetingManagementPage() {
         )}
       </div>
 
+      {/* 통계 섹션 */}
+      <div className="greeting-stats">
+        <div className="card card-stats">
+          <div className="stat-number">{greetings.length}</div>
+          <div className="stat-label">전체 인사말</div>
+        </div>
+        <div className="card card-stats">
+          <div className="stat-number">
+            {greetings.filter((g) => g.isActive).length}
+          </div>
+          <div className="stat-label">활성 인사말</div>
+        </div>
+        <div className="card card-stats">
+          <div className="stat-number">
+            {greetings.filter((g) => !g.isActive).length}
+          </div>
+          <div className="stat-label">비활성 인사말</div>
+        </div>
+      </div>
+
       {/* 추가 폼 모달 */}
       {showAddForm && (
-        <Modal isOpen={showAddForm} onClose={() => setShowAddForm(false)}>
-          <div className="modal-content">
-            <h2>새 인사말 추가</h2>
-            <form onSubmit={handleAddGreeting}>
-              <div className="form-group">
-                <label htmlFor="title">제목 *</label>
+        <Modal
+          isOpen={showAddForm}
+          onClose={() => setShowAddForm(false)}
+          title="새 인사말 추가"
+          size="large"
+        >
+          <form onSubmit={handleAddGreeting} className="modal-form">
+            <div className="form-group">
+              <label htmlFor="title">제목 *</label>
+              <input
+                type="text"
+                id="title"
+                name="title"
+                value={formData.title}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="content">내용 *</label>
+              <RichTextEditor
+                value={formData.content}
+                onChange={(content) =>
+                  setFormData((prev) => ({ ...prev, content }))
+                }
+                placeholder="인사말 내용을 입력하세요..."
+                height={300}
+              />
+            </div>
+            <div className="form-group">
+              <label>
                 <input
-                  type="text"
-                  id="title"
-                  name="title"
-                  value={formData.title}
+                  type="checkbox"
+                  name="isActive"
+                  checked={formData.isActive}
                   onChange={handleInputChange}
-                  required
                 />
-              </div>
-              <div className="form-group">
-                <label htmlFor="content">내용 *</label>
-                <textarea
-                  id="content"
-                  name="content"
-                  value={formData.content}
-                  onChange={handleInputChange}
-                  rows={10}
-                  required
-                  placeholder="HTML 태그를 사용할 수 있습니다. 예: <p>안녕하세요!</p>"
-                />
-              </div>
-              <div className="form-group">
-                <label>
-                  <input
-                    type="checkbox"
-                    name="isActive"
-                    checked={formData.isActive}
-                    onChange={handleInputChange}
-                  />
-                  활성화
-                </label>
-              </div>
-              <div className="form-actions">
-                <button type="submit" className="submit-button">
-                  추가
-                </button>
-                <button
-                  type="button"
-                  className="cancel-button"
-                  onClick={() => setShowAddForm(false)}
-                >
-                  취소
-                </button>
-              </div>
-            </form>
-          </div>
+                활성화
+              </label>
+            </div>
+            <div className="form-actions">
+              <button type="submit" className="submit-btn">
+                추가
+              </button>
+              <button
+                type="button"
+                className="cancel-btn"
+                onClick={() => setShowAddForm(false)}
+              >
+                취소
+              </button>
+            </div>
+          </form>
         </Modal>
       )}
 
       {/* 편집 폼 모달 */}
       {showEditForm && editingGreeting && (
-        <Modal isOpen={showEditForm} onClose={() => setShowEditForm(false)}>
-          <div className="modal-content">
-            <h2>인사말 수정</h2>
-            <form onSubmit={handleEditGreeting}>
-              <div className="form-group">
-                <label htmlFor="edit-title">제목 *</label>
+        <Modal
+          isOpen={showEditForm}
+          onClose={() => setShowEditForm(false)}
+          title="인사말 수정"
+          size="large"
+        >
+          <form onSubmit={handleEditGreeting} className="modal-form">
+            <div className="form-group">
+              <label htmlFor="edit-title">제목 *</label>
+              <input
+                type="text"
+                id="edit-title"
+                name="title"
+                value={formData.title}
+                onChange={handleInputChange}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="edit-content">내용 *</label>
+              <RichTextEditor
+                value={formData.content}
+                onChange={(content) =>
+                  setFormData((prev) => ({ ...prev, content }))
+                }
+                placeholder="인사말 내용을 입력하세요..."
+                height={300}
+              />
+            </div>
+            <div className="form-group">
+              <label>
                 <input
-                  type="text"
-                  id="edit-title"
-                  name="title"
-                  value={formData.title}
+                  type="checkbox"
+                  name="isActive"
+                  checked={formData.isActive}
                   onChange={handleInputChange}
-                  required
                 />
-              </div>
-              <div className="form-group">
-                <label htmlFor="edit-content">내용 *</label>
-                <textarea
-                  id="edit-content"
-                  name="content"
-                  value={formData.content}
-                  onChange={handleInputChange}
-                  rows={10}
-                  required
-                  placeholder="HTML 태그를 사용할 수 있습니다. 예: <p>안녕하세요!</p>"
-                />
-              </div>
-              <div className="form-group">
-                <label>
-                  <input
-                    type="checkbox"
-                    name="isActive"
-                    checked={formData.isActive}
-                    onChange={handleInputChange}
-                  />
-                  활성화
-                </label>
-              </div>
-              <div className="form-actions">
-                <button type="submit" className="submit-button">
-                  수정
-                </button>
-                <button
-                  type="button"
-                  className="cancel-button"
-                  onClick={() => setShowEditForm(false)}
-                >
-                  취소
-                </button>
-              </div>
-            </form>
-          </div>
+                활성화
+              </label>
+            </div>
+            <div className="form-actions">
+              <button type="submit" className="submit-btn">
+                수정
+              </button>
+              <button
+                type="button"
+                className="cancel-btn"
+                onClick={() => setShowEditForm(false)}
+              >
+                취소
+              </button>
+            </div>
+          </form>
         </Modal>
       )}
 
       {/* 확인 모달 */}
-      <Modal isOpen={modal.isOpen} onClose={closeModal}>
-        <div className="modal-content">
+      <Modal
+        isOpen={modal.isOpen}
+        onClose={closeModal}
+        title="알림"
+        size="small"
+      >
+        <div className="modal-confirm">
           <p>{modal.message}</p>
           <div className="modal-actions">
-            <button onClick={handleConfirm} className="confirm-button">
+            <button onClick={handleConfirm} className="submit-btn">
               확인
             </button>
             {modal.showCancel && (
-              <button onClick={closeModal} className="cancel-button">
+              <button onClick={closeModal} className="cancel-btn">
                 취소
               </button>
             )}

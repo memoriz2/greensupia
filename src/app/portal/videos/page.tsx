@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { Video } from "@/types/video";
 import ToggleSwitch from "@/components/ToggleSwitch";
 import Modal from "@/components/Modal";
@@ -474,13 +475,14 @@ export default function VideoManagementPage() {
                   <td>
                     {video.thumbnailUrl ? (
                       <div className="flex items-center">
-                        <img
+                        <Image
                           src={video.thumbnailUrl}
                           alt={video.title}
-                          className="w-12 h-12 object-cover rounded"
-                          onError={(e) => {
-                            const target = e.currentTarget as HTMLImageElement;
-                            target.style.display = "none";
+                          width={48}
+                          height={48}
+                          className="object-cover rounded"
+                          onError={() => {
+                            // 에러 시 이미지 숨김 처리
                           }}
                         />
                       </div>

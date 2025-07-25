@@ -49,7 +49,7 @@ export default function ContactPage() {
         budget: "",
         message: "",
       });
-    } catch (error) {
+    } catch {
       setSubmitStatus("error");
     } finally {
       setIsSubmitting(false);

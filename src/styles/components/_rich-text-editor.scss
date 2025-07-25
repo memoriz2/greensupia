@@ -1,0 +1,207 @@
+.rich-text-editor {
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  background: var(--background-light);
+
+  .editor-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 12px;
+    background: var(--background);
+    border-bottom: 1px solid var(--border-color);
+    flex-wrap: wrap;
+
+    .toolbar-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 32px;
+      height: 32px;
+      padding: 4px 8px;
+      border: 1px solid transparent;
+      border-radius: var(--radius-sm);
+      background: transparent;
+      color: var(--text-primary);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition-fast);
+
+      &:hover {
+        background: var(--primary-light);
+        border-color: var(--primary);
+        color: var(--primary);
+      }
+
+      &:active {
+        background: var(--primary);
+        color: var(--foreground);
+      }
+
+      strong {
+        font-weight: 700;
+      }
+
+      em {
+        font-style: italic;
+      }
+
+      u {
+        text-decoration: underline;
+      }
+    }
+
+    .toolbar-separator {
+      width: 1px;
+      height: 20px;
+      background: var(--border-color);
+      margin: 0 4px;
+    }
+
+    .toolbar-select {
+      padding: 4px 8px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      background: var(--background-light);
+      color: var(--text-primary);
+      font-size: 12px;
+      min-width: 80px;
+      cursor: pointer;
+      transition: var(--transition-fast);
+
+      &:hover {
+        border-color: var(--primary);
+      }
+
+      &:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 2px var(--primary-light);
+      }
+
+      option {
+        background: var(--background-light);
+        color: var(--text-primary);
+        padding: 4px 8px;
+      }
+    }
+  }
+
+  [contenteditable] {
+    &[data-placeholder]:empty:before {
+      content: attr(data-placeholder);
+      color: var(--muted-foreground);
+      pointer-events: none;
+      position: absolute;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px var(--primary-light);
+    }
+
+    // 동적 색상/하이라이트 클래스 우선 적용 (상위 스타일 간섭 방지)
+    span[class*="dynamic-text-"] {
+      color: unset !important; /* 상위 color 무효화 */
+    }
+
+    span[class*="dynamic-highlight-"] {
+      background-color: unset !important; /* 상위 background-color 무효화 */
+    }
+
+    // 더 강력한 동적 클래스 우선순위
+    .rich-text-editor [contenteditable] span[class*="dynamic-text-"] {
+      color: unset !important;
+    }
+
+    .rich-text-editor [contenteditable] span[class*="dynamic-highlight-"] {
+      background-color: unset !important;
+    }
+
+    // 병합된 클래스 스타일 (색상 + 하이라이트 동시 적용)
+    span[class*="dynamic-text-"][class*="dynamic-highlight-"] {
+      color: unset !important;
+      background-color: unset !important;
+    }
+
+    // zero-width space 스타일
+    span:empty {
+      display: inline-block;
+      width: 0;
+      height: 0;
+      overflow: hidden;
+    }
+
+    // 에디터 내부 요소 스타일
+    img {
+      max-width: 100%;
+      height: auto;
+      border-radius: var(--radius-sm);
+    }
+
+    a {
+      color: var(--primary);
+      text-decoration: underline;
+
+      &:hover {
+        color: var(--primary-hover);
+      }
+    }
+
+    ul,
+    ol {
+      padding-left: 20px;
+      margin: 8px 0;
+    }
+
+    li {
+      margin: 4px 0;
+    }
+
+    p {
+      margin: 8px 0;
+    }
+  }
+}
+
+// 다크 모드 지원
+@media (prefers-color-scheme: dark) {
+  .rich-text-editor {
+    .editor-toolbar {
+      background: var(--background);
+      border-bottom-color: var(--border);
+
+      .toolbar-btn {
+        color: var(--text-primary);
+
+        &:hover {
+          background: var(--primary-light);
+          border-color: var(--primary);
+          color: var(--primary);
+        }
+      }
+
+      .toolbar-separator {
+        background: var(--border);
+      }
+
+      .toolbar-select {
+        background: var(--background-light);
+        color: var(--text-primary);
+        border-color: var(--border);
+
+        &:hover {
+          border-color: var(--primary);
+        }
+
+        option {
+          background: var(--background-light);
+          color: var(--text-primary);
+        }
+      }
+    }
+  }
+}
