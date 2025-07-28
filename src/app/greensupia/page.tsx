@@ -5,6 +5,29 @@ import Image from "next/image";
 import Link from "next/link";
 import { BannerNews } from "@/types/bannerNews";
 
+// Google Maps API 타입 선언
+declare global {
+  interface Window {
+    google: {
+      maps: {
+        Map: new (
+          element: HTMLElement,
+          options: {
+            center: { lat: number; lng: number };
+            zoom: number;
+            styles?: any[];
+          }
+        ) => any;
+        Marker: new (options: {
+          position: { lat: number; lng: number };
+          map: any;
+          title: string;
+        }) => any;
+      };
+    };
+  }
+}
+
 // CSS 애니메이션을 위한 스타일
 const animationStyles = `
   @keyframes pulse-delay-2 {
@@ -27,8 +50,10 @@ interface Video {
   id: number;
   title: string;
   description: string;
-  youtubeUrl: string;
+  videoUrl: string;
+  thumbnailUrl: string;
   isActive: boolean;
+  sortOrder: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -53,6 +78,25 @@ interface Greeting {
   updatedAt: string;
 }
 
+interface OrganizationChart {
+  id: number;
+  fileName: string;
+  filePath: string;
+  imageUrl: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface History {
+  id: number;
+  year: string;
+  description: string;
+  sortOrder: number;
+  isActive: boolean;
+  createdAt: string;
+}
+
 export default function GreensupiaHomePage() {
   const [video, setVideo] = useState<Video | null>(null);
   const [banner, setBanner] = useState<Banner | null>(null);
@@ -60,6 +104,9 @@ export default function GreensupiaHomePage() {
   const [error, setError] = useState<string | null>(null);
   const [greeting, setGreeting] = useState<Greeting | null>(null);
   const [bannerNews, setBannerNews] = useState<BannerNews[] | null>(null);
+  const [organizationChart, setOrganizationChart] =
+    useState<OrganizationChart | null>(null);
+  const [histories, setHistories] = useState<History[]>([]);
 
   useEffect(() => {
     // CSS 스타일 주입
@@ -70,6 +117,143 @@ export default function GreensupiaHomePage() {
     return () => {
       document.head.removeChild(style);
     };
+  }, []);
+
+  // Google Maps API 로드 및 지도 초기화
+  useEffect(() => {
+    console.log("Google Maps API 초기화 시작");
+
+    const apiKey =
+      process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ||
+      "AIzaSyCJFR836cPFQxyZUE8bl375Cmkr3vBfAJ8";
+
+    console.log("API 키 확인:", apiKey ? "설정됨" : "설정되지 않음");
+
+    // API 키가 없으면 지도를 표시하지 않음
+    if (!apiKey) {
+      console.log("Google Maps API 키가 설정되지 않았습니다.");
+      return;
+    }
+
+    // 지도 초기화 함수
+    const initializeMap = () => {
+      console.log("지도 초기화 함수 실행");
+      const mapElement = document.getElementById("map");
+      console.log("지도 엘리먼트:", mapElement);
+
+      if (!mapElement) {
+        console.log("map 엘리먼트를 찾을 수 없습니다. 2초 후 재시도...");
+        setTimeout(initializeMap, 2000);
+        return;
+      }
+
+      // 이미 스크립트가 있으면 추가하지 않음
+      if (document.getElementById("google-maps-script")) {
+        console.log("Google Maps 스크립트가 이미 로드되어 있습니다.");
+        if (window.google && window.google.maps) {
+          console.log("Google Maps 객체가 이미 존재합니다. 지도 생성 중...");
+          createMap(mapElement);
+        }
+        return;
+      }
+
+      console.log("Google Maps 스크립트 로드 시작");
+      const script: HTMLScriptElement = document.createElement("script");
+      script.id = "google-maps-script";
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
+      script.async = true;
+      script.defer = true;
+      script.onload = () => {
+        console.log("Google Maps 스크립트 로드 완료");
+        setTimeout(() => createMap(mapElement), 100);
+      };
+      script.onerror = () => {
+        console.error("Google Maps API 로드 실패");
+        showMapPlaceholder(mapElement);
+      };
+      document.head.appendChild(script);
+    };
+
+    function createMap(mapElement: HTMLElement) {
+      console.log("지도 생성 함수 실행");
+      console.log("Google Maps 객체:", window.google?.maps);
+
+      if (window.google && window.google.maps && mapElement) {
+        console.log("지도 생성 조건 충족, 지도 생성 중...");
+        const center = { lat: 37.5665, lng: 126.978 }; // 서울 시청 좌표
+        const map = new window.google.maps.Map(mapElement, {
+          center,
+          zoom: 15,
+          styles: [
+            {
+              featureType: "poi",
+              elementType: "labels",
+              stylers: [{ visibility: "off" }],
+            },
+          ],
+        });
+        new window.google.maps.Marker({
+          position: center,
+          map: map,
+          title: "Greensupia",
+        });
+        console.log("지도 생성 완료");
+
+        // 플레이스홀더 제거
+        const placeholder = mapElement.querySelector(
+          ".greensupia-map__placeholder"
+        );
+        if (placeholder) {
+          placeholder.remove();
+        }
+
+        // Force map to recalculate its size and center
+        setTimeout(() => {
+          const googleMaps = window.google?.maps as any;
+          if (googleMaps?.event) {
+            googleMaps.event.trigger(map, "resize");
+            map.setCenter(center);
+          }
+        }, 100);
+
+        // Additional resize trigger after a longer delay
+        setTimeout(() => {
+          const googleMaps = window.google?.maps as any;
+          if (googleMaps?.event) {
+            googleMaps.event.trigger(map, "resize");
+            map.setCenter(center);
+          }
+        }, 500);
+      } else {
+        console.error("지도 생성 실패:", {
+          google: !!window.google,
+          maps: !!window.google?.maps,
+          mapElement: !!mapElement,
+        });
+        // 재시도
+        setTimeout(() => createMap(mapElement), 500);
+      }
+    }
+
+    function showMapPlaceholder(mapElement: HTMLElement) {
+      console.log("지도 플레이스홀더 표시");
+      if (mapElement) {
+        mapElement.innerHTML = `
+          <div class="flex items-center justify-center h-full bg-gray-200 rounded-lg">
+            <div class="text-center text-gray-600">
+              <svg class="w-16 h-16 mx-auto mb-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+              </svg>
+              <p class="text-lg font-medium">지도 로드 중...</p>
+              <p class="text-sm">Google Maps API 키가 필요합니다</p>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    // 컴포넌트가 마운트된 후 지도 초기화 시작
+    setTimeout(initializeMap, 2000);
   }, []);
 
   useEffect(() => {
@@ -116,7 +300,19 @@ export default function GreensupiaHomePage() {
             console.log("비디오 데이터:", videoData);
             // 배열의 첫 번째 항목 사용
             if (videoData && Array.isArray(videoData) && videoData.length > 0) {
-              setVideo(videoData[0]);
+              const firstVideo = videoData[0];
+              console.log("첫 번째 비디오:", firstVideo);
+              console.log("비디오 활성 상태:", firstVideo.isActive);
+              console.log("비디오 YouTube URL:", firstVideo.videoUrl);
+              // 활성 상태인 비디오만 설정
+              if (firstVideo.isActive) {
+                setVideo(firstVideo);
+                console.log("비디오 상태 설정 완료");
+              } else {
+                console.log("활성 상태인 비디오가 없습니다.");
+              }
+            } else {
+              console.log("비디오 데이터가 비어있습니다.");
             }
           }
         } catch (videoError) {
@@ -155,6 +351,43 @@ export default function GreensupiaHomePage() {
         } catch (bannerNewsError) {
           console.log("배너뉴스 데이터를 불러올 수 없습니다:", bannerNewsError);
           setBannerNews([]);
+        }
+
+        // 조직도 데이터 가져오기
+        try {
+          const organizationResponse = await fetch(
+            "/api/organization?action=active"
+          );
+          if (organizationResponse.ok) {
+            const organizationData = await organizationResponse.json();
+            console.log("조직도 데이터:", organizationData);
+            // 조직도 데이터는 단일 객체로 반환됨
+            if (organizationData && organizationData.isActive) {
+              setOrganizationChart(organizationData);
+            }
+          }
+        } catch (organizationError) {
+          console.log("조직도 데이터를 불러올 수 없습니다:", organizationError);
+        }
+
+        // 히스토리 데이터 가져오기
+        try {
+          const historyResponse = await fetch("/api/history?action=active");
+          if (historyResponse.ok) {
+            const historyData = await historyResponse.json();
+            console.log("히스토리 데이터:", historyData);
+            // 히스토리 데이터는 {data: Array} 형태로 반환됨
+            if (
+              historyData &&
+              historyData.data &&
+              Array.isArray(historyData.data)
+            ) {
+              setHistories(historyData.data);
+            }
+          }
+        } catch (historyError) {
+          console.log("히스토리 데이터를 불러올 수 없습니다:", historyError);
+          setHistories([]);
         }
       } catch (error) {
         console.error("데이터를 불러오는데 실패했습니다:", error);
@@ -200,22 +433,16 @@ export default function GreensupiaHomePage() {
                 홈
               </Link>
               <Link
-                href="/greensupia/services"
+                href="/greensupia/notice"
                 className="text-gray-600 hover:text-green-600 transition-colors"
               >
-                서비스
+                공지사항
               </Link>
               <Link
-                href="/greensupia/projects"
+                href="/greensupia/consultation"
                 className="text-gray-600 hover:text-green-600 transition-colors"
               >
-                프로젝트
-              </Link>
-              <Link
-                href="/greensupia/contact"
-                className="text-gray-600 hover:text-green-600 transition-colors"
-              >
-                문의
+                1:1 상담게시판
               </Link>
             </nav>
             <div className="md:hidden">
@@ -242,7 +469,7 @@ export default function GreensupiaHomePage() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* 배너 섹션 */}
         {banner && banner.imageUrl && (
-          <section className="mb-12">
+          <section className="mb-12 text-center">
             <div
               className="greensupia-banner"
               style={{
@@ -260,7 +487,7 @@ export default function GreensupiaHomePage() {
 
         {/* 기본 히어로 섹션 (배너가 없을 때) */}
         {!banner && (
-          <section className="mb-12 bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 py-20 rounded-lg relative overflow-hidden">
+          <section className="mb-12 bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 py-20 rounded-lg relative overflow-hidden text-center">
             {/* 배경 패턴 */}
             <div className="absolute inset-0 opacity-10">
               <div className="absolute top-0 left-0 w-72 h-72 bg-green-300 rounded-full mix-blend-multiply filter blur-xl animate-pulse"></div>
@@ -303,7 +530,7 @@ export default function GreensupiaHomePage() {
               {greeting.title}
             </h2>
             <div
-              className="max-w-4xl mx-auto prose prose-lg"
+              className="max-w-4xl mx-auto prose prose-lg text-center"
               dangerouslySetInnerHTML={{ __html: greeting.content }}
             />
           </section>
@@ -311,37 +538,33 @@ export default function GreensupiaHomePage() {
 
         {/* 배너뉴스 섹션 */}
         {bannerNews && bannerNews.length > 0 && (
-          <section className="mb-12">
+          <section className="mb-12 text-center">
             <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
               최신 소식
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {bannerNews.slice(0, 3).map((news) => (
-                <article
-                  key={news.id}
-                  className="bg-white rounded-lg shadow-sm border overflow-hidden hover:shadow-md transition-shadow"
-                >
+            <div className="greensupia-news__grid">
+              {bannerNews.slice(0, 4).map((news) => (
+                <article key={news.id} className="greensupia-news__item">
                   {news.imageUrl && (
-                    <div className="h-48 bg-gray-200">
+                    <div className="greensupia-news__image-container">
                       <Image
                         src={news.imageUrl}
                         alt={news.title}
                         width={400}
                         height={192}
-                        className="w-full h-full object-cover"
+                        className="greensupia-news__image"
                         priority={true}
+                        style={{ height: "auto" }}
                       />
                     </div>
                   )}
-                  <div className="p-6">
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                      {news.title}
-                    </h3>
-                    <p className="text-gray-600 mb-4 line-clamp-3">
+                  <div className="greensupia-news__content">
+                    <h3 className="greensupia-news__title">{news.title}</h3>
+                    <p className="greensupia-news__description">
                       {news.content}
                     </p>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-500">
+                    <div className="greensupia-news__meta">
+                      <span className="greensupia-news__date">
                         {news.startDate
                           ? new Date(news.startDate).toLocaleDateString("ko-KR")
                           : "날짜 없음"}
@@ -351,7 +574,7 @@ export default function GreensupiaHomePage() {
                           href={news.linkUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-green-600 hover:text-green-700 font-medium"
+                          className="greensupia-news__link"
                         >
                           자세히 보기 →
                         </a>
@@ -364,120 +587,13 @@ export default function GreensupiaHomePage() {
           </section>
         )}
 
-        {/* 서비스 섹션 */}
-        <section className="mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-            전문 서비스
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* 웹사이트 개발 */}
-            <div className="bg-white p-8 rounded-lg shadow-sm border hover:shadow-md transition-shadow">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-6">
-                <svg
-                  className="w-6 h-6 text-green-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                  />
-                </svg>
-              </div>
-              <h4 className="text-xl font-semibold text-gray-900 mb-4">
-                웹사이트 개발
-              </h4>
-              <p className="text-gray-600 mb-4">
-                반응형 웹사이트부터 복잡한 웹 애플리케이션까지, 최신 기술로
-                사용자 경험을 극대화합니다.
-              </p>
-              <ul className="text-sm text-gray-500 space-y-1">
-                <li>• 반응형 웹 디자인</li>
-                <li>• SEO 최적화</li>
-                <li>• 빠른 로딩 속도</li>
-              </ul>
-            </div>
-
-            {/* 웹 애플리케이션 */}
-            <div className="bg-white p-8 rounded-lg shadow-sm border hover:shadow-md transition-shadow">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-6">
-                <svg
-                  className="w-6 h-6 text-blue-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"
-                  />
-                </svg>
-              </div>
-              <h4 className="text-xl font-semibold text-gray-900 mb-4">
-                웹 애플리케이션
-              </h4>
-              <p className="text-gray-600 mb-4">
-                React, Next.js 등 최신 프레임워크를 활용한 고성능 웹
-                애플리케이션을 개발합니다.
-              </p>
-              <ul className="text-sm text-gray-500 space-y-1">
-                <li>• React/Next.js 개발</li>
-                <li>• TypeScript 적용</li>
-                <li>• 상태 관리 최적화</li>
-              </ul>
-            </div>
-
-            {/* 유지보수 */}
-            <div className="bg-white p-8 rounded-lg shadow-sm border hover:shadow-md transition-shadow">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-6">
-                <svg
-                  className="w-6 h-6 text-purple-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                </svg>
-              </div>
-              <h4 className="text-xl font-semibold text-gray-900 mb-4">
-                유지보수 & 호스팅
-              </h4>
-              <p className="text-gray-600 mb-4">
-                개발 완료 후에도 안정적인 운영을 위한 유지보수와 호스팅 서비스를
-                제공합니다.
-              </p>
-              <ul className="text-sm text-gray-500 space-y-1">
-                <li>• 24/7 모니터링</li>
-                <li>• 정기 업데이트</li>
-                <li>• 보안 패치</li>
-              </ul>
-            </div>
-          </div>
-        </section>
-
         {/* 비디오 섹션 */}
-        <section className="mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-            회사 소개 영상
-          </h2>
-          {video ? (
-            <div className="bg-white rounded-lg shadow-sm border p-8">
+        {video && video.isActive && (
+          <section className="mb-12 text-center">
+            <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
+              회사 소개 영상
+            </h2>
+            <div className="bg-white rounded-lg shadow-sm border p-8 text-center">
               <h3 className="text-2xl font-semibold text-gray-900 mb-4 text-center">
                 {video.title}
               </h3>
@@ -486,116 +602,167 @@ export default function GreensupiaHomePage() {
                   {video.description}
                 </p>
               )}
-              <div className="max-w-4xl mx-auto">
-                <div
-                  className="relative w-full"
-                  style={{ paddingBottom: "56.25%" }}
-                >
+              <div className="greensupia-video__container">
+                <div className="greensupia-video__iframe-wrapper">
                   <div
-                    className="absolute inset-0"
-                    dangerouslySetInnerHTML={{ __html: video.youtubeUrl }}
+                    className="greensupia-video__iframe"
+                    dangerouslySetInnerHTML={{ __html: video.videoUrl }}
                   />
                 </div>
               </div>
             </div>
-          ) : (
-            <div className="bg-white rounded-lg shadow-sm border p-8 text-center text-gray-600">
-              비디오가 없습니다.
-            </div>
-          )}
-        </section>
+          </section>
+        )}
 
-        {/* CTA 섹션 */}
-        <section className="mb-12 bg-green-600 rounded-lg py-12">
-          <div className="text-center">
-            <h3 className="text-3xl font-bold text-white mb-4">
-              프로젝트를 시작해보세요
-            </h3>
-            <p className="text-xl text-green-100 mb-8 max-w-2xl mx-auto">
-              무료 상담을 통해 귀사의 비즈니스에 최적화된 웹 개발 솔루션을
-              제안해드립니다.
-            </p>
-            <Link
-              href="/greensupia/contact"
-              className="bg-white text-green-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
-            >
-              무료 상담 신청
-            </Link>
+        {/* 조직도 섹션 */}
+        {organizationChart && organizationChart.isActive && (
+          <section className="mb-12 text-center">
+            <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
+              조직도
+            </h2>
+            <div className="bg-white rounded-lg shadow-sm border p-8 text-center">
+              <div className="greensupia-organization__container">
+                {organizationChart.imageUrl ? (
+                  <img
+                    src={organizationChart.imageUrl}
+                    alt="조직도"
+                    className="greensupia-organization__image"
+                    onError={(e) => {
+                      console.error(
+                        "조직도 이미지 로드 실패:",
+                        organizationChart.imageUrl
+                      );
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = "none";
+                    }}
+                  />
+                ) : (
+                  <div className="greensupia-organization__placeholder">
+                    조직도 이미지를 불러올 수 없습니다.
+                  </div>
+                )}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* 히스토리 섹션 */}
+        {histories.length > 0 && (
+          <section className="mb-12 text-center">
+            <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
+              회사 연혁
+            </h2>
+            <div className="bg-white rounded-lg shadow-sm border p-8 text-center">
+              <div className="max-w-4xl mx-auto">
+                <div className="greensupia-history__timeline">
+                  {Object.entries(
+                    histories.reduce((acc, history) => {
+                      if (!acc[history.year]) {
+                        acc[history.year] = [];
+                      }
+                      acc[history.year].push(history);
+                      return acc;
+                    }, {} as Record<string, History[]>)
+                  )
+                    .sort(([a], [b]) => b.localeCompare(a))
+                    .map(([year, yearHistories]) => (
+                      <div
+                        key={year}
+                        className="greensupia-history__year-group"
+                      >
+                        <h3 className="greensupia-history__year-title">
+                          {year}
+                        </h3>
+                        <div className="greensupia-history__year-content">
+                          {yearHistories
+                            .sort((a, b) => a.sortOrder - b.sortOrder)
+                            .map((history) => (
+                              <div
+                                key={history.id}
+                                className="greensupia-history__item"
+                              >
+                                <p className="greensupia-history__description">
+                                  {history.description}
+                                </p>
+                              </div>
+                            ))}
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* 오시는길 섹션 */}
+        <section className="greensupia-contact">
+          <h2 className="greensupia-contact__title">오시는 길</h2>
+          <div className="greensupia-contact__container">
+            <div className="greensupia-contact__content">
+              {/* 주소 정보 카드 */}
+              <div className="greensupia-contact__info">
+                <div className="greensupia-contact__card">
+                  <h3 className="greensupia-contact__company">Greensupia</h3>
+                  <div className="greensupia-contact__details">
+                    <div className="greensupia-contact__item">
+                      <strong>도로명</strong>
+                      <p>서울특별시 강남구 테헤란로 123</p>
+                    </div>
+                    <div className="greensupia-contact__item">
+                      <strong>지번</strong>
+                      <p>서울특별시 강남구 역삼동 123-45</p>
+                    </div>
+                    <div className="greensupia-contact__item">
+                      <strong>우편번호</strong>
+                      <p>06123</p>
+                    </div>
+                    <div className="greensupia-contact__item">
+                      <strong>전화</strong>
+                      <p>02-1234-5678</p>
+                    </div>
+                    <div className="greensupia-contact__item">
+                      <strong>이메일</strong>
+                      <p>info@greensupia.com</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* 지도 카드 */}
+              <div className="greensupia-contact__map">
+                <div className="greensupia-contact__card">
+                  <h3 className="greensupia-contact__location">위치</h3>
+                  <div className="greensupia-map__container">
+                    <div id="map" className="greensupia-map__element">
+                      <div className="greensupia-map__placeholder">
+                        <div className="placeholder-content">
+                          <svg fill="currentColor" viewBox="0 0 20 20">
+                            <path
+                              fillRule="evenodd"
+                              d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                          <p className="placeholder-title">지도 로드 중...</p>
+                          <p className="placeholder-subtitle">
+                            잠시만 기다려주세요
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
       </main>
 
       {/* 푸터 */}
-      <footer className="bg-gray-900 text-white py-12">
+      <footer className="bg-gray-900 text-white py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div>
-              <h4 className="text-xl font-bold text-green-400 mb-4">
-                Greensupia
-              </h4>
-              <p className="text-gray-400">
-                혁신적인 웹 개발로 비즈니스의 디지털 성장을 이끌어드립니다.
-              </p>
-            </div>
-            <div>
-              <h5 className="font-semibold mb-4">서비스</h5>
-              <ul className="space-y-2 text-gray-400">
-                <li>
-                  <Link
-                    href="/greensupia/services"
-                    className="hover:text-white transition-colors"
-                  >
-                    웹사이트 개발
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/greensupia/services"
-                    className="hover:text-white transition-colors"
-                  >
-                    웹 애플리케이션
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/greensupia/services"
-                    className="hover:text-white transition-colors"
-                  >
-                    유지보수
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h5 className="font-semibold mb-4">회사</h5>
-              <ul className="space-y-2 text-gray-400">
-                <li>
-                  <Link
-                    href="/greensupia/projects"
-                    className="hover:text-white transition-colors"
-                  >
-                    프로젝트
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/greensupia/contact"
-                    className="hover:text-white transition-colors"
-                  >
-                    문의하기
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h5 className="font-semibold mb-4">연락처</h5>
-              <div className="text-gray-400">
-                <p>이메일: info@greensupia.com</p>
-                <p>전화: 02-1234-5678</p>
-              </div>
-            </div>
-          </div>
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+          <div className="text-center text-gray-400">
             <p>&copy; 2024 Greensupia. All rights reserved.</p>
           </div>
         </div>

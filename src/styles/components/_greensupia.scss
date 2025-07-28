@@ -90,6 +90,104 @@
   }
 }
 
+// 배너뉴스 섹션
+.greensupia-news {
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+
+    @media (min-width: 640px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (min-width: 1024px) {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  &__item {
+    background: white;
+    border-radius: 0.5rem;
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+    &:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transform: translateY(-2px);
+    }
+  }
+
+  &__image-container {
+    height: 12rem;
+    background-color: #f3f4f6;
+    overflow: hidden;
+    position: relative;
+  }
+
+  &__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+
+    &:hover {
+      transform: scale(1.05);
+    }
+  }
+
+  &__content {
+    padding: 1.5rem;
+  }
+
+  &__title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  &__description {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  &__meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.875rem;
+  }
+
+  &__date {
+    color: #9ca3af;
+  }
+
+  &__link {
+    color: #059669;
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: #047857;
+    }
+  }
+}
+
 // 기본 히어로 섹션
 .greensupia-hero {
   background: linear-gradient(135deg, #f0fdf4 0%, #dbeafe 50%, #faf5ff 100%);
@@ -138,6 +236,144 @@
   }
 }
 
+// 조직도 섹션
+.greensupia-organization {
+  &__container {
+    max-width: 64rem;
+    margin: 0 auto;
+  }
+
+  &__image {
+    width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+
+    &:hover {
+      transform: scale(1.02);
+    }
+  }
+
+  &__placeholder {
+    text-align: center;
+    padding: 3rem 0;
+    color: #6b7280;
+  }
+}
+
+// 히스토리 섹션
+.greensupia-history {
+  &__timeline {
+    position: relative;
+    max-width: 60rem; // 타임라인 최대 너비 제한
+    margin: 0 auto; // 중앙 정렬
+    padding: 0 2rem; // 좌우 패딩 추가
+  }
+
+  &__year-group {
+    position: relative;
+    margin-bottom: 2rem;
+
+    &:not(:last-child)::after {
+      content: "";
+      position: absolute;
+      left: 0.5rem; // 왼쪽에 위치 (마커와 일치)
+      top: 3rem;
+      bottom: -2rem;
+      width: 2px;
+      background: linear-gradient(to bottom, #10b981, #e5e7eb);
+    }
+  }
+
+  &__year-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 1rem;
+    position: relative;
+    padding-left: 2rem; // 왼쪽 패딩 추가
+
+    &::before {
+      content: "";
+      position: absolute;
+      left: 0; // 왼쪽에 위치
+      top: 50%;
+      transform: translateY(-50%); // Y축만 중앙 정렬
+      width: 1rem;
+      height: 1rem;
+      background: #10b981;
+      border-radius: 50%;
+      border: 3px solid white;
+      box-shadow: 0 0 0 2px #10b981;
+    }
+  }
+
+  &__year-content {
+    padding: 0; // 기존 패딩 제거
+    max-width: 50rem; // 콘텐츠 최대 너비 제한
+  }
+
+  &__item {
+    background: #f9fafb;
+    border-radius: 0.5rem;
+    padding: 1.5rem; // 패딩 증가
+    margin-bottom: 1rem; // 마진 증가
+    border-left: 4px solid #10b981;
+    transition: all 0.3s ease;
+    text-align: left; // 텍스트는 왼쪽 정렬 유지
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); // 그림자 추가
+
+    &:hover {
+      background: #f3f4f6;
+      transform: translateY(-2px); // 위로 이동하는 효과
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); // 호버 시 그림자 강화
+    }
+  }
+
+  &__description {
+    color: #374151;
+    line-height: 1.6;
+    margin: 0;
+    font-size: 1rem; // 폰트 크기 증가
+  }
+}
+
+// 비디오 섹션 스타일
+.greensupia-video {
+  &__container {
+    max-width: 90rem; // 더 큰 최대 너비로 확대
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  &__iframe-wrapper {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%; // 16:9 비율 유지
+    margin: 0 auto;
+    max-width: 85rem; // iframe 최대 너비를 더 크게 설정
+  }
+
+  &__iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+
+    iframe {
+      width: 100% !important;
+      height: 100% !important;
+      border: none;
+      border-radius: 0.5rem;
+    }
+  }
+}
+
 @keyframes pulse {
   0%,
   100% {
@@ -145,5 +381,145 @@
   }
   50% {
     opacity: 1;
+  }
+}
+
+// 지도 섹션 스타일
+.greensupia-map {
+  &__container {
+    width: 100%;
+    height: 320px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 0.5rem;
+    background-color: #f3f4f6;
+    border: 1px solid #e5e7eb;
+  }
+
+  &__element {
+    width: 100% !important;
+    height: 100% !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    z-index: 1;
+  }
+
+  &__placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background-color: #f3f4f6;
+
+    .placeholder-content {
+      text-align: center;
+      color: #6b7280;
+
+      svg {
+        width: 4rem;
+        height: 4rem;
+        margin: 0 auto 1rem;
+        color: #9ca3af;
+      }
+
+      .placeholder-title {
+        font-size: 1.125rem;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+      }
+
+      .placeholder-subtitle {
+        font-size: 0.875rem;
+        color: #6b7280;
+      }
+    }
+  }
+}
+
+// 오시는 길 섹션 스타일
+.greensupia-contact {
+  margin-bottom: 3rem;
+  text-align: center;
+
+  &__title {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+
+  &__container {
+    max-width: 72rem;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    align-items: stretch;
+
+    // 데스크톱에서 가로 배치
+    @media (min-width: 1024px) {
+      flex-direction: row;
+      gap: 2rem;
+    }
+  }
+
+  &__info {
+    flex: 1;
+  }
+
+  &__map {
+    flex: 1;
+  }
+
+  &__card {
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+    padding: 1.5rem;
+    height: 100%;
+    text-align: left;
+  }
+
+  &__company {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 1rem;
+  }
+
+  &__location {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 1rem;
+  }
+
+  &__details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  &__item {
+    color: #374151;
+
+    strong {
+      color: #111827;
+      font-weight: 600;
+      display: block;
+      margin-bottom: 0.25rem;
+    }
+
+    p {
+      margin: 0;
+      line-height: 1.5;
+    }
   }
 }

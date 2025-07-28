@@ -31,20 +31,55 @@ export default function AdminDashboard() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        // 각 API에서 통계 데이터 가져오기 (임시로 기존 API 사용)
-        const [todoStats, orgStats, historyStats, bannerStats] =
-          await Promise.all([
-            fetch("/api/todos?action=stats").then((res) => res.json()),
-            fetch("/api/organization?action=stats").then((res) => res.json()),
-            fetch("/api/history?action=stats").then((res) => res.json()),
-            fetch("/api/banner-news?action=stats").then((res) => res.json()),
-          ]);
+        // 각 API에서 기본 데이터 가져오기
+        const [todoData, orgData, historyData, bannerData] = await Promise.all([
+          fetch("/api/todos").then((res) => res.json()),
+          fetch("/api/organization").then((res) => res.json()),
+          fetch("/api/history").then((res) => res.json()),
+          fetch("/api/banner-news").then((res) => res.json()),
+        ]);
+
+        // 데이터를 기반으로 통계 계산
+        const todos = Array.isArray(todoData) ? todoData : [];
+        const organization = Array.isArray(orgData) ? orgData : [];
+        const history = Array.isArray(historyData) ? historyData : [];
+        const bannerNews = Array.isArray(bannerData) ? bannerData : [];
 
         setStats({
-          todos: todoStats,
-          organization: orgStats,
-          history: historyStats,
-          bannerNews: bannerStats,
+          todos: {
+            total: todos.length,
+            completed: todos.filter((todo: any) => todo.completed).length,
+            pending: todos.filter((todo: any) => !todo.completed).length,
+            completionRate:
+              todos.length > 0
+                ? Math.round(
+                    (todos.filter((todo: any) => todo.completed).length /
+                      todos.length) *
+                      100
+                  )
+                : 0,
+          },
+          organization: {
+            total: organization.length,
+            departments: [
+              ...new Set(organization.map((org: any) => org.department)),
+            ],
+          },
+          history: {
+            total: history.length,
+            yearRange:
+              history.length > 0
+                ? {
+                    min: Math.min(...history.map((h: any) => h.year)),
+                    max: Math.max(...history.map((h: any) => h.year)),
+                  }
+                : { min: 2024, max: 2024 },
+          },
+          bannerNews: {
+            total: bannerNews.length,
+            active: bannerNews.filter((news: any) => news.isActive).length,
+            inactive: bannerNews.filter((news: any) => !news.isActive).length,
+          },
         });
       } catch (error) {
         console.error("대시보드 데이터 로딩 실패:", error);
