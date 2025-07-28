@@ -6,7 +6,7 @@ import ToggleSwitch from "@/components/ToggleSwitch";
 import Modal from "@/components/Modal";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import ErrorMessage from "@/components/ErrorMessage";
-import RichTextEditor from "@/components/RichTextEditor";
+import TipTapEditor from "@/components/TipTapEditor";
 
 export default function GreetingManagementPage() {
   const [greetings, setGreetings] = useState<Greeting[]>([]);
@@ -377,7 +377,7 @@ export default function GreetingManagementPage() {
             </div>
             <div className="form-group">
               <label htmlFor="content">내용 *</label>
-              <RichTextEditor
+              <TipTapEditor
                 value={formData.content}
                 onChange={(content) =>
                   setFormData((prev) => ({ ...prev, content }))
@@ -435,7 +435,7 @@ export default function GreetingManagementPage() {
             </div>
             <div className="form-group">
               <label htmlFor="edit-content">내용 *</label>
-              <RichTextEditor
+              <TipTapEditor
                 value={formData.content}
                 onChange={(content) =>
                   setFormData((prev) => ({ ...prev, content }))

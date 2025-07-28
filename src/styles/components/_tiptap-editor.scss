@@ -1,0 +1,257 @@
+/* TipTap 에디터 스타일 */
+
+.tiptap-editor-container {
+  border: 1px solid var(--border-color, #ddd);
+  border-radius: var(--border-radius, 4px);
+  overflow: hidden;
+}
+
+.editor-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  background: #f9fafb;
+  border-bottom: 1px solid #e0e0e0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  padding: 10px 16px;
+  border-radius: 8px 8px 0 0;
+
+  button,
+  select {
+    border: none;
+    background: none;
+    margin: 0 2px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 16px;
+    color: #333;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    min-width: 32px;
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &.is-active,
+    &:active {
+      background: #e3f0ff;
+      color: #1976d2;
+      box-shadow: 0 2px 8px rgba(25, 118, 210, 0.08);
+    }
+
+    &:hover {
+      background: #f0f4f8;
+      color: #1976d2;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  select {
+    background: #f7f7f7;
+    border: 1px solid #d0d0d0;
+    font-size: 15px;
+    border-radius: 6px;
+    padding: 4px 8px;
+    min-width: 80px;
+    cursor: pointer;
+  }
+}
+
+.color-picker-container {
+  position: relative;
+  display: inline-block;
+  pointer-events: auto;
+}
+
+.color-picker-popover {
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  padding: 8px;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  position: absolute;
+  z-index: 9999;
+  top: 36px;
+  left: 0;
+  pointer-events: auto;
+
+  button {
+    margin-top: 10px;
+    padding: 5px 10px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+
+    &:hover {
+      background: #0056b3;
+    }
+  }
+}
+
+.editor-container {
+  position: relative;
+  outline: none;
+  min-height: 320px;
+}
+
+.tiptap {
+  outline: none;
+  padding: 20px;
+  min-height: 320px;
+  background: white;
+  cursor: text;
+  position: relative;
+  z-index: 1;
+}
+
+.tiptap-loading {
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--background-light, #fff);
+  border: 1px solid var(--border-color, #ddd);
+  border-radius: var(--border-radius, 4px);
+  color: var(--muted-foreground, #999);
+}
+
+/* ProseMirror 전역 스타일 */
+:global(.ProseMirror) {
+  outline: none;
+  cursor: text;
+  position: relative;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  -webkit-font-variant-ligatures: none;
+  font-variant-ligatures: none;
+  padding: 4px 8px 4px 14px;
+  line-height: 1.5;
+  overflow-wrap: break-word;
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  min-width: 1px;
+
+  p {
+    margin: 1em 0;
+    cursor: text;
+    min-width: 1px;
+  }
+
+  h1,
+  h2,
+  h3 {
+    margin: 1em 0 0.5em 0;
+    cursor: text;
+    min-width: 1px;
+  }
+
+  ul,
+  ol {
+    margin: 1em 0;
+    padding-left: 2em;
+    cursor: text;
+    min-width: 1px;
+  }
+
+  li {
+    margin: 0.5em 0;
+    cursor: text;
+    min-width: 1px;
+  }
+
+  table {
+    border-collapse: collapse;
+    margin: 1em 0;
+    width: 100%;
+    cursor: text;
+    min-width: 1px;
+
+    td,
+    th {
+      border: 1px solid #ddd;
+      padding: 8px;
+      cursor: text;
+      min-width: 1px;
+    }
+
+    th {
+      background: #f5f5f5;
+      font-weight: bold;
+      cursor: text;
+      min-width: 1px;
+    }
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 1em 0;
+    cursor: text;
+  }
+
+  mark {
+    background: #ffeb3b;
+    padding: 0.1em 0.2em;
+    border-radius: 2px;
+    cursor: text;
+  }
+
+  /* TipTap 하이라이트 클래스 스타일 */
+  .tiptap-highlight {
+    background: #ffeb3b;
+    padding: 0.1em 0.2em;
+    border-radius: 2px;
+    cursor: text;
+  }
+
+  a {
+    color: #007bff;
+    text-decoration: underline;
+    cursor: pointer;
+
+    &:hover {
+      color: #0056b3;
+      cursor: pointer;
+    }
+  }
+
+  blockquote {
+    border-left: 4px solid #ddd;
+    margin: 1em 0;
+    padding-left: 1em;
+    font-style: italic;
+  }
+
+  code {
+    background: #f5f5f5;
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+    font-family: monospace;
+  }
+
+  pre {
+    background: #f5f5f5;
+    padding: 1em;
+    border-radius: 4px;
+    overflow-x: auto;
+
+    code {
+      background: none;
+      padding: 0;
+    }
+  }
+}
+
+/* TipTap이 자체적으로 스타일을 처리하므로 추가 스타일 규칙 제거 */

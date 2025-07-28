@@ -14,7 +14,8 @@
 @use "components/pagination";
 @use "components/toggle-switch";
 @use "components/modal";
-@use "components/rich-text-editor";
+// TipTap 에디터 스타일
+@use "components/tiptap-editor";
 // CSS 변수 정의 - 백조 브랜드 컬러 팔레트
 :root {
   // 기본 색상
@@ -900,285 +901,95 @@ button {
   }
 }
 
-// Rich Text Editor 스타일 - 전역 스타일 충돌 방지
-.rich-text-editor {
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+// TipTap 에디터 전역 스타일
+.tiptap-editor-container {
+  border: 1px solid var(--border-color, #ddd);
+  border-radius: var(--border-radius, 4px);
   overflow: hidden;
-  background: white;
-  box-shadow: var(--shadow-sm);
+}
 
-  // 전역 버튼 스타일 재정의 - 더 구체적인 선택자 사용
-  .editor-toolbar button,
-  .color-picker-popup button {
-    cursor: pointer;
-    border: none;
-    outline: none;
-    transition: var(--transition-fast);
-    font-family: inherit;
-    background: transparent;
-    padding: 0;
-    margin: 0;
+// 하이라이트 색상 클래스
+.highlight-light-yellow {
+  background-color: #f0e68c !important;
+}
+.highlight-light-green {
+  background-color: #98fb98 !important;
+}
+.highlight-peach {
+  background-color: #ffe4b5 !important;
+}
+
+// 전역 에디터 스타일
+.ProseMirror {
+  // zero-width space 스타일
+  span:empty {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    overflow: hidden;
   }
 
-  .editor-toolbar {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--spacing-xs);
-    padding: var(--spacing-sm);
+  // 에디터 내부 요소 스타일
+  p {
+    margin: 0 0 var(--spacing-sm) 0;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  ul,
+  ol {
+    margin: var(--spacing-sm) 0;
+    padding-left: var(--spacing-lg);
+  }
+
+  li {
+    margin: var(--spacing-xs) 0;
+  }
+
+  a {
+    color: var(--primary);
+    text-decoration: underline;
+
+    &:hover {
+      color: var(--primary-hover);
+    }
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--radius);
+    margin: var(--spacing-sm) 0;
+  }
+
+  blockquote {
+    border-left: 4px solid var(--primary);
+    padding-left: var(--spacing-md);
+    margin: var(--spacing-md) 0;
+    font-style: italic;
+    color: var(--text-muted);
+  }
+
+  code {
     background: var(--background-light);
-    border-bottom: 1px solid var(--border);
-    align-items: center;
-
-    .toolbar-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: var(--spacing-xs) var(--spacing-sm);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
-      background: white;
-      color: var(--text-primary);
-      font-size: 0.875rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: var(--transition-fast);
-      min-width: 32px;
-      height: 32px;
-
-      &:hover {
-        background: var(--primary-light);
-        border-color: var(--primary);
-        color: var(--primary);
-      }
-
-      &:active {
-        transform: translateY(1px);
-      }
-
-      strong,
-      em,
-      u {
-        font-weight: inherit;
-        font-style: inherit;
-        text-decoration: inherit;
-      }
-    }
-
-    .toolbar-separator {
-      width: 1px;
-      height: 24px;
-      background: var(--border);
-      margin: 0 var(--spacing-xs);
-    }
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-sm);
+    font-family: "Courier New", monospace;
+    font-size: 0.875em;
   }
 
-  // 컬러피커 팝업 스타일 강화
-  .color-picker-popup {
-    position: fixed;
-    z-index: 10000;
-    background-color: white;
-    border: 2px solid #ccc;
-    border-radius: 8px;
-    padding: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-
-    input[type="color"] {
-      width: 100px;
-      height: 40px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      cursor: pointer;
-      background: transparent;
-      padding: 0;
-      margin: 0;
-    }
-
-    button {
-      width: 20px;
-      height: 20px;
-      border: 1px solid #ccc;
-      border-radius: 3px;
-      cursor: pointer;
-      background: transparent;
-      padding: 0;
-      margin: 0;
-      transition: transform 0.1s ease;
-
-      &:hover {
-        transform: scale(1.1);
-      }
-    }
-  }
-
-  [contenteditable] {
-    min-height: 200px;
+  pre {
+    background: var(--background-light);
     padding: var(--spacing-md);
-    outline: none;
-    font-family: inherit;
-    font-size: 0.875rem;
-    line-height: 1.6;
-    color: var(--text-primary);
-    caret-color: var(--text-primary);
-    user-select: text;
-    ime-mode: auto;
-    position: relative;
-
-    &:empty::before {
-      content: attr(data-placeholder);
-      color: var(--text-muted);
-      pointer-events: none;
-    }
-
-    &:focus {
-      background: var(--background-light);
-      outline: none;
-    }
-
-    /* span 스타일 간섭 최소화 */
-    span {
-      /* execCommand 또는 DOM 조작으로 추가된 스타일 유지 */
-      color: initial;
-      background-color: initial;
-    }
-
-    /* 색상 클래스 */
-    .color-red {
-      color: #c91d1d !important;
-    }
-    .color-green {
-      color: #008000 !important;
-    }
-    .color-blue {
-      color: #2d45be !important;
-    }
-    .color-magenta {
-      color: #ff00ff !important;
-    }
-    .color-black {
-      color: #454545 !important;
-    }
-    .color-white {
-      color: #ffffff !important;
-    }
-    .color-orange {
-      color: #ffa500 !important;
-    }
-    .color-purple {
-      color: #800080 !important;
-    }
-    .color-cyan {
-      color: #00ffff !important;
-    }
-    .color-yellow {
-      color: #ffff00 !important;
-    }
-
-    /* 하이라이트 클래스 */
-    .highlight-yellow {
-      background-color: #fafa05 !important;
-    }
-    .highlight-light-salmon {
-      background-color: #ffa07a !important;
-    }
-    .highlight-green {
-      background-color: #00ff00 !important;
-    }
-    .highlight-light-blue {
-      background-color: #87ceeb !important;
-    }
-    .highlight-light-pink {
-      background-color: #ffb6c1 !important;
-    }
-    .highlight-light-purple {
-      background-color: #e6e6fa !important;
-    }
-    .highlight-light-cyan {
-      background-color: #b0e0e6 !important;
-    }
-    .highlight-light-yellow {
-      background-color: #f0e68c !important;
-    }
-    .highlight-light-green {
-      background-color: #98fb98 !important;
-    }
-    .highlight-peach {
-      background-color: #ffe4b5 !important;
-    }
-
-    // zero-width space 스타일
-    span:empty {
-      display: inline-block;
-      width: 0;
-      height: 0;
-      overflow: hidden;
-    }
-
-    // 에디터 내부 요소 스타일
-    p {
-      margin: 0 0 var(--spacing-sm) 0;
-
-      &:last-child {
-        margin-bottom: 0;
-      }
-    }
-
-    ul,
-    ol {
-      margin: var(--spacing-sm) 0;
-      padding-left: var(--spacing-lg);
-    }
-
-    li {
-      margin: var(--spacing-xs) 0;
-    }
-
-    a {
-      color: var(--primary);
-      text-decoration: underline;
-
-      &:hover {
-        color: var(--primary-hover);
-      }
-    }
-
-    img {
-      max-width: 100%;
-      height: auto;
-      border-radius: var(--radius);
-      margin: var(--spacing-sm) 0;
-    }
-
-    blockquote {
-      border-left: 4px solid var(--primary);
-      padding-left: var(--spacing-md);
-      margin: var(--spacing-md) 0;
-      font-style: italic;
-      color: var(--text-muted);
-    }
+    border-radius: var(--radius);
+    overflow-x: auto;
+    margin: var(--spacing-md) 0;
 
     code {
-      background: var(--background-light);
-      padding: var(--spacing-xs) var(--spacing-sm);
-      border-radius: var(--radius-sm);
-      font-family: "Courier New", monospace;
-      font-size: 0.875em;
-    }
-
-    pre {
-      background: var(--background-light);
-      padding: var(--spacing-md);
-      border-radius: var(--radius);
-      overflow-x: auto;
-      margin: var(--spacing-md) 0;
-
-      code {
-        background: none;
-        padding: 0;
-      }
+      background: none;
+      padding: 0;
     }
   }
 }
