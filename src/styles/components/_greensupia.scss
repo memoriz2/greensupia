@@ -1,0 +1,149 @@
+// Greensupia 페이지 스타일
+
+.greensupia-banner {
+  position: relative;
+  width: 100%;
+  height: 300px; // 모바일 높이 증가
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background-color: #f3f4f6;
+  background-repeat: no-repeat; // 배경 이미지 반복 방지
+  background-size: cover;
+  background-position: center;
+
+  @media (min-width: 768px) {
+    height: 500px; // 데스크톱 높이 500px로 증가
+  }
+
+  // 배경 이미지 스타일
+  &__background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  // 오버레이
+  &__overlay {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.3);
+  }
+
+  // 텍스트 컨테이너
+  &__content {
+    position: absolute;
+    bottom: 1.5rem;
+    left: 1.5rem;
+    color: white;
+    z-index: 10;
+
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+
+      @media (min-width: 768px) {
+        font-size: 1.875rem;
+      }
+    }
+
+    p {
+      font-size: 1rem;
+      opacity: 0.9;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+
+      @media (min-width: 768px) {
+        font-size: 1.125rem;
+      }
+    }
+  }
+
+  // 높이 변형 클래스들
+  &--small {
+    height: 150px;
+
+    @media (min-width: 768px) {
+      height: 200px;
+    }
+  }
+
+  &--medium {
+    height: 250px;
+
+    @media (min-width: 768px) {
+      height: 320px;
+    }
+  }
+
+  &--large {
+    height: 300px;
+
+    @media (min-width: 768px) {
+      height: 400px;
+    }
+  }
+}
+
+// 기본 히어로 섹션
+.greensupia-hero {
+  background: linear-gradient(135deg, #f0fdf4 0%, #dbeafe 50%, #faf5ff 100%);
+  padding: 5rem 0;
+  border-radius: 0.5rem;
+  position: relative;
+  overflow: hidden;
+
+  // 배경 패턴
+  &__pattern {
+    position: absolute;
+    inset: 0;
+    opacity: 0.1;
+
+    &::before,
+    &::after {
+      content: "";
+      position: absolute;
+      width: 18rem;
+      height: 18rem;
+      border-radius: 50%;
+      filter: blur(1rem);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    &::before {
+      top: 0;
+      left: 0;
+      background-color: #86efac;
+      mix-blend-mode: multiply;
+    }
+
+    &::after {
+      top: 0;
+      right: 0;
+      background-color: #93c5fd;
+      mix-blend-mode: multiply;
+      animation-delay: 1s;
+    }
+  }
+
+  &__content {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}

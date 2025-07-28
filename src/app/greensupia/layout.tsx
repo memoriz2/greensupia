@@ -20,10 +20,8 @@ export default function GreensupiaLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ko" className={geist.variable}>
-      <body className="font-sans antialiased">
-        <div className="min-h-screen bg-gray-50">{children}</div>
-      </body>
-    </html>
+    <div className={`${geist.variable} min-h-screen bg-gray-50`}>
+      {children}
+    </div>
   );
 }
