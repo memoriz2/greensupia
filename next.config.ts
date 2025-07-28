@@ -13,6 +13,7 @@ const nextConfig: NextConfig = {
   experimental: {
     // 최신 기능 활성화
   },
+
   // 정적 파일 서빙 설정
   async headers() {
     return [
@@ -38,6 +39,7 @@ const nextConfig: NextConfig = {
   },
   // 이미지 최적화 설정
   images: {
+    unoptimized: true, // 가비아 서버에서 이미지 최적화 비활성화
     remotePatterns: [
       {
         protocol: "http",

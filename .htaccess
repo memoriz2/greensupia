@@ -1,0 +1,67 @@
+# ========================================
+# 가비아 호스팅 - Next.js 업로드 설정
+# ========================================
+
+# PHP 업로드 크기 제한 증가
+php_value upload_max_filesize 50M
+php_value post_max_size 50M
+php_value max_execution_time 300
+php_value max_input_time 300
+php_value memory_limit 256M
+
+# ========================================
+# Next.js 라우팅 설정
+# ========================================
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # API 라우트 처리
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^api/(.*)$ /api/$1 [L]
+    
+    # Next.js SPA 라우팅
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ /index.html [L]
+</IfModule>
+
+# ========================================
+# CORS 설정 (API 호출용)
+# ========================================
+
+<IfModule mod_headers.c>
+    Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+    Header set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"
+</IfModule>
+
+# ========================================
+# 보안 설정
+# ========================================
+
+# 디렉토리 브라우징 비활성화
+Options -Indexes
+
+# .htaccess 파일 접근 차단
+<Files .htaccess>
+    Order allow,deny
+    Deny from all
+</Files>
+
+# ========================================
+# 압축 설정 (성능 향상)
+# ========================================
+
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/xml
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE application/xml
+    AddOutputFilterByType DEFLATE application/xhtml+xml
+    AddOutputFilterByType DEFLATE application/rss+xml
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/x-javascript
+</IfModule> 
