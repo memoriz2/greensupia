@@ -15,14 +15,31 @@ declare global {
           options: {
             center: { lat: number; lng: number };
             zoom: number;
-            styles?: any[];
+            styles?: Array<{
+              featureType?: string;
+              elementType?: string;
+              stylers: Array<{ [key: string]: string | number | boolean }>;
+            }>;
           }
-        ) => any;
+        ) => {
+          setZoom: (zoom: number) => void;
+          setCenter: (center: { lat: number; lng: number }) => void;
+        };
         Marker: new (options: {
           position: { lat: number; lng: number };
-          map: any;
+          map: {
+            setZoom: (zoom: number) => void;
+            setCenter: (center: { lat: number; lng: number }) => void;
+          };
           title: string;
-        }) => any;
+        }) => {
+          setMap: (
+            map: {
+              setZoom: (zoom: number) => void;
+              setCenter: (center: { lat: number; lng: number }) => void;
+            } | null
+          ) => void;
+        };
       };
     };
   }
@@ -209,7 +226,17 @@ export default function GreensupiaHomePage() {
 
         // Force map to recalculate its size and center
         setTimeout(() => {
-          const googleMaps = window.google?.maps as any;
+          const googleMaps = window.google?.maps as {
+            event?: {
+              trigger: (
+                map: {
+                  setZoom: (zoom: number) => void;
+                  setCenter: (center: { lat: number; lng: number }) => void;
+                },
+                event: string
+              ) => void;
+            };
+          };
           if (googleMaps?.event) {
             googleMaps.event.trigger(map, "resize");
             map.setCenter(center);
@@ -218,7 +245,17 @@ export default function GreensupiaHomePage() {
 
         // Additional resize trigger after a longer delay
         setTimeout(() => {
-          const googleMaps = window.google?.maps as any;
+          const googleMaps = window.google?.maps as {
+            event?: {
+              trigger: (
+                map: {
+                  setZoom: (zoom: number) => void;
+                  setCenter: (center: { lat: number; lng: number }) => void;
+                },
+                event: string
+              ) => void;
+            };
+          };
           if (googleMaps?.event) {
             googleMaps.event.trigger(map, "resize");
             map.setCenter(center);

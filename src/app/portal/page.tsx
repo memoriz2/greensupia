@@ -48,12 +48,18 @@ export default function AdminDashboard() {
         setStats({
           todos: {
             total: todos.length,
-            completed: todos.filter((todo: any) => todo.completed).length,
-            pending: todos.filter((todo: any) => !todo.completed).length,
+            completed: todos.filter(
+              (todo: { completed: boolean }) => todo.completed
+            ).length,
+            pending: todos.filter(
+              (todo: { completed: boolean }) => !todo.completed
+            ).length,
             completionRate:
               todos.length > 0
                 ? Math.round(
-                    (todos.filter((todo: any) => todo.completed).length /
+                    (todos.filter(
+                      (todo: { completed: boolean }) => todo.completed
+                    ).length /
                       todos.length) *
                       100
                   )
@@ -62,7 +68,11 @@ export default function AdminDashboard() {
           organization: {
             total: organization.length,
             departments: [
-              ...new Set(organization.map((org: any) => org.department)),
+              ...new Set(
+                organization.map(
+                  (org: { department: string }) => org.department
+                )
+              ),
             ],
           },
           history: {
@@ -70,15 +80,23 @@ export default function AdminDashboard() {
             yearRange:
               history.length > 0
                 ? {
-                    min: Math.min(...history.map((h: any) => h.year)),
-                    max: Math.max(...history.map((h: any) => h.year)),
+                    min: Math.min(
+                      ...history.map((h: { year: number }) => h.year)
+                    ),
+                    max: Math.max(
+                      ...history.map((h: { year: number }) => h.year)
+                    ),
                   }
                 : { min: 2024, max: 2024 },
           },
           bannerNews: {
             total: bannerNews.length,
-            active: bannerNews.filter((news: any) => news.isActive).length,
-            inactive: bannerNews.filter((news: any) => !news.isActive).length,
+            active: bannerNews.filter(
+              (news: { isActive: boolean }) => news.isActive
+            ).length,
+            inactive: bannerNews.filter(
+              (news: { isActive: boolean }) => !news.isActive
+            ).length,
           },
         });
       } catch (error) {
