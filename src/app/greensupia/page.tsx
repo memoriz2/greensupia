@@ -639,14 +639,14 @@ export default function GreensupiaHomePage() {
               회사 소개 영상
             </h2>
             <div className="bg-white rounded-lg shadow-sm border p-8 text-center">
-              <h3 className="text-2xl font-semibold text-gray-900 mb-4 text-center">
+              {/* <h3 className="text-2xl font-semibold text-gray-900 mb-4 text-center">
                 {video.title}
               </h3>
               {video.description && (
                 <p className="text-gray-600 mb-6 text-center">
                   {video.description}
                 </p>
-              )}
+              )} */}
               <div className="greensupia-video__container">
                 <div className="greensupia-video__iframe-wrapper">
                   <div
