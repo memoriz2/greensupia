@@ -5,10 +5,9 @@ import Link from "next/link";
 import { Notice } from "@/types/notice";
 import Pagination from "@/components/Pagination";
 
-export default function PortalNoticesPage() {
+export default function NoticesPage() {
   const [notices, setNotices] = useState<Notice[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
@@ -23,11 +22,9 @@ export default function PortalNoticesPage() {
         setNotices(result.data.notices);
         setTotal(result.data.total);
         setTotalPages(Math.ceil(result.data.total / 10));
-      } else {
-        setError("공지사항을 불러오는데 실패했습니다.");
       }
     } catch (error) {
-      setError("공지사항을 불러오는 중 오류가 발생했습니다.");
+      console.error("공지사항 불러오기 오류:", error);
     } finally {
       setLoading(false);
     }
@@ -42,16 +39,13 @@ export default function PortalNoticesPage() {
       const response = await fetch(`/api/notices/${id}/toggle`, {
         method: "PATCH",
       });
-      const result = await response.json();
 
-      if (result.success) {
+      if (response.ok) {
         // 목록 새로고침
         fetchNotices(page);
-      } else {
-        alert("상단고정 변경에 실패했습니다.");
       }
-    } catch (error) {
-      alert("상단고정 변경 중 오류가 발생했습니다.");
+    } catch (err) {
+      console.error("상단고정 토글 오류:", err);
     }
   };
 
@@ -64,16 +58,13 @@ export default function PortalNoticesPage() {
       const response = await fetch(`/api/notices/${id}`, {
         method: "DELETE",
       });
-      const result = await response.json();
 
-      if (result.success) {
+      if (response.ok) {
         // 목록 새로고침
         fetchNotices(page);
-      } else {
-        alert("삭제에 실패했습니다.");
       }
-    } catch (error) {
-      alert("삭제 중 오류가 발생했습니다.");
+    } catch (err) {
+      console.error("공지사항 삭제 오류:", err);
     }
   };
 
@@ -95,17 +86,9 @@ export default function PortalNoticesPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-lg">로딩 중...</div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
       <div className="card">
         <h2 className="text-xl font-semibold mb-4">공지사항 관리</h2>
-        <div className="text-red-600">{error}</div>
+        <div className="text-lg">로딩 중...</div>
       </div>
     );
   }

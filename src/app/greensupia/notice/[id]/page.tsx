@@ -1,17 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import Link from "next/link";
 import Header from "@/components/Header";
 import { Notice } from "@/types/notice";
 
 export default function NoticeDetailPage() {
   const params = useParams();
-  const router = useRouter();
   const [notice, setNotice] = useState<Notice | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchNotice = async () => {
@@ -22,11 +20,9 @@ export default function NoticeDetailPage() {
 
         if (result.success) {
           setNotice(result.data);
-        } else {
-          setError("공지사항을 찾을 수 없습니다.");
         }
       } catch (error) {
-        setError("공지사항을 불러오는 중 오류가 발생했습니다.");
+        console.error("공지사항 불러오기 오류:", error);
       } finally {
         setLoading(false);
       }
@@ -69,7 +65,7 @@ export default function NoticeDetailPage() {
     );
   }
 
-  if (error || !notice) {
+  if (!notice) {
     return (
       <div className="greensupia-notice">
         <Header />
@@ -77,7 +73,7 @@ export default function NoticeDetailPage() {
           <div className="text-center">
             <div className="greensupia-notice__empty">
               <p className="text-red-800 text-lg mb-4">
-                {error || "공지사항을 찾을 수 없습니다."}
+                공지사항을 찾을 수 없습니다.
               </p>
               <Link
                 href="/greensupia/notice"

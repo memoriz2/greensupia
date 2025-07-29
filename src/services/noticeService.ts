@@ -1,7 +1,6 @@
+import { Notice } from "@/types/notice";
 import { NoticeRepository } from "@/repositories/noticeRepository";
 import {
-  Notice,
-  NoticeAttachment,
   CreateNoticeRequest,
   UpdateNoticeRequest,
   NoticeListResponse,
@@ -162,8 +161,8 @@ export class NoticeService {
   }
 
   // 첨부파일 삭제
-  async deleteAttachment(attachmentId: number): Promise<boolean> {
-    return await this.repository.deleteAttachment(attachmentId);
+  async deleteAttachment(attachmentId: number): Promise<void> {
+    await this.repository.deleteAttachment(attachmentId);
   }
 
   // 응답 형식 변환

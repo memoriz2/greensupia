@@ -1,17 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import TipTapEditor from "@/components/TipTapEditor";
 import { Notice } from "@/types/notice";
 
-export default function WriteNoticePage() {
+function WriteNoticeContent() {
   const router = useRouter();
   const params = useParams();
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   // 폼 상태
@@ -43,11 +42,7 @@ export default function WriteNoticePage() {
           setIsPinned(notice.isPinned);
           setIsActive(notice.isActive);
         } catch (err) {
-          setError(
-            err instanceof Error
-              ? err.message
-              : "알 수 없는 오류가 발생했습니다."
-          );
+          console.error("공지사항 불러오기 오류:", err);
         } finally {
           setLoading(false);
         }
@@ -60,7 +55,6 @@ export default function WriteNoticePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-    setError(null);
 
     try {
       const formData = new FormData();
@@ -92,9 +86,7 @@ export default function WriteNoticePage() {
 
       router.push("/portal/notices");
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다."
-      );
+      console.error("제출 오류:", err);
     } finally {
       setSubmitting(false);
     }
@@ -127,12 +119,6 @@ export default function WriteNoticePage() {
 
       <div className="card">
         <form onSubmit={handleSubmit} className="modal-form">
-          {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-600">
-              {error}
-            </div>
-          )}
-
           {/* 제목 입력 */}
           <div className="form-group">
             <label htmlFor="title" className="form-label">
@@ -300,5 +286,13 @@ export default function WriteNoticePage() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function WriteNoticePage() {
+  return (
+    <Suspense fallback={<div>로딩 중...</div>}>
+      <WriteNoticeContent />
+    </Suspense>
   );
 }

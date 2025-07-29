@@ -9,7 +9,6 @@ import Pagination from "@/components/Pagination";
 export default function NoticePage() {
   const [notices, setNotices] = useState<Notice[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
@@ -24,11 +23,9 @@ export default function NoticePage() {
         setNotices(result.data.notices);
         setTotal(result.data.total);
         setTotalPages(Math.ceil(result.data.total / 10));
-      } else {
-        setError("공지사항을 불러오는데 실패했습니다.");
       }
     } catch (error) {
-      setError("공지사항을 불러오는 중 오류가 발생했습니다.");
+      console.error("공지사항 불러오기 오류:", error);
     } finally {
       setLoading(false);
     }
@@ -44,14 +41,6 @@ export default function NoticePage() {
       month: "2-digit",
       day: "2-digit",
     });
-  };
-
-  const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return "0 Bytes";
-    const k = 1024;
-    const sizes = ["Bytes", "KB", "MB", "GB"];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
   if (loading) {
@@ -82,12 +71,6 @@ export default function NoticePage() {
             </p>
           </div>
         </div>
-
-        {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-            <p className="text-red-800">{error}</p>
-          </div>
-        )}
 
         {/* 공지사항 목록 */}
         <div className="greensupia-notice__list">

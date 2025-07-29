@@ -223,14 +223,14 @@ export class NoticeRepository {
   }
 
   // 첨부파일 삭제
-  async deleteAttachment(attachmentId: number): Promise<boolean> {
+  async deleteAttachment(id: number): Promise<void> {
     try {
       await prisma.noticeAttachment.delete({
-        where: { id: attachmentId },
+        where: { id },
       });
-      return true;
-    } catch (error) {
-      return false;
+    } catch (err) {
+      console.error("첨부파일 삭제 오류:", err);
+      throw new Error("첨부파일 삭제에 실패했습니다.");
     }
   }
 
@@ -251,5 +251,16 @@ export class NoticeRepository {
     };
 
     return convertedAttachment as NoticeAttachment;
+  }
+
+  async deleteNotice(id: number): Promise<void> {
+    try {
+      await prisma.notice.delete({
+        where: { id },
+      });
+    } catch (err) {
+      console.error("공지사항 삭제 오류:", err);
+      throw new Error("공지사항 삭제에 실패했습니다.");
+    }
   }
 }
