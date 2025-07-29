@@ -79,31 +79,11 @@ export default function Header() {
             공지사항
           </Link>
           <Link
-            href="/greensupia/projects"
-            className="greensupia-header__nav-item"
-          >
-            프로젝트
-          </Link>
-          <Link
             href="/greensupia/contact"
             className="greensupia-header__nav-item"
           >
             문의하기
           </Link>
-          <div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
-            <Link
-              href="/greensupia/contact"
-              className="greensupia-header__cta-button greensupia-header__cta-button--primary"
-            >
-              무료 견적
-            </Link>
-            <Link
-              href="/portal"
-              className="greensupia-header__cta-button greensupia-header__cta-button--secondary"
-            >
-              관리자
-            </Link>
-          </div>
         </div>
       </div>
     </header>
