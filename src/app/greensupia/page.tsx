@@ -570,14 +570,14 @@ export default function GreensupiaHomePage() {
 
         {/* 인사말 섹션 */}
         {greeting && (
-          <section className="mb-12 text-center">
-            <h2 className="text-3xl font-bold text-gray-900 mb-8">
-              {greeting.title}
-            </h2>
-            <div
-              className="max-w-4xl mx-auto prose prose-lg text-center"
-              dangerouslySetInnerHTML={{ __html: greeting.content }}
-            />
+          <section className="greensupia-greeting">
+            <h2 className="greensupia-greeting__title">{greeting.title}</h2>
+            <div className="greensupia-greeting__container">
+              <div
+                className="greensupia-greeting__content"
+                dangerouslySetInnerHTML={{ __html: greeting.content }}
+              />
+            </div>
           </section>
         )}
 
