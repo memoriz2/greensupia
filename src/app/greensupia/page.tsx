@@ -520,8 +520,8 @@ export default function GreensupiaHomePage() {
                   What is Lorem Ipsum? <br />
                   Lorem Ipsum is simply dummy text of the printing and
                   typesetting industry. <br />
-                  Lorem Ipsum has been the industry's standard dummy text ever
-                  since the 1500s, <br />
+                  Lorem Ipsum has been the industry&apos;s standard dummy text
+                  ever since the 1500s, <br />
                   when an unknown printer took a galley of type and scrambled it
                   to make a type specimen book.
                 </p>
@@ -668,9 +668,11 @@ export default function GreensupiaHomePage() {
             <div className="bg-white rounded-lg shadow-sm border p-8 text-center">
               <div className="greensupia-organization__container">
                 {organizationChart.imageUrl ? (
-                  <img
+                  <Image
                     src={organizationChart.imageUrl}
                     alt="조직도"
+                    width={800}
+                    height={600}
                     className="greensupia-organization__image"
                     onError={(e) => {
                       console.error(
