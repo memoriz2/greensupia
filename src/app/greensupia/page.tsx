@@ -455,36 +455,36 @@ export default function GreensupiaHomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="greensupia-home">
       <Header />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* 배너 섹션 */}
-        {banner && banner.imageUrl && (
-          <section className="mb-12 text-center">
-            <div
-              className="greensupia-banner"
-              style={{
-                backgroundImage: `url(${banner.imageUrl})`,
-              }}
-            >
-              <div className="greensupia-banner__overlay"></div>
-              <div className="greensupia-banner__content">
-                <h2>{banner.title}</h2>
-                <p>
-                  What is Lorem Ipsum? <br />
-                  Lorem Ipsum is simply dummy text of the printing and
-                  typesetting industry. <br />
-                  Lorem Ipsum has been the industry&apos;s standard dummy text
-                  ever since the 1500s, <br />
-                  when an unknown printer took a galley of type and scrambled it
-                  to make a type specimen book.
-                </p>
-              </div>
+      {/* 배너 섹션 - 전체 너비 */}
+      {banner && banner.imageUrl && (
+        <section className="greensupia-banner-full">
+          <div
+            className="greensupia-banner"
+            style={{
+              backgroundImage: `url(${banner.imageUrl})`,
+            }}
+          >
+            <div className="greensupia-banner__overlay"></div>
+            <div className="greensupia-banner__content">
+              <h2>{banner.title}</h2>
+              <p>
+                What is Lorem Ipsum? <br />
+                Lorem Ipsum is simply dummy text of the printing and typesetting
+                industry. <br />
+                Lorem Ipsum has been the industry&apos;s standard dummy text
+                ever since the 1500s, <br />
+                when an unknown printer took a galley of type and scrambled it
+                to make a type specimen book.
+              </p>
             </div>
-          </section>
-        )}
+          </div>
+        </section>
+      )}
 
+      <main className="greensupia-home__container">
         {/* 기본 히어로 섹션 (배너가 없을 때) */}
         {!banner && (
           <section className="mb-12 bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 py-20 rounded-lg relative overflow-hidden text-center">

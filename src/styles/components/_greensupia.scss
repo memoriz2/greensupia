@@ -1,5 +1,43 @@
 // Greensupia 페이지 스타일
 
+// 홈페이지 배경
+.greensupia-home {
+  min-height: 100vh;
+  background-image: url("/home_background.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(249, 250, 251, 0.85); // 반투명 오버레이
+    z-index: 1;
+  }
+
+  &__container {
+    max-width: 80rem;
+    margin: 0 auto;
+    padding: 0 1rem;
+    position: relative;
+    z-index: 2;
+  }
+}
+
+// 전체 너비 배너 섹션
+.greensupia-banner-full {
+  width: 100%;
+  margin-bottom: 3rem;
+  position: relative;
+  z-index: 2;
+}
+
 // 인사말 섹션
 .greensupia-greeting {
   margin-bottom: 3rem;
