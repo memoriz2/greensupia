@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
     DATABASE_URL: process.env.DATABASE_URL,
   },
   // 가비아 호스팅을 위한 설정
-  output: "standalone", // 독립 실행 가능한 빌드
+  trailingSlash: true, // URL 끝에 슬래시 추가
   experimental: {
     // 최신 기능 활성화
   },
@@ -32,6 +32,15 @@ const nextConfig: NextConfig = {
           {
             key: "Content-Type",
             value: "font/woff2; charset=utf-8",
+          },
+        ],
+      },
+      {
+        source: "/banner-news/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
           },
         ],
       },
