@@ -538,10 +538,8 @@ export default function GreensupiaHomePage() {
 
         {/* 배너뉴스 섹션 */}
         {bannerNews && bannerNews.length > 0 && (
-          <section className="mb-12 text-center">
-            <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-              최신 소식
-            </h2>
+          <section className="greensupia-news greensupia-section">
+            <h2 className="greensupia-contact__title">최신 소식</h2>
             <div className="greensupia-news__grid">
               {bannerNews.slice(0, 4).map((news) => (
                 <article key={news.id} className="greensupia-news__item">
@@ -589,10 +587,8 @@ export default function GreensupiaHomePage() {
 
         {/* 비디오 섹션 */}
         {video && video.isActive && (
-          <section className="mb-12 text-center">
-            <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-              회사 소개 영상
-            </h2>
+          <section className="greensupia-video greensupia-section">
+            <h2 className="greensupia-contact__title">회사 소개 영상</h2>
             <div className="bg-white rounded-lg shadow-sm border p-8 text-center">
               {/* <h3 className="text-2xl font-semibold text-gray-900 mb-4 text-center">
                 {video.title}
@@ -616,33 +612,33 @@ export default function GreensupiaHomePage() {
 
         {/* 조직도 섹션 */}
         {organizationChart && organizationChart.isActive && (
-          <section className="mb-12 text-center">
-            <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-              조직도
-            </h2>
-            <div className="bg-white rounded-lg shadow-sm border p-8 text-center">
-              <div className="greensupia-organization__container">
-                {organizationChart.imageUrl ? (
-                  <Image
-                    src={organizationChart.imageUrl}
-                    alt="조직도"
-                    width={800}
-                    height={600}
-                    className="greensupia-organization__image"
-                    onError={(e) => {
-                      console.error(
-                        "조직도 이미지 로드 실패:",
-                        organizationChart.imageUrl
-                      );
-                      const target = e.target as HTMLImageElement;
-                      target.style.display = "none";
-                    }}
-                  />
-                ) : (
-                  <div className="greensupia-organization__placeholder">
-                    조직도 이미지를 불러올 수 없습니다.
-                  </div>
-                )}
+          <section className="greensupia-organization greensupia-section">
+            <h2 className="greensupia-contact__title">조직도</h2>
+            <div className="greensupia-news__container">
+              <div className="bg-white rounded-lg shadow-sm border p-4 text-center">
+                <div className="greensupia-organization__container">
+                  {organizationChart.imageUrl ? (
+                    <Image
+                      src={organizationChart.imageUrl}
+                      alt="조직도"
+                      width={800}
+                      height={600}
+                      className="greensupia-organization__image"
+                      onError={(e) => {
+                        console.error(
+                          "조직도 이미지 로드 실패:",
+                          organizationChart.imageUrl
+                        );
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = "none";
+                      }}
+                    />
+                  ) : (
+                    <div className="greensupia-organization__placeholder">
+                      조직도 이미지를 불러올 수 없습니다.
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </section>
@@ -650,10 +646,8 @@ export default function GreensupiaHomePage() {
 
         {/* 히스토리 섹션 */}
         {histories.length > 0 && (
-          <section className="mb-12 text-center">
-            <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-              회사 연혁
-            </h2>
+          <section className="greensupia-history greensupia-section">
+            <h2 className="greensupia-contact__title">회사 연혁</h2>
             <div className="bg-white rounded-lg shadow-sm border p-8 text-center">
               <div className="max-w-4xl mx-auto">
                 <div className="greensupia-history__timeline">

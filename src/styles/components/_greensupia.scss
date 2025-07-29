@@ -1,6 +1,11 @@
 // Greensupia 페이지 스타일
 
-// 홈페이지 배경
+// 공통 섹션 스타일
+.greensupia-section {
+  margin-bottom: 3rem;
+}
+
+// 홈 페이지 컨테이너
 .greensupia-home {
   background-image: url("/home_background.png");
   background-size: cover;
@@ -60,13 +65,13 @@
     border-radius: 0.5rem;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     border: 1px solid #e5e7eb;
-    padding: 2rem;
+    padding: 3rem;
     text-align: center;
-    max-width: 64rem;
+    max-width: 80rem;
     margin: 0 auto;
 
     @media (max-width: 768px) {
-      padding: 1.25rem;
+      padding: 2rem;
     }
   }
 
@@ -75,6 +80,8 @@
     line-height: 1.7;
     text-align: center;
     font-size: 1.125rem;
+    max-width: 60rem; // 최대 너비 제한
+    margin: 0 auto; // 중앙 정렬
 
     @media (max-width: 768px) {
       font-size: 0.875rem;
@@ -242,6 +249,11 @@
     left: 1.5rem;
     color: white;
     z-index: 10;
+
+    // 최신소식과 동일한 마진 적용
+    @media (min-width: 80rem) {
+      left: calc((100vw - 80rem) / 2 + 1rem);
+    }
 
     h2 {
       font-size: 1.5rem;
@@ -450,8 +462,18 @@
 // 조직도 섹션
 .greensupia-organization {
   &__container {
-    max-width: 64rem;
+    max-width: 80rem;
     margin: 0 auto;
+    padding: 3rem;
+    background: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+
+    // 최신소식과 정확히 동일한 마진 적용
+    @media (max-width: 80rem) {
+      padding: 3rem;
+    }
   }
 
   &__image {
@@ -477,9 +499,9 @@
 .greensupia-history {
   &__timeline {
     position: relative;
-    max-width: 60rem; // 타임라인 최대 너비 제한
+    max-width: 80rem; // 최신소식과 동일한 최대 너비
     margin: 0 auto; // 중앙 정렬
-    padding: 0 2rem; // 좌우 패딩 추가
+    padding: 0; // 패딩 제거
   }
 
   &__year-group {
@@ -522,7 +544,7 @@
 
   &__year-content {
     padding: 0; // 기존 패딩 제거
-    max-width: 50rem; // 콘텐츠 최대 너비 제한
+    max-width: 80rem; // 최신소식과 동일한 최대 너비
   }
 
   &__item {
@@ -654,17 +676,22 @@
   text-align: center;
 
   &__title {
-    font-size: 1.875rem;
+    font-size: 1.5rem; // 모바일 기본 크기
     font-weight: 700;
     color: #111827;
     margin-bottom: 2rem;
     text-align: center;
+
+    // 데스크톱에서 더 큰 크기
+    @media (min-width: 768px) {
+      font-size: 1.875rem;
+    }
   }
 
   &__container {
-    max-width: 72rem;
+    max-width: 80rem;
     margin: 0 auto;
-    padding: 0 1rem;
+    padding: 0;
   }
 
   &__content {
@@ -768,10 +795,16 @@
   }
 
   &__title {
-    font-size: 2.5rem;
+    font-size: 1.25rem; // 모바일 기본 크기 (더 작게)
     font-weight: 700;
     color: #111827;
-    margin-bottom: 0.75rem;
+    margin-bottom: 2rem;
+    text-align: center;
+
+    // 데스크톱에서 더 큰 크기
+    @media (min-width: 768px) {
+      font-size: 1.875rem;
+    }
   }
 
   &__description {
