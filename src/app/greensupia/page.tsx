@@ -516,7 +516,15 @@ export default function GreensupiaHomePage() {
               <div className="greensupia-banner__overlay"></div>
               <div className="greensupia-banner__content">
                 <h2>{banner.title}</h2>
-                <p>혁신적인 웹 개발로 비즈니스 성장을 이끌어드립니다</p>
+                <p>
+                  What is Lorem Ipsum? <br />
+                  Lorem Ipsum is simply dummy text of the printing and
+                  typesetting industry. <br />
+                  Lorem Ipsum has been the industry's standard dummy text ever
+                  since the 1500s, <br />
+                  when an unknown printer took a galley of type and scrambled it
+                  to make a type specimen book.
+                </p>
               </div>
             </div>
           </section>
