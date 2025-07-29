@@ -97,3 +97,34 @@ model Greeting {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+// 공지사항 모델
+model Notice {
+  id          Int      @id @default(autoincrement())
+  title       String
+  content     String   @db.LongText // TipTap HTML 콘텐츠
+  author      String   @default("관리자") // 작성자
+  isPinned    Boolean  @default(false) // 상단고정 여부
+  viewCount   Int      @default(0) // 조회수
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // 파일 첨부 관계
+  attachments NoticeAttachment[]
+}
+
+// 공지사항 첨부파일 모델
+model NoticeAttachment {
+  id        Int      @id @default(autoincrement())
+  noticeId  Int      // 공지사항 ID
+  fileName  String   // 원본 파일명
+  filePath  String   // 저장된 파일 경로
+  fileSize  Int      // 파일 크기 (bytes)
+  mimeType  String   // MIME 타입
+  downloadCount Int  @default(0) // 다운로드 횟수
+  createdAt DateTime @default(now())
+  
+  // 관계 설정
+  notice    Notice   @relation(fields: [noticeId], references: [id], onDelete: Cascade)
+}

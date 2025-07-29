@@ -39,6 +39,9 @@ export default function AdminLayout({
                 <a href="/portal">📊 대시보드</a>
               </li>
               <li>
+                <a href="/portal/notices">📢 공지사항 관리</a>
+              </li>
+              <li>
                 <a href="/portal/videos">🎥 비디오 관리</a>
               </li>
               <li>

@@ -22,6 +22,12 @@ interface DashboardStats {
     active: number;
     inactive: number;
   };
+  notices: {
+    total: number;
+    pinned: number;
+    active: number;
+    inactive: number;
+  };
 }
 
 export default function AdminDashboard() {
@@ -32,18 +38,21 @@ export default function AdminDashboard() {
     const fetchStats = async () => {
       try {
         // 각 API에서 기본 데이터 가져오기
-        const [todoData, orgData, historyData, bannerData] = await Promise.all([
-          fetch("/api/todos").then((res) => res.json()),
-          fetch("/api/organization").then((res) => res.json()),
-          fetch("/api/history").then((res) => res.json()),
-          fetch("/api/banner-news").then((res) => res.json()),
-        ]);
+        const [todoData, orgData, historyData, bannerData, noticeData] =
+          await Promise.all([
+            fetch("/api/todos").then((res) => res.json()),
+            fetch("/api/organization").then((res) => res.json()),
+            fetch("/api/history").then((res) => res.json()),
+            fetch("/api/banner-news").then((res) => res.json()),
+            fetch("/api/notices").then((res) => res.json()),
+          ]);
 
         // 데이터를 기반으로 통계 계산
         const todos = Array.isArray(todoData) ? todoData : [];
         const organization = Array.isArray(orgData) ? orgData : [];
         const history = Array.isArray(historyData) ? historyData : [];
         const bannerNews = Array.isArray(bannerData) ? bannerData : [];
+        const notices = noticeData?.data?.notices || [];
 
         setStats({
           todos: {
@@ -98,6 +107,18 @@ export default function AdminDashboard() {
               (news: { isActive: boolean }) => !news.isActive
             ).length,
           },
+          notices: {
+            total: notices.length,
+            pinned: notices.filter(
+              (notice: { isPinned: boolean }) => notice.isPinned
+            ).length,
+            active: notices.filter(
+              (notice: { isActive: boolean }) => notice.isActive
+            ).length,
+            inactive: notices.filter(
+              (notice: { isActive: boolean }) => !notice.isActive
+            ).length,
+          },
         });
       } catch (error) {
         console.error("대시보드 데이터 로딩 실패:", error);
@@ -107,6 +128,7 @@ export default function AdminDashboard() {
           organization: { total: 0, departments: [] },
           history: { total: 0, yearRange: { min: 2024, max: 2024 } },
           bannerNews: { total: 0, active: 0, inactive: 0 },
+          notices: { total: 0, pinned: 0, active: 0, inactive: 0 },
         });
       } finally {
         setLoading(false);
@@ -235,12 +257,35 @@ export default function AdminDashboard() {
             </div>
           </div>
         </div>
+
+        {/* 공지사항 통계 */}
+        <div className="card card-stats">
+          <div className="stat-number">{stats.notices.total}</div>
+          <div className="stat-label">공지사항</div>
+          <div className="mt-2 text-sm text-gray-500">
+            고정: {stats.notices.pinned} | 활성: {stats.notices.active} |
+            비활성: {stats.notices.inactive}
+          </div>
+          <div className="mt-2">
+            <div className="flex gap-2">
+              <span className="px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full">
+                고정 {stats.notices.pinned}
+              </span>
+              <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">
+                활성 {stats.notices.active}
+              </span>
+              <span className="px-2 py-1 text-xs bg-red-100 text-red-800 rounded-full">
+                비활성 {stats.notices.inactive}
+              </span>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* 빠른 액션 */}
       <section className="card">
         <h2 className="text-xl font-semibold mb-4">빠른 액션</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           <button className="btn btn-primary">
             <span>📝</span>새 할일 추가
           </button>
@@ -255,6 +300,10 @@ export default function AdminDashboard() {
           <button className="btn btn-warning">
             <span>📰</span>
             배너뉴스 등록
+          </button>
+          <button className="btn btn-info">
+            <span>📢</span>
+            공지사항 관리
           </button>
         </div>
       </section>

@@ -1,0 +1,221 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { Notice } from "@/types/notice";
+import Pagination from "@/components/Pagination";
+
+export default function PortalNoticesPage() {
+  const [notices, setNotices] = useState<Notice[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+
+  const fetchNotices = async (pageNum: number = 1) => {
+    try {
+      setLoading(true);
+      const response = await fetch(`/api/notices?page=${pageNum}&limit=10`);
+      const result = await response.json();
+
+      if (result.success) {
+        setNotices(result.data.notices);
+        setTotal(result.data.total);
+        setTotalPages(Math.ceil(result.data.total / 10));
+      } else {
+        setError("공지사항을 불러오는데 실패했습니다.");
+      }
+    } catch (error) {
+      setError("공지사항을 불러오는 중 오류가 발생했습니다.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotices(page);
+  }, [page]);
+
+  const handleTogglePin = async (id: number) => {
+    try {
+      const response = await fetch(`/api/notices/${id}/toggle`, {
+        method: "PATCH",
+      });
+      const result = await response.json();
+
+      if (result.success) {
+        // 목록 새로고침
+        fetchNotices(page);
+      } else {
+        alert("상단고정 변경에 실패했습니다.");
+      }
+    } catch (error) {
+      alert("상단고정 변경 중 오류가 발생했습니다.");
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    if (!confirm("정말로 이 공지사항을 삭제하시겠습니까?")) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/notices/${id}`, {
+        method: "DELETE",
+      });
+      const result = await response.json();
+
+      if (result.success) {
+        // 목록 새로고침
+        fetchNotices(page);
+      } else {
+        alert("삭제에 실패했습니다.");
+      }
+    } catch (error) {
+      alert("삭제 중 오류가 발생했습니다.");
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("ko-KR", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+  };
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return "0 Bytes";
+    const k = 1024;
+    const sizes = ["Bytes", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-lg">로딩 중...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="card">
+        <h2 className="text-xl font-semibold mb-4">공지사항 관리</h2>
+        <div className="text-red-600">{error}</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold text-gray-900">공지사항 관리</h1>
+        <Link href="/portal/notices/new/write" className="btn btn-primary">
+          새 공지사항 작성
+        </Link>
+      </div>
+
+      <div className="card">
+        <div className="overflow-x-auto">
+          <table className="table">
+            <thead>
+              <tr>
+                <th>상태</th>
+                <th>제목</th>
+                <th>작성자</th>
+                <th>작성일</th>
+                <th>조회수</th>
+                <th>첨부파일</th>
+                <th>관리</th>
+              </tr>
+            </thead>
+            <tbody>
+              {notices.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="text-center py-8 text-gray-500">
+                    등록된 공지사항이 없습니다.
+                  </td>
+                </tr>
+              ) : (
+                notices.map((notice) => (
+                  <tr key={notice.id}>
+                    <td>
+                      <div className="flex items-center gap-2">
+                        {notice.isPinned && (
+                          <span className="status-badge active">📌 고정</span>
+                        )}
+                        {!notice.isActive && (
+                          <span className="status-badge inactive">비활성</span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="max-w-xs truncate font-medium">
+                      {notice.title}
+                    </td>
+                    <td>{notice.author}</td>
+                    <td>{formatDate(notice.createdAt)}</td>
+                    <td>{notice.viewCount}</td>
+                    <td className="max-w-md">
+                      {notice.attachments && notice.attachments.length > 0 ? (
+                        <div className="flex flex-col gap-1">
+                          {notice.attachments.map((attachment) => (
+                            <div
+                              key={attachment.id}
+                              className="text-xs text-gray-600"
+                            >
+                              📎 {attachment.fileName} (
+                              {formatFileSize(attachment.fileSize)})
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <span className="text-gray-400">없음</span>
+                      )}
+                    </td>
+                    <td>
+                      <div className="flex items-center gap-2">
+                        <Link
+                          href={`/portal/notices/${notice.id}/write?edit=true`}
+                          className="btn btn-sm btn-outline"
+                        >
+                          수정
+                        </Link>
+                        <button
+                          onClick={() => handleTogglePin(notice.id)}
+                          className={`btn btn-sm ${
+                            notice.isPinned ? "btn-warning" : "btn-outline"
+                          }`}
+                        >
+                          {notice.isPinned ? "고정해제" : "고정"}
+                        </button>
+                        <button
+                          onClick={() => handleDelete(notice.id)}
+                          className="btn btn-sm btn-danger"
+                        >
+                          삭제
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* 페이지네이션 */}
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          totalItems={total}
+          itemsPerPage={10}
+          onPageChange={setPage}
+        />
+      </div>
+    </div>
+  );
+}
