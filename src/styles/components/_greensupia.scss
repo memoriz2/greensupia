@@ -1,5 +1,33 @@
 // Greensupia 페이지 스타일
 
+// 전체 레이아웃 배경 스타일
+.greensupia-layout {
+  min-height: 100vh;
+  position: relative;
+}
+
+.greensupia-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("/home_background.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  z-index: 1;
+}
+
+.greensupia-overlay {
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  background: rgba(255, 255, 255, 0.85); // 반투명 오버레이로 콘텐츠 가독성 확보
+  backdrop-filter: blur(1px); // 약간의 블러 효과
+}
+
 // 홈페이지 배경
 .greensupia-home {
   min-height: 100vh;
@@ -635,7 +663,7 @@
 // 공지사항 페이지 스타일
 .greensupia-notice {
   min-height: 100vh;
-  background-image: url("/notice_background.png");
+  background-image: url("/home_background.png"); // notice_background.png에서 변경
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

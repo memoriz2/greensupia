@@ -19,8 +19,10 @@ export default function GreensupiaLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className={`${geist.variable} min-h-screen bg-gray-50`}>
-      {children}
+    <div className={`${geist.variable} greensupia-layout`}>
+      <div className="greensupia-background">
+        <div className="greensupia-overlay">{children}</div>
+      </div>
     </div>
   );
 }
