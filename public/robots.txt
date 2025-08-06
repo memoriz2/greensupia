@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+# 관리자 페이지는 크롤링 제한
+Disallow: /portal/
+Disallow: /api/
+
+# 문의하기 페이지는 비밀글이라 크롤링 제한
+Disallow: /greensupia/contact/
+
+# 사이트맵 위치
+Sitemap: https://jseo.shop/sitemap.xml 

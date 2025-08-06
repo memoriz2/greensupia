@@ -46,7 +46,7 @@ export default function Header() {
               공지사항
             </Link>
             <Link
-              href="/greensupia/contact"
+              href="/greensupia/inquiry"
               className="greensupia-header__nav-item"
             >
               문의하기
@@ -79,7 +79,7 @@ export default function Header() {
             공지사항
           </Link>
           <Link
-            href="/greensupia/contact"
+            href="/greensupia/inquiry"
             className="greensupia-header__nav-item"
           >
             문의하기

@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import Header from "@/components/Header";
 import { Notice } from "@/types/notice";
 import Pagination from "@/components/Pagination";
 
@@ -45,23 +44,20 @@ export default function NoticePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <Header />
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="greensupia-notice">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
             <p className="mt-4 text-gray-600">공지사항을 불러오는 중...</p>
           </div>
-        </main>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="greensupia-notice">
-      <Header />
-
-      <main className="greensupia-notice__container">
+      <div className="greensupia-notice__container">
         {/* 페이지 헤더 */}
         <div className="greensupia-notice__header">
           <div className="greensupia-notice__header-content">
@@ -169,7 +165,7 @@ export default function NoticePage() {
             />
           </div>
         )}
-      </main>
+      </div>
     </div>
   );
 }

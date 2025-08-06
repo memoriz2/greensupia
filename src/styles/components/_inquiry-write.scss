@@ -1,0 +1,243 @@
+// 문의글 작성/수정 페이지 스타일
+.inquiry-write,
+.inquiry-edit {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+
+  &__header {
+    text-align: center;
+    margin-bottom: 2rem;
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      color: #666;
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+  }
+
+  &__form-section {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  &__fieldset {
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 1.5rem;
+    background: #fafafa;
+
+    &:focus-within {
+      border-color: #007bff;
+      box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+    }
+  }
+
+  &__legend {
+    font-weight: 600;
+    color: #333;
+    font-size: 1.1rem;
+    padding: 0 0.5rem;
+    background: #fafafa;
+  }
+
+  &__field {
+    margin-bottom: 1.5rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  &__label {
+    display: block;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+  }
+
+  &__required {
+    color: #dc3545;
+    font-weight: 600;
+  }
+
+  &__input,
+  &__textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+
+    &:focus {
+      outline: none;
+      border-color: #007bff;
+      box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+    }
+
+    &::placeholder {
+      color: #999;
+    }
+  }
+
+  &__textarea {
+    resize: vertical;
+    min-height: 120px;
+    font-family: inherit;
+  }
+
+  &__checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-weight: 500;
+    color: #333;
+  }
+
+  &__checkbox {
+    width: 1.2rem;
+    height: 1.2rem;
+    accent-color: #007bff;
+  }
+
+  &__checkbox-text {
+    font-size: 0.95rem;
+  }
+
+  &__help {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.85rem;
+    color: #666;
+    line-height: 1.4;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    padding-top: 1rem;
+    border-top: 1px solid #e0e0e0;
+  }
+
+  &__button {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 100px;
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    &--primary {
+      background: #007bff;
+      color: white;
+
+      &:hover:not(:disabled) {
+        background: #0056b3;
+      }
+    }
+
+    &--secondary {
+      background: #6c757d;
+      color: white;
+
+      &:hover:not(:disabled) {
+        background: #545b62;
+      }
+    }
+  }
+
+  // 로딩 상태
+  &__loading {
+    text-align: center;
+    padding: 3rem 1rem;
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      color: #666;
+      font-size: 1.1rem;
+    }
+  }
+
+  // 에러 상태
+  &__error {
+    text-align: center;
+    padding: 3rem 1rem;
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      color: #dc3545;
+    }
+
+    p {
+      color: #666;
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+    }
+  }
+}
+
+// 반응형 디자인
+@media (max-width: 768px) {
+  .inquiry-write,
+  .inquiry-edit {
+    padding: 1rem;
+
+    &__header {
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      p {
+        font-size: 0.9rem;
+      }
+    }
+
+    &__form-section {
+      padding: 1.5rem;
+    }
+
+    &__fieldset {
+      padding: 1rem;
+    }
+
+    &__actions {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    &__button {
+      width: 100%;
+    }
+  }
+}

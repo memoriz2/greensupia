@@ -128,3 +128,29 @@ model NoticeAttachment {
   // 관계 설정
   notice    Notice   @relation(fields: [noticeId], references: [id], onDelete: Cascade)
 }
+
+// 문의하기 모델
+model Inquiry {
+  id          Int      @id @default(autoincrement())
+  title       String   // 제목
+  content     String   @db.LongText // 내용 (일반글/비밀글 모두)
+  author      String   // 작성자
+  email       String?  // 이메일 (암호화된 상태)
+  
+  // 비밀글 관련
+  isSecret    Boolean  @default(false)  // 비밀글 여부
+  password    String?  // 비밀글 비밀번호 (해시된 상태)
+  
+  // 답변 상태 관리
+  isAnswered  Boolean  @default(false)  // 답변 완료 여부
+  answer      String?  @db.LongText // 답변 내용
+  answeredAt  DateTime? // 답변 작성 시간
+  
+  // 시간 정보
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // 인덱스
+  @@index([isAnswered, createdAt])
+  @@index([isSecret, isAnswered])
+}

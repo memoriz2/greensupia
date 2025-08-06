@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
     DATABASE_URL: process.env.DATABASE_URL,
   },
   // 가비아 호스팅을 위한 설정
-  trailingSlash: true, // URL 끝에 슬래시 추가
+  trailingSlash: true,
   experimental: {
     // 최신 기능 활성화
   },
@@ -41,6 +41,48 @@ const nextConfig: NextConfig = {
           {
             key: "Cache-Control",
             value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      // SEO 최적화 헤더
+      {
+        source: "/(.*)",
+        headers: [
+          {
+            key: "X-Robots-Tag",
+            value: "index, follow",
+          },
+          {
+            key: "X-Content-Type-Options",
+            value: "nosniff",
+          },
+          {
+            key: "X-Frame-Options",
+            value: "DENY",
+          },
+          {
+            key: "X-XSS-Protection",
+            value: "1; mode=block",
+          },
+        ],
+      },
+      // 관리자 페이지는 크롤링 제한
+      {
+        source: "/portal/(.*)",
+        headers: [
+          {
+            key: "X-Robots-Tag",
+            value: "noindex, nofollow",
+          },
+        ],
+      },
+      // 문의하기 페이지는 비밀글이라 크롤링 제한
+      {
+        source: "/greensupia/contact",
+        headers: [
+          {
+            key: "X-Robots-Tag",
+            value: "noindex, nofollow",
           },
         ],
       },

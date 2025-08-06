@@ -33,6 +33,13 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# deployment guides (contains sensitive information)
+가비아_서버_배포_시나리오.md
+환경변수_설정_가이드.md
+*_배포_*.md
+*_설정_*.md
+*_가이드_*.md
+
 # vercel
 .vercel
 

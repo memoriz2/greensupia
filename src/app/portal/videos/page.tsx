@@ -430,9 +430,9 @@ export default function VideoManagementPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="portal space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">비디오 관리</h1>
+        <h1 className="text-2xl font-bold">비디오 관리</h1>
         <button
           className="btn btn-primary"
           onClick={() => setShowAddForm(true)}

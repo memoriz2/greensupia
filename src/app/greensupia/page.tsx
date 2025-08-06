@@ -3,8 +3,9 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import Header from "@/components/Header";
 import { BannerNews } from "@/types/bannerNews";
+import { generateGreensupiaMetadata } from "@/utils/seo";
+import { OrganizationStructuredData } from "@/components/StructuredData";
 
 // Google Maps API 타입 선언
 declare global {
@@ -456,7 +457,26 @@ export default function GreensupiaHomePage() {
 
   return (
     <div className="greensupia-home">
-      <Header />
+      <OrganizationStructuredData
+        data={{
+          name: "Greensupia",
+          url: "https://jseo.shop/greensupia",
+          description:
+            "Greensupia는 친환경 비닐 제작업체로, 지속가능한 농업을 위한 혁신적인 솔루션을 제공합니다.",
+          logo: "https://jseo.shop/greensupia-logo.png",
+          address: {
+            streetAddress: "테헤란로 123",
+            addressLocality: "강남구",
+            addressRegion: "서울특별시",
+            postalCode: "06123",
+            addressCountry: "KR",
+          },
+          contactPoint: {
+            telephone: "+82-2-1234-5678",
+            contactType: "customer service",
+          },
+        }}
+      />
 
       {/* 배너 섹션 - 전체 너비 */}
       {banner && banner.imageUrl && (
@@ -507,10 +527,10 @@ export default function GreensupiaHomePage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link
-                  href="/greensupia/contact"
+                  href="/greensupia/inquiry"
                   className="bg-green-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                 >
-                  무료 견적 받기
+                  문의하기
                 </Link>
                 <Link
                   href="/greensupia/projects"
@@ -754,15 +774,6 @@ export default function GreensupiaHomePage() {
           </div>
         </section>
       </main>
-
-      {/* 푸터 */}
-      <footer className="bg-gray-900 text-white py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center text-gray-400">
-            <p>&copy; 2024 Greensupia. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

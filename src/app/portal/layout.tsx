@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import Link from "next/link";
+import UserInfo from "../../components/UserInfo";
 import "../../styles/globals.scss";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -21,10 +23,15 @@ export default function AdminLayout({
         <nav>
           <div className="header-content">
             <div className="header-left">
-              <h1 className="text-xl">JSEO 관리자 포털</h1>
+              <Link
+                href="/portal"
+                className="hover:opacity-80 transition-opacity"
+              >
+                <h1 className="text-xl cursor-pointer">JSEO 관리자 포털</h1>
+              </Link>
             </div>
             <div className="header-right">
-              <span className="user-info">관리자</span>
+              <UserInfo />
             </div>
           </div>
         </nav>
@@ -36,31 +43,34 @@ export default function AdminLayout({
           <nav>
             <ul>
               <li>
-                <a href="/portal">📊 대시보드</a>
+                <Link href="/portal">📊 대시보드</Link>
               </li>
               <li>
-                <a href="/portal/notices">📢 공지사항 관리</a>
+                <Link href="/portal/notices">📢 공지사항 관리</Link>
               </li>
               <li>
-                <a href="/portal/videos">🎥 비디오 관리</a>
+                <Link href="/portal/videos">🎥 비디오 관리</Link>
               </li>
               <li>
-                <a href="/portal/banners">🖼️ 배너 관리</a>
+                <Link href="/portal/banners">🖼️ 배너 관리</Link>
               </li>
               <li>
-                <a href="/portal/greetings">💬 인사말 관리</a>
+                <Link href="/portal/greetings">💬 인사말 관리</Link>
               </li>
               <li>
-                <a href="/portal/organization">🏢 조직도 관리</a>
+                <Link href="/portal/organization">🏢 조직도 관리</Link>
               </li>
               <li>
-                <a href="/portal/history">📅 히스토리 관리</a>
+                <Link href="/portal/history">📅 히스토리 관리</Link>
               </li>
               <li>
-                <a href="/portal/banner-news">📰 배너뉴스 관리</a>
+                <Link href="/portal/banner-news">📰 배너뉴스 관리</Link>
               </li>
               <li>
-                <a href="/portal/todos">✅ Todo 관리</a>
+                <Link href="/portal/todos">✅ Todo 관리</Link>
+              </li>
+              <li>
+                <Link href="/portal/inquiry">💬 문의하기 관리</Link>
               </li>
             </ul>
           </nav>

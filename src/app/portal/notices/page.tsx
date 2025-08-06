@@ -94,17 +94,19 @@ export default function NoticesPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">공지사항 관리</h1>
-        <Link href="/portal/notices/new/write" className="btn btn-primary">
-          새 공지사항 작성
-        </Link>
+    <div className="portal__container">
+      <div className="portal__header">
+        <div className="flex justify-between items-center">
+          <h1 className="portal__title">공지사항 관리</h1>
+          <Link href="/portal/notices/new/write" className="portal__button">
+            새 공지사항 작성
+          </Link>
+        </div>
       </div>
 
-      <div className="card">
+      <div className="portal__card">
         <div className="overflow-x-auto">
-          <table className="table">
+          <table className="portal__table">
             <thead>
               <tr>
                 <th>상태</th>
@@ -163,21 +165,35 @@ export default function NoticesPage() {
                       <div className="flex items-center gap-2">
                         <Link
                           href={`/portal/notices/${notice.id}/write?edit=true`}
-                          className="btn btn-sm btn-outline"
+                          className="portal__button"
+                          style={{
+                            fontSize: "0.875rem",
+                            padding: "0.5rem 1rem",
+                          }}
                         >
                           수정
                         </Link>
                         <button
                           onClick={() => handleTogglePin(notice.id)}
-                          className={`btn btn-sm ${
-                            notice.isPinned ? "btn-warning" : "btn-outline"
-                          }`}
+                          className="portal__button"
+                          style={{
+                            fontSize: "0.875rem",
+                            padding: "0.5rem 1rem",
+                            background: notice.isPinned
+                              ? "#ed8936"
+                              : "linear-gradient(135deg, #f8c300 0%, #ffd886 100%)",
+                          }}
                         >
                           {notice.isPinned ? "고정해제" : "고정"}
                         </button>
                         <button
                           onClick={() => handleDelete(notice.id)}
-                          className="btn btn-sm btn-danger"
+                          className="portal__button"
+                          style={{
+                            fontSize: "0.875rem",
+                            padding: "0.5rem 1rem",
+                            background: "#f56565",
+                          }}
                         >
                           삭제
                         </button>

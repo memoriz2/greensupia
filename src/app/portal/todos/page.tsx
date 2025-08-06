@@ -70,9 +70,9 @@ export default function TodosPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="portal space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">Todo 관리</h1>
+        <h1 className="text-2xl font-bold">Todo 관리</h1>
         <button className="btn btn-primary">+ 새 Todo 추가</button>
       </div>
 

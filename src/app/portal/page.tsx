@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface DashboardStats {
   todos: {
@@ -28,24 +30,78 @@ interface DashboardStats {
     active: number;
     inactive: number;
   };
+  inquiries: {
+    total: number;
+    pending: number;
+    answered: number;
+    secret: number;
+    public: number;
+    answerRate: number;
+  };
 }
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [userType, setUserType] = useState<string>("guest");
+
+  const router = useRouter();
+
+  const handleButtonClick = () => {
+    if (userType === "guest") {
+      router.push("/portal/login");
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+      setUserType("guest");
+      // 로그아웃 후 페이지 새로고침
+      window.location.reload();
+    } catch (err) {
+      console.error("로그아웃 오류:", err);
+      setUserType("guest");
+    }
+  };
+
+  const fetchUserInfo = async () => {
+    try {
+      const response = await fetch("/api/auth/me");
+      if (response.ok) {
+        const data = await response.json();
+        setUserType(data.userType || "guest");
+      } else {
+        setUserType("guest");
+      }
+    } catch (err) {
+      console.error("사용자 정보 가져오기 실패:", err);
+      setUserType("guest");
+    }
+  };
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
+        // 서버에서 사용자 정보 가져오기
+        await fetchUserInfo();
+
         // 각 API에서 기본 데이터 가져오기
-        const [todoData, orgData, historyData, bannerData, noticeData] =
-          await Promise.all([
-            fetch("/api/todos").then((res) => res.json()),
-            fetch("/api/organization").then((res) => res.json()),
-            fetch("/api/history").then((res) => res.json()),
-            fetch("/api/banner-news").then((res) => res.json()),
-            fetch("/api/notices").then((res) => res.json()),
-          ]);
+        const [
+          todoData,
+          orgData,
+          historyData,
+          bannerData,
+          noticeData,
+          inquiryStats,
+        ] = await Promise.all([
+          fetch("/api/todos").then((res) => res.json()),
+          fetch("/api/organization").then((res) => res.json()),
+          fetch("/api/history").then((res) => res.json()),
+          fetch("/api/banner-news").then((res) => res.json()),
+          fetch("/api/notices").then((res) => res.json()),
+          fetch("/api/inquiries/stats").then((res) => res.json()),
+        ]);
 
         // 데이터를 기반으로 통계 계산
         const todos = Array.isArray(todoData) ? todoData : [];
@@ -53,6 +109,11 @@ export default function AdminDashboard() {
         const history = Array.isArray(historyData) ? historyData : [];
         const bannerNews = Array.isArray(bannerData) ? bannerData : [];
         const notices = noticeData?.data?.notices || [];
+        const inquiryStatsData = inquiryStats?.data || {
+          total: 0,
+          pending: 0,
+          secret: 0,
+        };
 
         setStats({
           todos: {
@@ -119,6 +180,23 @@ export default function AdminDashboard() {
               (notice: { isActive: boolean }) => !notice.isActive
             ).length,
           },
+          inquiries: {
+            total: inquiryStatsData.total || 0,
+            pending: inquiryStatsData.pending || 0,
+            answered:
+              (inquiryStatsData.total || 0) - (inquiryStatsData.pending || 0),
+            secret: inquiryStatsData.secret || 0,
+            public:
+              (inquiryStatsData.total || 0) - (inquiryStatsData.secret || 0),
+            answerRate:
+              inquiryStatsData.total > 0
+                ? Math.round(
+                    ((inquiryStatsData.total - inquiryStatsData.pending) /
+                      inquiryStatsData.total) *
+                      100
+                  )
+                : 0,
+          },
         });
       } catch (error) {
         console.error("대시보드 데이터 로딩 실패:", error);
@@ -129,6 +207,14 @@ export default function AdminDashboard() {
           history: { total: 0, yearRange: { min: 2024, max: 2024 } },
           bannerNews: { total: 0, active: 0, inactive: 0 },
           notices: { total: 0, pinned: 0, active: 0, inactive: 0 },
+          inquiries: {
+            total: 0,
+            pending: 0,
+            answered: 0,
+            secret: 0,
+            public: 0,
+            answerRate: 0,
+          },
         });
       } finally {
         setLoading(false);
@@ -164,10 +250,36 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="portal space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">관리자 대시보드</h1>
-        <p className="text-gray-600">시스템 현황을 한눈에 확인하세요</p>
+        <h1 className="text-2xl font-bold">
+          {userType === "admin" ? "관리자" : "게스트"} 대시보드
+        </h1>
+
+        <p className="text-gray-600">
+          {userType === "admin"
+            ? "시스템 현황을 한눈에 확인하세요"
+            : "읽기 전용 모드로 시스템 현황을 확인하세요"}
+        </p>
+        <div className="mt-2 flex items-center gap-3">
+          <span
+            className={`px-3 py-1 text-sm rounded-full ${
+              userType === "admin"
+                ? "bg-blue-100 text-blue-800"
+                : "bg-gray-100 text-gray-800"
+            }`}
+          >
+            {userType === "admin" ? "관리자 권한" : "게스트 권한"}
+          </span>
+          {userType === "admin" && (
+            <button
+              onClick={handleLogout}
+              className="px-3 py-1 text-sm bg-red-100 text-red-800 rounded-full hover:bg-red-200 transition-colors"
+            >
+              로그아웃
+            </button>
+          )}
+        </div>
       </div>
 
       {/* 통계 카드들 */}
@@ -280,32 +392,127 @@ export default function AdminDashboard() {
             </div>
           </div>
         </div>
+
+        {/* 문의글 통계 */}
+        <div className="card card-stats">
+          <div className="stat-number">{stats.inquiries.total}</div>
+          <div className="stat-label">문의글</div>
+          <div className="mt-2 text-sm text-gray-500">
+            답변대기: {stats.inquiries.pending} | 답변완료:{" "}
+            {stats.inquiries.answered}
+          </div>
+          <div className="mt-2">
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div
+                className="bg-gradient-to-r from-green-500 to-emerald-600 h-2 rounded-full transition-all duration-500"
+                style={{ width: `${stats.inquiries.answerRate}%` }}
+              ></div>
+            </div>
+            <div className="text-xs text-gray-500 mt-1">
+              답변율: {stats.inquiries.answerRate}%
+            </div>
+          </div>
+          <div className="mt-2">
+            <div className="flex gap-2">
+              <span className="px-2 py-1 text-xs bg-purple-100 text-purple-800 rounded-full">
+                비밀글 {stats.inquiries.secret}
+              </span>
+              <span className="px-2 py-1 text-xs bg-gray-100 text-gray-800 rounded-full">
+                일반글 {stats.inquiries.public}
+              </span>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* 빠른 액션 */}
       <section className="card">
-        <h2 className="text-xl font-semibold mb-4">빠른 액션</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-          <button className="btn btn-primary">
-            <span>📝</span>새 할일 추가
-          </button>
-          <button className="btn btn-secondary">
-            <span>👥</span>
-            조직도 관리
-          </button>
-          <button className="btn btn-success">
-            <span>📅</span>
-            히스토리 추가
-          </button>
-          <button className="btn btn-warning">
-            <span>📰</span>
-            배너뉴스 등록
-          </button>
-          <button className="btn btn-info">
-            <span>📢</span>
-            공지사항 관리
-          </button>
+        <h2 className="text-xl font-semibold mb-4">
+          {userType === "admin" ? "빠른 액션" : "메뉴"}
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
+          {userType === "admin" ? (
+            <>
+              <button className="btn btn-primary">
+                <span>📝</span>새 할일 추가
+              </button>
+              <button className="btn btn-secondary">
+                <span>👥</span>
+                조직도 관리
+              </button>
+              <button className="btn btn-success">
+                <span>📅</span>
+                히스토리 추가
+              </button>
+              <button className="btn btn-warning">
+                <span>📰</span>
+                배너뉴스 등록
+              </button>
+              <button className="btn btn-info">
+                <span>📢</span>
+                공지사항 관리
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                className="btn btn-primary opacity-50 cursor-pointer hover:opacity-70"
+                onClick={handleButtonClick}
+              >
+                <span>📝</span>새 할일 추가
+              </button>
+              <button
+                className="btn btn-secondary opacity-50 cursor-pointer hover:opacity-70"
+                onClick={handleButtonClick}
+              >
+                <span>👥</span>
+                조직도 관리
+              </button>
+              <button
+                className="btn btn-success opacity-50 cursor-pointer hover:opacity-70"
+                onClick={handleButtonClick}
+              >
+                <span>📅</span>
+                히스토리 추가
+              </button>
+              <button
+                className="btn btn-warning opacity-50 cursor-pointer hover:opacity-70"
+                onClick={handleButtonClick}
+              >
+                <span>📰</span>
+                배너뉴스 등록
+              </button>
+              <button
+                className="btn btn-info opacity-50 cursor-pointer hover:opacity-70"
+                onClick={handleButtonClick}
+              >
+                <span>📢</span>
+                공지사항 관리
+              </button>
+            </>
+          )}
+          {userType === "admin" ? (
+            <Link href="/portal/inquiry" className="btn btn-purple">
+              <span>💬</span>
+              문의글 관리
+            </Link>
+          ) : (
+            <button
+              className="btn btn-purple opacity-50 cursor-pointer hover:opacity-70"
+              onClick={handleButtonClick}
+            >
+              <span>💬</span>
+              문의글 관리
+            </button>
+          )}
         </div>
+        {userType === "guest" && (
+          <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-sm text-blue-800">
+              💡 편집 기능을 사용하려면 버튼을 클릭하여 관리자로 로그인하세요.
+            </p>
+          </div>
+        )}
       </section>
 
       {/* 최근 활동 */}
@@ -326,6 +533,16 @@ export default function AdminDashboard() {
             <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
             <span className="text-sm">배너뉴스가 활성화되었습니다</span>
             <span className="text-xs text-gray-500 ml-auto">10분 전</span>
+          </div>
+          <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+            <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+            <span className="text-sm">새로운 문의글이 등록되었습니다</span>
+            <span className="text-xs text-gray-500 ml-auto">15분 전</span>
+          </div>
+          <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+            <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+            <span className="text-sm">문의글에 답변이 완료되었습니다</span>
+            <span className="text-xs text-gray-500 ml-auto">30분 전</span>
           </div>
         </div>
       </section>

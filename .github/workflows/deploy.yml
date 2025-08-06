@@ -28,6 +28,11 @@ jobs:
         run: npx prisma generate
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          EMAIL_FROM_NAME: ${{ secrets.EMAIL_FROM_NAME }}
+          NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
 
       - name: Build application
         run: npm run build
@@ -35,6 +40,11 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           DOMAIN_URL: ${{ secrets.DOMAIN_URL }}
           NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: ${{ secrets.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }}
+          ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          EMAIL_FROM_NAME: ${{ secrets.EMAIL_FROM_NAME }}
+          NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
 
       - name: Deploy to Gabia
         uses: appleboy/ssh-action@v1.0.0
@@ -50,6 +60,11 @@ jobs:
             export DATABASE_URL="${{ secrets.DATABASE_URL }}"
             export DOMAIN_URL="${{ secrets.DOMAIN_URL }}"
             export NEXT_PUBLIC_GOOGLE_MAPS_API_KEY="${{ secrets.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }}"
+            export ENCRYPTION_KEY="${{ secrets.ENCRYPTION_KEY }}"
+            export GMAIL_USER="${{ secrets.GMAIL_USER }}"
+            export GMAIL_APP_PASSWORD="${{ secrets.GMAIL_APP_PASSWORD }}"
+            export EMAIL_FROM_NAME="${{ secrets.EMAIL_FROM_NAME }}"
+            export NEXT_PUBLIC_SITE_URL="${{ secrets.NEXT_PUBLIC_SITE_URL }}"
             npx prisma generate
             npx prisma db push
             npm run build

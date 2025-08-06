@@ -107,9 +107,9 @@ function WriteNoticeContent() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="portal space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">
+        <h1 className="text-2xl font-bold">
           {isEditMode ? "공지사항 수정" : "새 공지사항 작성"}
         </h1>
         <Link href="/portal/notices" className="btn btn-outline">

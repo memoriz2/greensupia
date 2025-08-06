@@ -1,0 +1,135 @@
+// 포털 페이지 공통 스타일
+
+// 포털 경로의 모든 h1 제목을 자동으로 노란색으로 설정
+[data-page-type="portal"] h1,
+.portal h1 {
+  color: #f8c300 !important;
+}
+
+.portal {
+  // 포털 페이지 제목 스타일
+  &__title {
+    font-size: 1.5rem; // text-2xl
+    font-weight: 700; // font-bold
+    color: #f8c300; // 브랜드 노란색
+    margin-bottom: 1.5rem;
+  }
+
+  // 포털 페이지 컨테이너
+  &__container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  // 포털 페이지 헤더
+  &__header {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  // 포털 페이지 카드
+  &__card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+    padding: 1.5rem;
+  }
+
+  // 포털 페이지 버튼
+  &__button {
+    background: linear-gradient(135deg, #f8c300 0%, #ffd886 100%);
+    color: #1f2937;
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(248, 195, 0, 0.3);
+    }
+
+    &:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+      transform: none;
+    }
+  }
+
+  // 포털 페이지 테이블
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+
+    th,
+    td {
+      padding: 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    th {
+      background: #f9fafb;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    tr:hover {
+      background: #f9fafb;
+    }
+  }
+
+  // 포털 페이지 폼
+  &__form {
+    .portal__form-group {
+      margin-bottom: 1rem;
+
+      label {
+        display: block;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.5rem;
+      }
+
+      input,
+      textarea,
+      select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.2s ease;
+
+        &:focus {
+          outline: none;
+          border-color: #f8c300;
+          box-shadow: 0 0 0 3px rgba(248, 195, 0, 0.1);
+        }
+      }
+    }
+  }
+}
+
+// 반응형 디자인
+@media (max-width: 768px) {
+  .portal {
+    &__container {
+      padding: 1rem;
+    }
+
+    &__title {
+      font-size: 1.25rem;
+    }
+
+    &__card {
+      padding: 1rem;
+    }
+  }
+}

@@ -210,10 +210,10 @@ export default function OrganizationPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="portal space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">조직도 관리</h1>
+          <h1 className="text-2xl font-bold">조직도 관리</h1>
           <p className="text-gray-600">회사 조직도를 이미지로 관리하세요</p>
         </div>
         <div className="flex gap-3">
