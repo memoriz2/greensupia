@@ -135,7 +135,7 @@ model Inquiry {
   title       String   // 제목
   content     String   @db.LongText // 내용 (일반글/비밀글 모두)
   author      String   // 작성자
-  email       String?  // 이메일 (암호화된 상태)
+  email       String?  @db.Text // 이메일 (암호화된 상태)
   
   // 비밀글 관련
   isSecret    Boolean  @default(false)  // 비밀글 여부

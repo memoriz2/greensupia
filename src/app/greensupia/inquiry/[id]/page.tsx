@@ -170,12 +170,14 @@ export default function InquiryDetailPage() {
             >
               목록으로
             </Link>
-            <Link
-              href={`/greensupia/inquiry/write/${inquiry.id}`}
-              className="inquiry-detail__button inquiry-detail__button--primary"
-            >
-              수정하기
-            </Link>
+            {!inquiry.isAnswered && (
+              <Link
+                href={`/greensupia/inquiry/write/${inquiry.id}`}
+                className="inquiry-detail__button inquiry-detail__button--primary"
+              >
+                수정하기
+              </Link>
+            )}
           </div>
         </div>
       </header>

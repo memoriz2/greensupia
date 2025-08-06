@@ -19,7 +19,7 @@ export class InquiryRepository implements IRepository<Inquiry> {
 
   async create(data: {
     title: string;
-    content: string; // constent -> content 오타 수정
+    content: string;
     author: string;
     email?: string;
     isSecret: boolean;
