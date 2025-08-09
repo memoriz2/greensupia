@@ -35,12 +35,17 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+
       {
         source: "/banner-news/:path*",
         headers: [
           {
             key: "Cache-Control",
             value: "public, max-age=31536000, immutable",
+          },
+          {
+            key: "Content-Type",
+            value: "image/gif",
           },
         ],
       },
@@ -124,6 +129,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+
   // 서버 설정 - IPv4 강제 사용
   serverRuntimeConfig: {
     hostname: "0.0.0.0",

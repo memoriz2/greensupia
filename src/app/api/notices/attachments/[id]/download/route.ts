@@ -31,7 +31,7 @@ export async function GET(
     }
 
     // 파일 경로에서 실제 파일 시스템 경로로 변환
-    const filePath = attachmentInfo.filePath.replace("/static-assets/", "");
+    const filePath = attachmentInfo.filePath.replace("/", "");
     const fullPath = join(process.cwd(), "public", filePath);
 
     try {

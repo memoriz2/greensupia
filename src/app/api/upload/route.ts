@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
     }
 
     // URL 반환 (동적 경로)
-    const imageUrl = `/static-assets/${folder}/${fileName}`;
+    const imageUrl = `/${folder}/${fileName}`;
     console.log("반환할 URL:", imageUrl);
 
     return NextResponse.json({

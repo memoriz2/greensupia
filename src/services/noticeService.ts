@@ -99,7 +99,7 @@ export class NoticeService {
         // 데이터베이스에 첨부파일 정보 저장
         await this.repository.addAttachment(noticeId, {
           fileName: file.name,
-          filePath: `/static-assets/notice-attachments/${fileName}`,
+          filePath: `/notice-attachments/${fileName}`,
           fileSize: file.size,
           mimeType: file.type,
         });
@@ -133,7 +133,7 @@ export class NoticeService {
       // 데이터베이스에 첨부파일 정보 저장
       await this.repository.addAttachment(noticeId, {
         fileName: file.name,
-        filePath: `/static-assets/notice-attachments/${fileName}`,
+        filePath: `/notice-attachments/${fileName}`,
         fileSize: file.size,
         mimeType: file.type,
       });
