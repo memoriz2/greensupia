@@ -4,9 +4,6 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-import { useRealtimeStats } from "@/hooks/useRealtimeStats";
-import { AnimatedNumber } from "@/components/AnimatedNumber";
-
 interface DashboardStats {
   // 방문자 통계 (새로 추가)
   visitors: {
@@ -20,7 +17,7 @@ interface DashboardStats {
     today: number;
     thisWeek: number;
     thisMonth: number;
-    topBots: { name: string; count: number }[];
+    topBots: string[];
   };
   todos: {
     total: number;
@@ -58,53 +55,10 @@ interface DashboardStats {
 }
 
 export default function AdminDashboard() {
-  const [userType, setUserType] = useState<string>("guest");
+  const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
-
-  // 실시간 통계 훅 사용
-  const { data: visitorStats, loading: visitorLoading } = useRealtimeStats(
-    () => fetch("/api/stats/visitors").then((res) => res.json()),
-    { intervalMs: 120000, enabled: true } // 2분마다 업데이트
-  );
-
-  const { data: searchBotStats, loading: searchBotLoading } = useRealtimeStats(
-    () => fetch("/api/stats/searchbots").then((res) => res.json()),
-    { intervalMs: 120000, enabled: true }
-  );
-
-  // 마지막 업데이트 시간 표시
-  const [lastUpdateTime, setLastUpdateTime] = useState<Date>(new Date());
-
-  useEffect(() => {
-    if (visitorStats || searchBotStats) {
-      setLastUpdateTime(new Date());
-    }
-  }, [visitorStats, searchBotStats]);
-
-  // 통계 데이터 통합
-  const stats: DashboardStats = {
-    visitors: visitorStats || { total: 0, today: 0, thisWeek: 0, thisMonth: 0 },
-    searchBots: searchBotStats || {
-      total: 0,
-      today: 0,
-      thisWeek: 0,
-      thisMonth: 0,
-      topBots: [],
-    },
-    todos: { total: 0, completed: 0, pending: 0, completionRate: 0 },
-    organization: { total: 0, departments: [] },
-    history: { total: 0, yearRange: { min: 2024, max: 2024 } },
-    bannerNews: { total: 0, active: 0, inactive: 0 },
-    notices: { total: 0, pinned: 0, active: 0, inactive: 0 },
-    inquiries: {
-      total: 0,
-      pending: 0,
-      answered: 0,
-      secret: 0,
-      public: 0,
-      answerRate: 0,
-    },
-  };
+  const [userType, setUserType] = useState<string>("guest");
+  const [isPageVisible, setIsPageVisible] = useState(true);
 
   const router = useRouter();
 
@@ -141,27 +95,365 @@ export default function AdminDashboard() {
     }
   };
 
+  const fetchStats = async () => {
+    try {
+      // 서버에서 사용자 정보 가져오기
+      await fetchUserInfo();
+
+      // 각 API에서 기본 데이터 가져오기
+      const [
+        visitorData,
+        searchBotData,
+        todoData,
+        orgData,
+        historyData,
+        bannerData,
+        noticeData,
+        inquiryStats,
+      ] = await Promise.all([
+        fetch("/api/stats/visitors").then((res) => res.json()),
+        fetch("/api/stats/searchbots").then((res) => res.json()),
+        fetch("/api/todos").then((res) => res.json()),
+        fetch("/api/organization").then((res) => res.json()),
+        fetch("/api/history").then((res) => res.json()),
+        fetch("/api/banner-news").then((res) => res.json()),
+        fetch("/api/notices").then((res) => res.json()),
+        fetch("/api/inquiries/stats").then((res) => res.json()),
+      ]);
+
+      // 데이터를 기반으로 통계 계산
+      const todos = Array.isArray(todoData) ? todoData : [];
+      const organization = Array.isArray(orgData) ? orgData : [];
+      const history = Array.isArray(historyData) ? historyData : [];
+      const bannerNews = Array.isArray(bannerData) ? bannerData : [];
+      const notices = noticeData?.data?.notices || [];
+      const inquiryStatsData = inquiryStats?.data || {
+        total: 0,
+        pending: 0,
+        secret: 0,
+      };
+
+      setStats({
+        visitors: visitorData || {
+          total: 0,
+          today: 0,
+          thisWeek: 0,
+          thisMonth: 0,
+        },
+        searchBots: searchBotData || {
+          total: 0,
+          today: 0,
+          thisWeek: 0,
+          thisMonth: 0,
+          topBots: [],
+        },
+        todos: {
+          total: todos.length,
+          completed: todos.filter(
+            (todo: { completed: boolean }) => todo.completed
+          ).length,
+          pending: todos.filter(
+            (todo: { completed: boolean }) => !todo.completed
+          ).length,
+          completionRate:
+            todos.length > 0
+              ? Math.round(
+                  (todos.filter(
+                    (todo: { completed: boolean }) => todo.completed
+                  ).length /
+                    todos.length) *
+                    100
+                )
+              : 0,
+        },
+        organization: {
+          total: organization.length,
+          departments: [
+            ...new Set(
+              organization.map(
+                (org: { department: string }) => org.department
+              )
+            ),
+          ],
+        },
+        history: {
+          total: history.length,
+          yearRange:
+            history.length > 0
+              ? {
+                  min: Math.min(
+                    ...history.map((h: { year: number }) => h.year)
+                  ),
+                  max: Math.max(
+                    ...history.map((h: { year: number }) => h.year)
+                  ),
+                }
+              : { min: 2024, max: 2024 },
+        },
+        bannerNews: {
+          total: bannerNews.length,
+          active: bannerNews.filter(
+            (news: { isActive: boolean }) => news.isActive
+          ).length,
+          inactive: bannerNews.filter(
+            (news: { isActive: boolean }) => !news.isActive
+          ).length,
+        },
+        notices: {
+          total: notices.length,
+          pinned: notices.filter(
+            (notice: { isActive: boolean }) => notice.isPinned
+          ).length,
+          active: notices.filter(
+            (notice: { isActive: boolean }) => notice.isActive
+          ).length,
+          inactive: notices.filter(
+            (notice: { isActive: boolean }) => !notice.isActive
+          ).length,
+        },
+        inquiries: {
+          total: inquiryStatsData.total || 0,
+          pending: inquiryStatsData.pending || 0,
+          answered:
+            (inquiryStatsData.total || 0) - (inquiryStatsData.pending || 0),
+          secret: inquiryStatsData.secret || 0,
+          public:
+            (inquiryStatsData.total || 0) - (inquiryStatsData.secret || 0),
+          answerRate:
+            inquiryStatsData.total > 0
+              ? Math.round(
+                  ((inquiryStatsData.total - inquiryStatsData.pending) /
+                    inquiryStatsData.total) *
+                    100
+                )
+              : 0,
+        },
+      });
+    } catch (error) {
+      console.error("대시보드 데이터 로딩 실패:", error);
+      // 에러가 발생해도 기본값으로 설정
+      setStats({
+        visitors: { total: 0, today: 0, thisWeek: 0, thisMonth: 0 },
+        searchBots: {
+          total: 0,
+          today: 0,
+          thisWeek: 0,
+          thisMonth: 0,
+          topBots: [],
+        },
+        todos: { total: 0, completed: 0, pending: 0, completionRate: 0 },
+        organization: { total: 0, departments: [] },
+        history: { total: 0, yearRange: { min: 2024, max: 2024 } },
+        bannerNews: { total: 0, active: 0, inactive: 0 },
+        notices: { total: 0, pinned: 0, active: 0, inactive: 0 },
+        inquiries: {
+          total: 0,
+          pending: 0,
+          answered: 0,
+          secret: 0,
+          public: 0,
+          answerRate: 0,
+        },
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 페이지 가시성 감지 (사용자가 다른 탭으로 이동하면 감지)
   useEffect(() => {
-    const fetchUserInfo = async () => {
+    const handleVisibilityChange = () => {
+      setIsPageVisible(!document.hidden);
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
+
+  // 주기적 데이터 업데이트 (2분마다, 페이지가 보일 때만)
+  useEffect(() => {
+    if (!isPageVisible) return; // 페이지가 숨겨져 있으면 업데이트 중단
+
+    const interval = setInterval(() => {
+      fetchStats();
+    }, 2 * 60 * 1000); // 2분 = 120,000ms
+
+    return () => clearInterval(interval);
+  }, [isPageVisible]);
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
       try {
-        const response = await fetch("/api/auth/me");
-        if (response.ok) {
-          const data = await response.json();
-          setUserType(data.userType || "guest");
-        } else {
-          setUserType("guest");
-        }
-      } catch (err) {
-        console.error("사용자 정보 가져오기 실패:", err);
-        setUserType("guest");
+        // 서버에서 사용자 정보 가져오기
+        await fetchUserInfo();
+
+        // 각 API에서 기본 데이터 가져오기
+        const [
+          visitorData,
+          searchBotData,
+          todoData,
+          orgData,
+          historyData,
+          bannerData,
+          noticeData,
+          inquiryStats,
+        ] = await Promise.all([
+          fetch("/api/stats/visitors").then((res) => res.json()),
+          fetch("/api/stats/searchbots").then((res) => res.json()),
+          fetch("/api/todos").then((res) => res.json()),
+          fetch("/api/organization").then((res) => res.json()),
+          fetch("/api/history").then((res) => res.json()),
+          fetch("/api/banner-news").then((res) => res.json()),
+          fetch("/api/notices").then((res) => res.json()),
+          fetch("/api/inquiries/stats").then((res) => res.json()),
+        ]);
+
+        // 데이터를 기반으로 통계 계산
+        const todos = Array.isArray(todoData) ? todoData : [];
+        const organization = Array.isArray(orgData) ? orgData : [];
+        const history = Array.isArray(historyData) ? historyData : [];
+        const bannerNews = Array.isArray(bannerData) ? bannerData : [];
+        const notices = noticeData?.data?.notices || [];
+        const inquiryStatsData = inquiryStats?.data || {
+          total: 0,
+          pending: 0,
+          secret: 0,
+        };
+
+        setStats({
+          visitors: visitorData || {
+            total: 0,
+            today: 0,
+            thisWeek: 0,
+            thisMonth: 0,
+          },
+          searchBots: searchBotData || {
+            total: 0,
+            today: 0,
+            thisWeek: 0,
+            thisMonth: 0,
+            topBots: [],
+          },
+          todos: {
+            total: todos.length,
+            completed: todos.filter(
+              (todo: { completed: boolean }) => todo.completed
+            ).length,
+            pending: todos.filter(
+              (todo: { completed: boolean }) => !todo.completed
+            ).length,
+            completionRate:
+              todos.length > 0
+                ? Math.round(
+                    (todos.filter(
+                      (todo: { completed: boolean }) => todo.completed
+                    ).length /
+                      todos.length) *
+                      100
+                  )
+                : 0,
+          },
+          organization: {
+            total: organization.length,
+            departments: [
+              ...new Set(
+                organization.map(
+                  (org: { department: string }) => org.department
+                )
+              ),
+            ],
+          },
+          history: {
+            total: history.length,
+            yearRange:
+              history.length > 0
+                ? {
+                    min: Math.min(
+                      ...history.map((h: { year: number }) => h.year)
+                    ),
+                    max: Math.max(
+                      ...history.map((h: { year: number }) => h.year)
+                    ),
+                  }
+                : { min: 2024, max: 2024 },
+          },
+          bannerNews: {
+            total: bannerNews.length,
+            active: bannerNews.filter(
+              (news: { isActive: boolean }) => news.isActive
+            ).length,
+            inactive: bannerNews.filter(
+              (news: { isActive: boolean }) => !news.isActive
+            ).length,
+          },
+          notices: {
+            total: notices.length,
+            pinned: notices.filter(
+              (notice: { isPinned: boolean }) => notice.isPinned
+            ).length,
+            active: notices.filter(
+              (notice: { isActive: boolean }) => notice.isActive
+            ).length,
+            inactive: notices.filter(
+              (notice: { isActive: boolean }) => !notice.isActive
+            ).length,
+          },
+          inquiries: {
+            total: inquiryStatsData.total || 0,
+            pending: inquiryStatsData.pending || 0,
+            answered:
+              (inquiryStatsData.total || 0) - (inquiryStatsData.pending || 0),
+            secret: inquiryStatsData.secret || 0,
+            public:
+              (inquiryStatsData.total || 0) - (inquiryStatsData.secret || 0),
+            answerRate:
+              inquiryStatsData.total > 0
+                ? Math.round(
+                    ((inquiryStatsData.total - inquiryStatsData.pending) /
+                      inquiryStatsData.total) *
+                      100
+                  )
+                : 0,
+          },
+        });
+      } catch (error) {
+        console.error("대시보드 데이터 로딩 실패:", error);
+        // 에러가 발생해도 기본값으로 설정
+        setStats({
+          visitors: { total: 0, today: 0, thisWeek: 0, thisMonth: 0 },
+          searchBots: {
+            total: 0,
+            today: 0,
+            thisWeek: 0,
+            thisMonth: 0,
+            topBots: [],
+          },
+          todos: { total: 0, completed: 0, pending: 0, completionRate: 0 },
+          organization: { total: 0, departments: [] },
+          history: { total: 0, yearRange: { min: 2024, max: 2024 } },
+          bannerNews: { total: 0, active: 0, inactive: 0 },
+          notices: { total: 0, pinned: 0, active: 0, inactive: 0 },
+          inquiries: {
+            total: 0,
+            pending: 0,
+            answered: 0,
+            secret: 0,
+            public: 0,
+            answerRate: 0,
+          },
+        });
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchUserInfo();
-    setLoading(false);
+    fetchStats();
   }, []);
 
-  if (loading || visitorLoading || searchBotLoading) {
+  if (loading) {
     return (
       <section className="dashboard-loading" aria-label="로딩 중">
         <div className="loading-text" role="status" aria-live="polite">
@@ -188,7 +480,7 @@ export default function AdminDashboard() {
 
         <p className="dashboard-subtitle">
           {userType === "admin"
-            ? "시스템 현황을 한눈에 확인하세요 (2분마다 자동 업데이트)"
+            ? "시스템 현황을 한눈에 확인하세요"
             : "읽기 전용 모드로 시스템 현황을 확인하세요"}
         </p>
         <div className="dashboard-status">
@@ -200,17 +492,9 @@ export default function AdminDashboard() {
             {userType === "admin" ? "관리자 권한" : "게스트 권한"}
           </span>
           {userType === "admin" && (
-            <>
-              <span className="realtime-status">
-                🔄 실시간 업데이트 활성화
-                <span className="last-update-time">
-                  (마지막 업데이트: {lastUpdateTime.toLocaleTimeString()})
-                </span>
-              </span>
-              <button onClick={handleLogout} className="logout-button">
-                로그아웃
-              </button>
-            </>
+            <button onClick={handleLogout} className="logout-button">
+              로그아웃
+            </button>
           )}
         </div>
       </div>
@@ -225,7 +509,7 @@ export default function AdminDashboard() {
             <div className="visitor-title">방문자 통계</div>
           </div>
           <div className="visitor-main-number">
-            <AnimatedNumber value={stats.visitors.total} />
+            {stats.visitors.total.toLocaleString()}
           </div>
           <div className="visitor-main-label">총 방문자</div>
           <div className="visitor-details">
@@ -251,9 +535,7 @@ export default function AdminDashboard() {
             <div className="visitor-icon">🤖</div>
             <div className="visitor-title">검색봇 방문</div>
           </div>
-          <div className="visitor-main-number">
-            <AnimatedNumber value={stats.searchBots.total} />
-          </div>
+          <div className="visitor-main-number">{stats.searchBots.total}</div>
           <div className="visitor-main-label">총 봇 방문</div>
           <div className="visitor-details">
             <div className="visitor-period">
@@ -271,11 +553,11 @@ export default function AdminDashboard() {
           </div>
           <div className="bot-tags">
             <div className="tag-container">
-                                      {stats.searchBots.topBots.slice(0, 3).map((bot, index) => (
-                          <span key={index} className="bot-tag">
-                            {bot.name}
-                          </span>
-                        ))}
+              {stats.searchBots.topBots.slice(0, 3).map((bot, index) => (
+                <span key={index} className="bot-tag">
+                  {bot}
+                </span>
+              ))}
               {stats.searchBots.topBots.length > 3 && (
                 <span className="bot-tag-more">
                   +{stats.searchBots.topBots.length - 3}
