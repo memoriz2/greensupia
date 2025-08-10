@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { InquiryService } from "@/services/inquiryService";
 
 export async function GET() {
   try {
-    const service = new InquiryService(prisma);
+    const service = new InquiryService();
     const stats = await service.getInquiryStats();
 
     return NextResponse.json({

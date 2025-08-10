@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,144 +7,129 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// 간단한 Todo 스키마 (사용자 없이)
-model Todo {
-  id          Int      @id @default(autoincrement())
-  title       String
-  description String?
-  completed   Boolean  @default(false)
-  priority    Priority @default(MEDIUM)
-  dueDate     DateTime? // 추가: 마감일
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+model banner {
+  id        Int      @id @default(autoincrement())
+  title     String
+  imageUrl  String   @db.Text
+  linkUrl   String?
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime
 }
 
-enum Priority {
+model bannernews {
+  id        Int       @id @default(autoincrement())
+  title     String
+  content   String    @db.Text
+  imageUrl  String?
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime
+  endDate   DateTime?
+  linkUrl   String?
+  sortOrder Int       @default(0)
+  startDate DateTime?
+}
+
+model greeting {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String   @db.LongText
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+}
+
+model history {
+  id          Int      @id @default(autoincrement())
+  year        String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime
+  description String   @db.Text
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+}
+
+model inquiry {
+  id         Int       @id @default(autoincrement())
+  title      String
+  content    String    @db.LongText
+  author     String
+  email      String?   @db.Text
+  isSecret   Boolean   @default(false)
+  password   String?
+  isAnswered Boolean   @default(false)
+  answer     String?   @db.LongText
+  answeredAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime
+
+  @@index([isAnswered, createdAt], map: "Inquiry_isAnswered_createdAt_idx")
+  @@index([isSecret, isAnswered], map: "Inquiry_isSecret_isAnswered_idx")
+}
+
+model notice {
+  id               Int                @id @default(autoincrement())
+  title            String
+  content          String             @db.LongText
+  author           String             @default("관리자")
+  isPinned         Boolean            @default(false)
+  viewCount        Int                @default(0)
+  isActive         Boolean            @default(true)
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime
+  noticeattachment noticeattachment[]
+}
+
+model noticeattachment {
+  id            Int      @id @default(autoincrement())
+  noticeId      Int
+  fileName      String
+  filePath      String
+  fileSize      Int
+  mimeType      String
+  downloadCount Int      @default(0)
+  createdAt     DateTime @default(now())
+  notice        notice   @relation(fields: [noticeId], references: [id], onDelete: Cascade, map: "NoticeAttachment_noticeId_fkey")
+
+  @@index([noticeId], map: "NoticeAttachment_noticeId_fkey")
+}
+
+model organizationchart {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+  imageUrl  String   @db.Text
+  isActive  Boolean  @default(true)
+}
+
+model video {
+  id           Int      @id @default(autoincrement())
+  title        String
+  description  String?  @db.Text
+  videoUrl     String   @db.Text
+  thumbnailUrl String?
+  duration     Int?
+  sortOrder    Int      @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime
+}
+
+model todo {
+  id          Int           @id @default(autoincrement())
+  title       String
+  description String?
+  completed   Boolean       @default(false)
+  priority    todo_priority @default(MEDIUM)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime
+  dueDate     DateTime?
+}
+
+enum todo_priority {
   LOW
   MEDIUM
   HIGH
-}
-
-// Greensupia 기능 모델들
-model OrganizationChart {
-  id        Int      @id @default(autoincrement())
-  imageUrl  String   @db.Text
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model History {
-  id          Int      @id @default(autoincrement())
-  year        String   // 연도 (예: "2024", "2023-2024")
-  description String   @db.Text
-  sortOrder   Int      @default(0)
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
-
-model BannerNews {
-  id        Int      @id @default(autoincrement())
-  title     String
-  content   String   @db.Text
-  imageUrl  String?
-  linkUrl   String?
-  startDate DateTime?
-  endDate   DateTime?
-  sortOrder Int      @default(0)
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-// 추가 모델들
-model Video {
-  id          Int      @id @default(autoincrement())
-  title       String
-  description String?  @db.Text
-  videoUrl    String   @db.Text
-  thumbnailUrl String?
-  duration    Int?     // 초 단위
-  sortOrder   Int      @default(0)
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
-
-model Banner {
-  id        Int      @id @default(autoincrement())
-  title     String
-  imageUrl  String   @db.Text
-  linkUrl   String?
-  sortOrder Int      @default(0)
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Greeting {
-  id        Int      @id @default(autoincrement())
-  title     String
-  content   String   @db.LongText // HTML 콘텐츠를 위한 LongText
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-// 공지사항 모델
-model Notice {
-  id          Int      @id @default(autoincrement())
-  title       String
-  content     String   @db.LongText // TipTap HTML 콘텐츠
-  author      String   @default("관리자") // 작성자
-  isPinned    Boolean  @default(false) // 상단고정 여부
-  viewCount   Int      @default(0) // 조회수
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  // 파일 첨부 관계
-  attachments NoticeAttachment[]
-}
-
-// 공지사항 첨부파일 모델
-model NoticeAttachment {
-  id        Int      @id @default(autoincrement())
-  noticeId  Int      // 공지사항 ID
-  fileName  String   // 원본 파일명
-  filePath  String   // 저장된 파일 경로
-  fileSize  Int      // 파일 크기 (bytes)
-  mimeType  String   // MIME 타입
-  downloadCount Int  @default(0) // 다운로드 횟수
-  createdAt DateTime @default(now())
-  
-  // 관계 설정
-  notice    Notice   @relation(fields: [noticeId], references: [id], onDelete: Cascade)
-}
-
-// 문의하기 모델
-model Inquiry {
-  id          Int      @id @default(autoincrement())
-  title       String   // 제목
-  content     String   @db.LongText // 내용 (일반글/비밀글 모두)
-  author      String   // 작성자
-  email       String?  @db.Text // 이메일 (암호화된 상태)
-  
-  // 비밀글 관련
-  isSecret    Boolean  @default(false)  // 비밀글 여부
-  password    String?  // 비밀글 비밀번호 (해시된 상태)
-  
-  // 답변 상태 관리
-  isAnswered  Boolean  @default(false)  // 답변 완료 여부
-  answer      String?  @db.LongText // 답변 내용
-  answeredAt  DateTime? // 답변 작성 시간
-  
-  // 시간 정보
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  // 인덱스
-  @@index([isAnswered, createdAt])
-  @@index([isSecret, isAnswered])
 }

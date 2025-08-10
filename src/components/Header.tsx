@@ -1,24 +1,57 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  );
 
-  useEffect(() => {
-    const handleScroll = () => {
+  // 스크롤 이벤트 최적화 - debounce 적용
+  const handleScroll = useCallback(() => {
+    if (scrollTimeoutRef.current) {
+      clearTimeout(scrollTimeoutRef.current);
+    }
+
+    scrollTimeoutRef.current = setTimeout(() => {
       setIsScrolled(window.scrollY > 10);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    }, 16); // 60fps에 맞춘 최적화
   }, []);
 
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
+  useEffect(() => {
+    // passive: true로 성능 향상
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, [handleScroll]);
+
+  // 모바일 메뉴 토글 최적화
+  const toggleMobileMenu = useCallback(() => {
+    setIsMobileMenuOpen((prev) => !prev);
+  }, []);
+
+  // 메뉴 닫기 함수
+  const closeMobileMenu = useCallback(() => {
+    setIsMobileMenuOpen(false);
+  }, []);
+
+  // 메뉴 아이템 메모이제이션
+  const menuItems = useMemo(
+    () => [
+      { href: "/greensupia", label: "홈" },
+      { href: "/greensupia/notice", label: "공지사항" },
+      { href: "/greensupia/inquiry", label: "문의하기" },
+    ],
+    []
+  );
 
   return (
     <header
@@ -36,21 +69,15 @@ export default function Header() {
 
           {/* 데스크톱 네비게이션 */}
           <nav className="greensupia-header__nav">
-            <Link href="/greensupia" className="greensupia-header__nav-item">
-              홈
-            </Link>
-            <Link
-              href="/greensupia/notice"
-              className="greensupia-header__nav-item"
-            >
-              공지사항
-            </Link>
-            <Link
-              href="/greensupia/inquiry"
-              className="greensupia-header__nav-item"
-            >
-              문의하기
-            </Link>
+            {menuItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="greensupia-header__nav-item"
+              >
+                {item.label}
+              </Link>
+            ))}
           </nav>
 
           {/* 모바일 메뉴 토글 */}
@@ -58,6 +85,7 @@ export default function Header() {
             className="greensupia-header__mobile-toggle"
             onClick={toggleMobileMenu}
             aria-label="메뉴 열기"
+            aria-expanded={isMobileMenuOpen}
           >
             {isMobileMenuOpen ? "✕" : "☰"}
           </button>
@@ -69,21 +97,16 @@ export default function Header() {
             isMobileMenuOpen ? "greensupia-header__mobile-menu--open" : ""
           }`}
         >
-          <Link href="/greensupia" className="greensupia-header__nav-item">
-            홈
-          </Link>
-          <Link
-            href="/greensupia/notice"
-            className="greensupia-header__nav-item"
-          >
-            공지사항
-          </Link>
-          <Link
-            href="/greensupia/inquiry"
-            className="greensupia-header__nav-item"
-          >
-            문의하기
-          </Link>
+          {menuItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="greensupia-header__nav-item"
+              onClick={closeMobileMenu}
+            >
+              {item.label}
+            </Link>
+          ))}
         </div>
       </div>
     </header>

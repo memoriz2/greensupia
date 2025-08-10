@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { InquiryService } from "@/services/inquiryService";
 
 export async function POST(
@@ -29,7 +28,7 @@ export async function POST(
     }
 
     // 3. Service 호출 (알림 포함)
-    const service = new InquiryService(prisma);
+    const service = new InquiryService();
     const updatedInquiry = await service.addAnswerWithNotification(
       id,
       answer.trim()

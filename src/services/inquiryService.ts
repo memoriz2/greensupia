@@ -1,13 +1,28 @@
-import { PrismaClient, Inquiry } from "@prisma/client";
 import { InquiryRepository } from "@/repositories/inquiryRepository";
 import { Id } from "@/types/utils";
 import { encrypt, decrypt, hashPassword } from "@/utils/encryption";
 import { emailService } from "@/utils/emailService";
+import { prisma } from "@/lib/prisma";
+
+// Inquiry 인터페이스 정의
+interface Inquiry {
+  id: number;
+  title: string;
+  content: string;
+  author: string;
+  email: string | null;
+  isSecret: boolean;
+  isAnswered: boolean;
+  answer: string | null;
+  answeredAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 export class InquiryService {
   private repository: InquiryRepository;
 
-  constructor(private prisma: PrismaClient) {
+  constructor() {
     this.repository = new InquiryRepository(prisma);
   }
 
@@ -150,7 +165,22 @@ export class InquiryService {
   }
 
   // 이메일 알림 발송 (시스템 내부용)
-  private async sendNotificationEmail(email: string, inquiry: Inquiry) {
+  private async sendNotificationEmail(
+    email: string,
+    inquiry: {
+      id: number;
+      title: string;
+      content: string;
+      author: string;
+      email: string | null;
+      isSecret: boolean;
+      isAnswered: boolean;
+      answer: string | null;
+      answeredAt: Date | null;
+      createdAt: Date;
+      updatedAt: Date;
+    }
+  ) {
     try {
       // 이메일 템플릿 생성
       const emailContent = emailService.generateInquiryAnswerEmail(
@@ -188,7 +218,19 @@ export class InquiryService {
   }
 
   // toResponse() 메서드 (API 응답용)
-  toResponse(inquiry: Inquiry) {
+  toResponse(inquiry: {
+    id: number;
+    title: string;
+    content: string;
+    author: string;
+    email: string | null;
+    isSecret: boolean;
+    isAnswered: boolean;
+    answer: string | null;
+    answeredAt: Date | null;
+    createdAt: Date;
+    updatedAt: Date;
+  }) {
     return {
       id: inquiry.id,
       title: inquiry.title,
@@ -196,8 +238,8 @@ export class InquiryService {
       author: inquiry.author,
       isSecret: inquiry.isSecret,
       isAnswered: inquiry.isAnswered,
-      createdAt: inquiry.createdAt,
-      updatedAt: inquiry.updatedAt,
+      createdAt: inquiry.createdAt.toISOString(),
+      updatedAt: inquiry.updatedAt.toISOString(),
       // 이메일은 필요시에만 복호화하여 반환
     };
   }

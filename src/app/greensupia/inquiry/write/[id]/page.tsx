@@ -18,7 +18,6 @@ export default function InquiryEditPage() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingData, setIsLoadingData] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   // 기존 데이터 로드
   useEffect(() => {
@@ -38,10 +37,10 @@ export default function InquiryEditPage() {
             password: "", // 비밀번호는 보안상 빈 값
           });
         } else {
-          setError("문의글을 찾을 수 없습니다.");
+          console.error("문의글을 찾을 수 없습니다.");
         }
-      } catch (error) {
-        setError("문의글 로드 중 오류가 발생했습니다.");
+      } catch (err) {
+        console.error("문의글 로드 중 오류가 발생했습니다:", err);
       } finally {
         setIsLoadingData(false);
       }
@@ -69,7 +68,8 @@ export default function InquiryEditPage() {
         const error = await response.json();
         alert(error.error);
       }
-    } catch (error) {
+    } catch (err) {
+      console.error("문의글 수정 중 오류:", err);
       alert("문의글 수정 중 오류가 발생했습니다.");
     } finally {
       setIsLoading(false);
@@ -82,23 +82,6 @@ export default function InquiryEditPage() {
         <section className="inquiry-edit__loading">
           <h1>문의글 수정</h1>
           <p>문의글을 불러오는 중입니다...</p>
-        </section>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="inquiry-edit">
-        <section className="inquiry-edit__error">
-          <h1>문의글 수정</h1>
-          <p>{error}</p>
-          <button
-            onClick={() => router.push("/greensupia/inquiry")}
-            className="inquiry-edit__button"
-          >
-            목록으로 돌아가기
-          </button>
         </section>
       </div>
     );

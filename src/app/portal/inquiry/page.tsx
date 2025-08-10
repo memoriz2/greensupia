@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 
 interface Inquiry {
@@ -31,17 +31,15 @@ interface InquiryListResponse {
 export default function PortalInquiryPage() {
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [filter, setFilter] = useState<
     "all" | "pending" | "answered" | "secret" | "public"
   >("all");
 
-  const loadInquiries = async () => {
+  const loadInquiries = useCallback(async () => {
     try {
       setLoading(true);
-      setError(null);
 
       const params = new URLSearchParams({
         page: currentPage.toString(),
@@ -72,18 +70,18 @@ export default function PortalInquiryPage() {
         setInquiries(data.data);
         setTotalPages(data.pagination.totalPages);
       } else {
-        setError("문의글 목록을 불러오는데 실패했습니다.");
+        console.error("문의글 목록을 불러오는데 실패했습니다.");
       }
-    } catch (err) {
-      setError("서버 오류가 발생했습니다.");
+    } catch (error) {
+      console.error("서버 오류가 발생했습니다:", error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, filter]);
 
   useEffect(() => {
     loadInquiries();
-  }, [currentPage, filter]);
+  }, [loadInquiries]);
 
   const handleFilterChange = (newFilter: typeof filter) => {
     setFilter(newFilter);
@@ -149,12 +147,6 @@ export default function PortalInquiryPage() {
             공개글
           </button>
         </div>
-
-        {error && (
-          <div className="error-message">
-            <span>{error}</span>
-          </div>
-        )}
 
         <div className="overflow-x-auto">
           <table className="table">

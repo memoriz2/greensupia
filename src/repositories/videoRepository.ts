@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { Video } from "@prisma/client";
+import { video } from "@prisma/client";
 import {
   VideoCreateRequest,
   VideoUpdateRequest,
@@ -11,13 +11,13 @@ import { Id } from "@/types/utils";
 export class VideoRepository
   implements
     IFilterableRepository<
-      Video,
+      video,
       Record<string, unknown>,
       VideoCreateRequest,
       VideoUpdateRequest
     >
 {
-  async findAll(): Promise<Video[]> {
+  async findAll(): Promise<video[]> {
     try {
       return await prisma.video.findMany({
         orderBy: { sortOrder: "asc" },
@@ -27,7 +27,7 @@ export class VideoRepository
     }
   }
 
-  async findById(id: Id): Promise<Video | null> {
+  async findById(id: Id): Promise<video | null> {
     try {
       return await prisma.video.findUnique({
         where: { id },
@@ -37,7 +37,7 @@ export class VideoRepository
     }
   }
 
-  async create(data: VideoCreateRequest): Promise<Video> {
+  async create(data: VideoCreateRequest): Promise<video> {
     try {
       return await prisma.video.create({
         data: {
@@ -48,6 +48,7 @@ export class VideoRepository
           duration: data.duration,
           sortOrder: data.sortOrder || 0,
           isActive: data.isActive ?? true,
+          updatedAt: new Date(),
         },
       });
     } catch (error) {
@@ -55,7 +56,7 @@ export class VideoRepository
     }
   }
 
-  async update(id: Id, data: VideoUpdateRequest): Promise<Video> {
+  async update(id: Id, data: VideoUpdateRequest): Promise<video> {
     try {
       return await prisma.video.update({
         where: { id },
@@ -71,6 +72,7 @@ export class VideoRepository
           ...(data.duration !== undefined && { duration: data.duration }),
           ...(data.sortOrder !== undefined && { sortOrder: data.sortOrder }),
           ...(data.isActive !== undefined && { isActive: data.isActive }),
+          updatedAt: new Date(),
         },
       });
     } catch (error) {
@@ -102,7 +104,7 @@ export class VideoRepository
     }
   }
 
-  async findByFilters(filters: Record<string, unknown>): Promise<Video[]> {
+  async findByFilters(filters: Record<string, unknown>): Promise<video[]> {
     try {
       const where: Record<string, unknown> = {};
 
@@ -137,7 +139,7 @@ export class VideoRepository
     page: number,
     limit: number
   ): Promise<{
-    data: Video[];
+    data: video[];
     pagination: {
       page: number;
       limit: number;
@@ -173,7 +175,7 @@ export class VideoRepository
     }
   }
 
-  async findActive(): Promise<Video[]> {
+  async findActive(): Promise<video[]> {
     try {
       return await prisma.video.findMany({
         where: { isActive: true },
@@ -184,7 +186,7 @@ export class VideoRepository
     }
   }
 
-  async toggleActive(id: Id): Promise<Video> {
+  async toggleActive(id: Id): Promise<video> {
     try {
       const video = await prisma.video.findUnique({ where: { id } });
       if (!video) {
@@ -225,7 +227,7 @@ export class VideoRepository
     }
   }
 
-  toResponse(video: Video): VideoResponse {
+  toResponse(video: video): VideoResponse {
     return {
       id: video.id,
       title: video.title,

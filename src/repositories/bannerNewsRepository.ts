@@ -8,7 +8,7 @@ import {
 import { IFilterableRepository } from "./baseRepository";
 import { Id } from "@/types/utils";
 
-export class BannerNewsRepository
+export class bannerNewsRepository
   implements
     IFilterableRepository<
       BannerNews,
@@ -19,7 +19,7 @@ export class BannerNewsRepository
 {
   async findAll(): Promise<BannerNews[]> {
     try {
-      return await prisma.bannerNews.findMany({
+      return await prisma.bannernews.findMany({
         orderBy: { createdAt: "desc" },
       });
     } catch (error) {
@@ -29,7 +29,7 @@ export class BannerNewsRepository
 
   async findById(id: Id): Promise<BannerNews | null> {
     try {
-      return await prisma.bannerNews.findUnique({
+      return await prisma.bannernews.findUnique({
         where: { id },
       });
     } catch (error) {
@@ -39,10 +39,11 @@ export class BannerNewsRepository
 
   async create(data: CreateBannerNewsRequest): Promise<BannerNews> {
     try {
-      return await prisma.bannerNews.create({
+      return await prisma.bannernews.create({
         data: {
           ...data,
           isActive: data.isActive ?? true,
+          updatedAt: new Date(),
         },
       });
     } catch (error) {
@@ -52,7 +53,7 @@ export class BannerNewsRepository
 
   async update(id: Id, data: UpdateBannerNewsRequest): Promise<BannerNews> {
     try {
-      return await prisma.bannerNews.update({
+      return await prisma.bannernews.update({
         where: { id },
         data,
       });
@@ -63,7 +64,7 @@ export class BannerNewsRepository
 
   async delete(id: Id): Promise<void> {
     try {
-      await prisma.bannerNews.delete({
+      await prisma.bannernews.delete({
         where: { id },
       });
     } catch (error) {
@@ -73,7 +74,7 @@ export class BannerNewsRepository
 
   async exists(id: Id): Promise<boolean> {
     try {
-      const bannerNews = await prisma.bannerNews.findUnique({
+      const bannerNews = await prisma.bannernews.findUnique({
         where: { id },
         select: { id: true },
       });
@@ -105,7 +106,7 @@ export class BannerNewsRepository
         orderBy = { [filters.sortBy]: filters.sortOrder || "desc" };
       }
 
-      return await prisma.bannerNews.findMany({
+      return await prisma.bannernews.findMany({
         where,
         orderBy,
       });
@@ -116,7 +117,7 @@ export class BannerNewsRepository
 
   async findActive(): Promise<BannerNews[]> {
     try {
-      return await prisma.bannerNews.findMany({
+      return await prisma.bannernews.findMany({
         where: { isActive: true },
         orderBy: { createdAt: "desc" },
       });

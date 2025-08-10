@@ -178,10 +178,10 @@ export default function BannerNewsPage() {
 
       await fetchBannerNews();
       closeModal();
-    } catch (err) {
-      console.error("폼 제출 에러:", err);
+    } catch (error) {
+      console.error("폼 제출 에러:", error);
       setError(
-        err instanceof Error ? err.message : "저장 중 오류가 발생했습니다."
+        error instanceof Error ? error.message : "저장 중 오류가 발생했습니다."
       );
     }
   };
@@ -211,9 +211,9 @@ export default function BannerNewsPage() {
       }
 
       await fetchBannerNews();
-    } catch (err) {
+    } catch (error) {
       setError(
-        err instanceof Error ? err.message : "삭제 중 오류가 발생했습니다."
+        error instanceof Error ? error.message : "삭제 중 오류가 발생했습니다."
       );
     }
   };
@@ -233,9 +233,11 @@ export default function BannerNewsPage() {
       }
 
       await fetchBannerNews();
-    } catch (err) {
+    } catch (error) {
       setError(
-        err instanceof Error ? err.message : "상태 변경 중 오류가 발생했습니다."
+        error instanceof Error
+          ? error.message
+          : "상태 변경 중 오류가 발생했습니다."
       );
     }
   };

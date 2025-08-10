@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 
@@ -25,14 +25,13 @@ export default function InquiryDetailPage() {
 
   const [inquiry, setInquiry] = useState<Inquiry | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [password, setPassword] = useState("");
   const [isPasswordVerifying, setIsPasswordVerifying] = useState(false);
   const [passwordError, setPasswordError] = useState<string | null>(null);
 
   // 문의글 상세 로드
-  const loadInquiry = async () => {
+  const loadInquiry = useCallback(async () => {
     setIsLoading(true);
     try {
       const response = await fetch(`/api/inquiries/${inquiryId}`);
@@ -45,20 +44,20 @@ export default function InquiryDetailPage() {
           setIsPasswordModalOpen(true);
         }
       } else {
-        setError("문의글을 찾을 수 없습니다.");
+        console.error("문의글을 찾을 수 없습니다.");
       }
-    } catch (error) {
-      setError("문의글을 불러오는 중 오류가 발생했습니다.");
+    } catch (err) {
+      console.error("문의글을 불러오는 중 오류가 발생했습니다:", err);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [inquiryId]);
 
   useEffect(() => {
     if (inquiryId) {
       loadInquiry();
     }
-  }, [inquiryId]);
+  }, [inquiryId, loadInquiry]);
 
   // 비밀번호 확인
   const handlePasswordVerify = async (e: React.FormEvent) => {
@@ -84,7 +83,8 @@ export default function InquiryDetailPage() {
         const errorData = await response.json();
         setPasswordError(errorData.error || "비밀번호가 올바르지 않습니다.");
       }
-    } catch (error) {
+    } catch (err) {
+      console.error("비밀번호 확인 중 오류:", err);
       setPasswordError("비밀번호 확인 중 오류가 발생했습니다.");
     } finally {
       setIsPasswordVerifying(false);
@@ -100,10 +100,10 @@ export default function InquiryDetailPage() {
         const data = await response.json();
         setInquiry(data.data);
       } else {
-        setError("문의글을 찾을 수 없습니다.");
+        console.error("문의글을 찾을 수 없습니다.");
       }
-    } catch (error) {
-      setError("문의글을 불러오는 중 오류가 발생했습니다.");
+    } catch (err) {
+      console.error("문의글을 불러오는 중 오류가 발생했습니다:", err);
     } finally {
       setIsLoading(false);
     }
@@ -125,20 +125,6 @@ export default function InquiryDetailPage() {
         <section className="inquiry-detail__loading">
           <h1>문의글 상세</h1>
           <p>문의글을 불러오는 중입니다...</p>
-        </section>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="inquiry-detail">
-        <section className="inquiry-detail__error">
-          <h1>문의글 상세</h1>
-          <p>{error}</p>
-          <Link href="/greensupia/inquiry" className="inquiry-detail__button">
-            목록으로 돌아가기
-          </Link>
         </section>
       </div>
     );

@@ -1,6 +1,31 @@
 import { prisma } from "@/lib/prisma";
 import { Notice, NoticeAttachment } from "@/types/notice";
 
+// Prisma 결과를 위한 타입 정의
+interface PrismaNotice {
+  id: number;
+  title: string;
+  content: string;
+  author: string;
+  isPinned: boolean;
+  isActive: boolean;
+  viewCount: number;
+  createdAt: Date;
+  updatedAt: Date;
+  noticeattachment: PrismaNoticeAttachment[];
+}
+
+interface PrismaNoticeAttachment {
+  id: number;
+  fileName: string;
+  filePath: string;
+  fileSize: number;
+  mimeType: string;
+  downloadCount: number;
+  createdAt: Date;
+  noticeId: number;
+}
+
 export class NoticeRepository {
   // 공지사항 목록 조회 (상단고정 먼저, 그 다음 최신순)
   async findAll(
@@ -13,7 +38,7 @@ export class NoticeRepository {
       prisma.notice.findMany({
         where: { isActive: true },
         include: {
-          attachments: true,
+          noticeattachment: true,
         },
         orderBy: [
           { isPinned: "desc" }, // 상단고정 먼저
@@ -28,14 +53,16 @@ export class NoticeRepository {
     ]);
 
     // Prisma 결과를 Notice 타입에 맞게 변환
-    const convertedNotices = notices.map((notice) => ({
+    const convertedNotices = notices.map((notice: PrismaNotice) => ({
       ...notice,
       createdAt: notice.createdAt.toISOString(),
       updatedAt: notice.updatedAt.toISOString(),
-      attachments: notice.attachments.map((attachment) => ({
-        ...attachment,
-        createdAt: attachment.createdAt.toISOString(),
-      })),
+      attachments: notice.noticeattachment.map(
+        (attachment: PrismaNoticeAttachment) => ({
+          ...attachment,
+          createdAt: attachment.createdAt.toISOString(),
+        })
+      ),
     }));
 
     return {
@@ -49,7 +76,7 @@ export class NoticeRepository {
     const notice = await prisma.notice.findFirst({
       where: { id, isActive: true },
       include: {
-        attachments: true,
+        noticeattachment: true,
       },
     });
 
@@ -65,10 +92,12 @@ export class NoticeRepository {
         ...notice,
         createdAt: notice.createdAt.toISOString(),
         updatedAt: notice.updatedAt.toISOString(),
-        attachments: notice.attachments.map((attachment) => ({
-          ...attachment,
-          createdAt: attachment.createdAt.toISOString(),
-        })),
+        attachments: notice.noticeattachment.map(
+          (attachment: PrismaNoticeAttachment) => ({
+            ...attachment,
+            createdAt: attachment.createdAt.toISOString(),
+          })
+        ),
       };
 
       return convertedNotice as Notice;
@@ -90,9 +119,10 @@ export class NoticeRepository {
         content: data.content,
         author: data.author || "관리자",
         isPinned: data.isPinned || false,
+        updatedAt: new Date(),
       },
       include: {
-        attachments: true,
+        noticeattachment: true,
       },
     });
 
@@ -101,10 +131,12 @@ export class NoticeRepository {
       ...notice,
       createdAt: notice.createdAt.toISOString(),
       updatedAt: notice.updatedAt.toISOString(),
-      attachments: notice.attachments.map((attachment) => ({
-        ...attachment,
-        createdAt: attachment.createdAt.toISOString(),
-      })),
+      attachments: notice.noticeattachment.map(
+        (attachment: PrismaNoticeAttachment) => ({
+          ...attachment,
+          createdAt: attachment.createdAt.toISOString(),
+        })
+      ),
     };
 
     return convertedNotice as Notice;
@@ -124,7 +156,7 @@ export class NoticeRepository {
       where: { id },
       data,
       include: {
-        attachments: true,
+        noticeattachment: true,
       },
     });
 
@@ -133,10 +165,12 @@ export class NoticeRepository {
       ...notice,
       createdAt: notice.createdAt.toISOString(),
       updatedAt: notice.updatedAt.toISOString(),
-      attachments: notice.attachments.map((attachment) => ({
-        ...attachment,
-        createdAt: attachment.createdAt.toISOString(),
-      })),
+      attachments: notice.noticeattachment.map(
+        (attachment: PrismaNoticeAttachment) => ({
+          ...attachment,
+          createdAt: attachment.createdAt.toISOString(),
+        })
+      ),
     };
 
     return convertedNotice as Notice;
@@ -161,13 +195,15 @@ export class NoticeRepository {
       where: { id },
     });
 
-    if (!notice) return null;
+    if (!notice) {
+      return null;
+    }
 
     const updatedNotice = await prisma.notice.update({
       where: { id },
       data: { isPinned: !notice.isPinned },
       include: {
-        attachments: true,
+        noticeattachment: true,
       },
     });
 
@@ -176,10 +212,12 @@ export class NoticeRepository {
       ...updatedNotice,
       createdAt: updatedNotice.createdAt.toISOString(),
       updatedAt: updatedNotice.updatedAt.toISOString(),
-      attachments: updatedNotice.attachments.map((attachment) => ({
-        ...attachment,
-        createdAt: attachment.createdAt.toISOString(),
-      })),
+      attachments: updatedNotice.noticeattachment.map(
+        (attachment: PrismaNoticeAttachment) => ({
+          ...attachment,
+          createdAt: attachment.createdAt.toISOString(),
+        })
+      ),
     };
 
     return convertedNotice as Notice;
@@ -195,7 +233,7 @@ export class NoticeRepository {
       mimeType: string;
     }
   ): Promise<NoticeAttachment> {
-    const attachment = await prisma.noticeAttachment.create({
+    const attachment = await prisma.noticeattachment.create({
       data: {
         noticeId,
         fileName: data.fileName,
@@ -216,7 +254,7 @@ export class NoticeRepository {
 
   // 첨부파일 다운로드 횟수 증가
   async incrementDownloadCount(attachmentId: number): Promise<void> {
-    await prisma.noticeAttachment.update({
+    await prisma.noticeattachment.update({
       where: { id: attachmentId },
       data: { downloadCount: { increment: 1 } },
     });
@@ -225,11 +263,11 @@ export class NoticeRepository {
   // 첨부파일 삭제
   async deleteAttachment(id: number): Promise<void> {
     try {
-      await prisma.noticeAttachment.delete({
+      await prisma.noticeattachment.delete({
         where: { id },
       });
-    } catch (err) {
-      console.error("첨부파일 삭제 오류:", err);
+    } catch (error) {
+      console.error("첨부파일 삭제 오류:", error);
       throw new Error("첨부파일 삭제에 실패했습니다.");
     }
   }
@@ -238,7 +276,7 @@ export class NoticeRepository {
   async findAttachmentById(
     attachmentId: number
   ): Promise<NoticeAttachment | null> {
-    const attachment = await prisma.noticeAttachment.findUnique({
+    const attachment = await prisma.noticeattachment.findUnique({
       where: { id: attachmentId },
     });
 

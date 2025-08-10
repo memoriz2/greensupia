@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { InquiryService } from "@/services/inquiryService";
 
 export async function POST(
@@ -29,7 +28,7 @@ export async function POST(
     }
 
     // 3. Service 호출
-    const service = new InquiryService(prisma);
+    const service = new InquiryService();
     const isVerified = await service.verifyInquiryPassword(id, password);
 
     // 4. 비밀번호 확인 결과

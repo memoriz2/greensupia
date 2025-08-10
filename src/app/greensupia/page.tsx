@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { BannerNews } from "@/types/bannerNews";
-import { generateGreensupiaMetadata } from "@/utils/seo";
+
 import { OrganizationStructuredData } from "@/components/StructuredData";
 
 // Google Maps API 타입 선언
@@ -572,7 +572,11 @@ export default function GreensupiaHomePage() {
                         height={192}
                         className="greensupia-news__image"
                         priority={true}
-                        style={{ height: "auto" }}
+                        style={{
+                          height: "192px",
+                          objectFit: "cover",
+                          objectPosition: "center",
+                        }}
                       />
                     </div>
                   )}

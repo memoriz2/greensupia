@@ -25,12 +25,11 @@ interface InquiryResponse {
 
 export default function PortalInquiryDetailPage() {
   const params = useParams();
-  const router = useRouter();
+  // const router = useRouter(); // 사용되지 않음
   const inquiryId = params.id as string;
 
   const [inquiry, setInquiry] = useState<Inquiry | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [answer, setAnswer] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -47,10 +46,10 @@ export default function PortalInquiryDetailPage() {
         if (data.success) {
           setInquiry(data.data);
         } else {
-          setError("문의글을 불러오는데 실패했습니다.");
+          console.error("문의글을 불러오는데 실패했습니다.");
         }
-      } catch (err) {
-        setError("서버 오류가 발생했습니다.");
+      } catch (error) {
+        console.error("서버 오류가 발생했습니다:", error);
       } finally {
         setLoading(false);
       }
@@ -88,7 +87,8 @@ export default function PortalInquiryDetailPage() {
       } else {
         alert("답변 등록에 실패했습니다.");
       }
-    } catch (err) {
+    } catch (error) {
+      console.error("답변 등록 중 오류:", error);
       alert("서버 오류가 발생했습니다.");
     } finally {
       setSubmitting(false);
@@ -115,11 +115,11 @@ export default function PortalInquiryDetailPage() {
     );
   }
 
-  if (error || !inquiry) {
+  if (!inquiry) {
     return (
       <div className="portal-inquiry-detail">
         <div className="portal-inquiry-detail__error">
-          오류: {error || "문의글을 찾을 수 없습니다."}
+          문의글을 찾을 수 없습니다.
         </div>
         <Link
           href="/portal/inquiry"

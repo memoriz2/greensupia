@@ -57,9 +57,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 이미지 업로드
-    const uploadResult = await uploadImage(imageFile);
-    
+    // 이미지 업로드 (조직도 폴더 지정)
+    const uploadResult = await uploadImage(imageFile, "organizationcharts");
+
     if (!uploadResult.success) {
       return NextResponse.json(
         { error: uploadResult.error || "이미지 업로드에 실패했습니다." },

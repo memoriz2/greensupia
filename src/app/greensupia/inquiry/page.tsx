@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 
 interface Inquiry {
@@ -25,10 +24,8 @@ interface InquiryListResponse {
 }
 
 export default function InquiryListPage() {
-  const router = useRouter();
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 10,
@@ -41,34 +38,37 @@ export default function InquiryListPage() {
   });
 
   // 문의글 목록 로드
-  const loadInquiries = async (page = 1) => {
-    setIsLoading(true);
-    try {
-      const params = new URLSearchParams({
-        page: page.toString(),
-        limit: pagination.limit.toString(),
-        ...(filters.isAnswered && { isAnswered: filters.isAnswered }),
-        ...(filters.isSecret && { isSecret: filters.isSecret }),
-      });
+  const loadInquiries = useCallback(
+    async (page = 1) => {
+      setIsLoading(true);
+      try {
+        const params = new URLSearchParams({
+          page: page.toString(),
+          limit: pagination.limit.toString(),
+          ...(filters.isAnswered && { isAnswered: filters.isAnswered }),
+          ...(filters.isSecret && { isSecret: filters.isSecret }),
+        });
 
-      const response = await fetch(`/api/inquiries?${params}`);
-      if (response.ok) {
-        const data: InquiryListResponse = await response.json();
-        setInquiries(data.data);
-        setPagination(data.pagination);
-      } else {
-        setError("문의글 목록을 불러오는데 실패했습니다.");
+        const response = await fetch(`/api/inquiries?${params}`);
+        if (response.ok) {
+          const data: InquiryListResponse = await response.json();
+          setInquiries(data.data);
+          setPagination(data.pagination);
+        } else {
+          console.error("문의글 목록을 불러오는데 실패했습니다.");
+        }
+      } catch (err) {
+        console.error("문의글 목록을 불러오는 중 오류가 발생했습니다:", err);
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      setError("문의글 목록을 불러오는 중 오류가 발생했습니다.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    },
+    [filters, pagination.limit]
+  );
 
   useEffect(() => {
     loadInquiries();
-  }, [filters]);
+  }, [loadInquiries]);
 
   const handlePageChange = (newPage: number) => {
     loadInquiries(newPage);
@@ -85,23 +85,6 @@ export default function InquiryListPage() {
       day: "2-digit",
     });
   };
-
-  if (error) {
-    return (
-      <div className="inquiry-list">
-        <section className="inquiry-list__error">
-          <h1>문의글 목록</h1>
-          <p>{error}</p>
-          <button
-            onClick={() => loadInquiries()}
-            className="inquiry-list__button"
-          >
-            다시 시도
-          </button>
-        </section>
-      </div>
-    );
-  }
 
   return (
     <div className="inquiry-list">

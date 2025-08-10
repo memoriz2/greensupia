@@ -32,7 +32,8 @@ export default function InquiryWritePage() {
         const error = await response.json();
         alert(error.error);
       }
-    } catch (error) {
+    } catch (err) {
+      console.error("문의글 등록 중 오류:", err);
       alert("문의글 등록 중 오류가 발생했습니다.");
     } finally {
       setIsLoading(false);

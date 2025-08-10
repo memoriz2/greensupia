@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 3. Service 호출
-    const service = new InquiryService(prisma);
+    const service = new InquiryService();
     let inquiry;
 
     if (isSecret) {

@@ -9,7 +9,7 @@ import { Id } from "@/types/utils";
 export class OrganizationChartRepository {
   async findAll(): Promise<OrganizationChart[]> {
     try {
-      return await prisma.organizationChart.findMany({
+      return await prisma.organizationchart.findMany({
         orderBy: { createdAt: "desc" },
       });
     } catch (error) {
@@ -19,7 +19,7 @@ export class OrganizationChartRepository {
 
   async findActive(): Promise<OrganizationChart | null> {
     try {
-      return await prisma.organizationChart.findFirst({
+      return await prisma.organizationchart.findFirst({
         where: { isActive: true },
         orderBy: { createdAt: "desc" },
       });
@@ -30,7 +30,7 @@ export class OrganizationChartRepository {
 
   async findById(id: Id): Promise<OrganizationChart | null> {
     try {
-      return await prisma.organizationChart.findUnique({
+      return await prisma.organizationchart.findUnique({
         where: { id },
       });
     } catch (error) {
@@ -44,10 +44,11 @@ export class OrganizationChartRepository {
     data: CreateOrganizationChartRequest
   ): Promise<OrganizationChart> {
     try {
-      return await prisma.organizationChart.create({
+      return await prisma.organizationchart.create({
         data: {
           imageUrl: data.imageUrl,
           isActive: data.isActive ?? true,
+          updatedAt: new Date(),
         },
       });
     } catch (error) {
@@ -71,7 +72,7 @@ export class OrganizationChartRepository {
         updateData.isActive = data.isActive;
       }
 
-      return await prisma.organizationChart.update({
+      return await prisma.organizationchart.update({
         where: { id },
         data: updateData,
       });
@@ -84,7 +85,7 @@ export class OrganizationChartRepository {
 
   async delete(id: Id): Promise<void> {
     try {
-      await prisma.organizationChart.delete({
+      await prisma.organizationchart.delete({
         where: { id },
       });
     } catch (error) {
@@ -96,7 +97,7 @@ export class OrganizationChartRepository {
 
   async deactivateAll(): Promise<void> {
     try {
-      await prisma.organizationChart.updateMany({
+      await prisma.organizationchart.updateMany({
         where: { isActive: true },
         data: { isActive: false },
       });
@@ -107,7 +108,7 @@ export class OrganizationChartRepository {
 
   async exists(id: Id): Promise<boolean> {
     try {
-      const orgChart = await prisma.organizationChart.findUnique({
+      const orgChart = await prisma.organizationchart.findUnique({
         where: { id },
         select: { id: true },
       });

@@ -1,5 +1,3 @@
-import { Todo } from "./todo";
-
 export interface ApiResponse<T = unknown> {
   success: boolean;
   data?: T;
@@ -21,7 +19,3 @@ export interface PaginatedResponse<T> {
     totalPages: number;
   };
 }
-
-export type TodoResponse = ApiResponse<Todo>;
-export type TodoListResponse = ApiResponse<Todo[]>;
-export type PaginatedTodoResponse = ApiResponse<PaginatedResponse<Todo>>;

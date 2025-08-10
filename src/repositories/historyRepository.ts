@@ -40,7 +40,10 @@ export class HistoryRepository
   async create(data: CreateHistoryRequest): Promise<History> {
     try {
       return await prisma.history.create({
-        data,
+        data: {
+          ...data,
+          updatedAt: new Date(),
+        },
       });
     } catch (error) {
       throw new Error(`Failed to create history: ${error}`);

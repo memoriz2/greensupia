@@ -106,7 +106,7 @@ export async function PUT(
     }
 
     // 3. Service 호출
-    const service = new InquiryService(prisma);
+    const service = new InquiryService();
     const updatedInquiry = await service.updateInquiry(id, {
       title,
       content,

@@ -11,10 +11,16 @@ export interface UploadResponse {
   error?: string;
 }
 
-export const uploadImage = async (file: File): Promise<UploadResponse> => {
+export const uploadImage = async (
+  file: File,
+  folder?: string
+): Promise<UploadResponse> => {
   try {
     const formData = new FormData();
     formData.append("file", file);
+    if (folder) {
+      formData.append("folder", folder);
+    }
 
     const response = await fetch("/api/upload", {
       method: "POST",

@@ -1,4 +1,4 @@
-import { BannerNewsRepository } from "@/repositories/bannerNewsRepository";
+import { bannerNewsRepository } from "@/repositories/bannerNewsRepository";
 import {
   BannerNews,
   CreateBannerNewsRequest,
@@ -9,10 +9,10 @@ import { ApiResponse } from "@/types/api";
 import { Id } from "@/types/utils";
 
 export class BannerNewsService {
-  private bannerNewsRepository: BannerNewsRepository;
+  private bannerNewsRepository: bannerNewsRepository;
 
   constructor() {
-    this.bannerNewsRepository = new BannerNewsRepository();
+    this.bannerNewsRepository = new bannerNewsRepository();
   }
 
   async getAllBannerNews(): Promise<ApiResponse<BannerNews[]>> {
@@ -201,13 +201,15 @@ export class BannerNewsService {
       const allBannerNews = await this.bannerNewsRepository.findAll();
 
       const total = allBannerNews.length;
-      const active = allBannerNews.filter((news) => news.isActive).length;
+      const active = allBannerNews.filter(
+        (news: BannerNews) => news.isActive
+      ).length;
       const inactive = total - active;
       const activeRate = total > 0 ? Math.round((active / total) * 100) : 0;
 
       const recentBannerNews = allBannerNews
         .sort(
-          (a, b) =>
+          (a: BannerNews, b: BannerNews) =>
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         )
         .slice(0, 5);

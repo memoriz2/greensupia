@@ -23,7 +23,6 @@ export default function PortalLoginPage() {
     password: "",
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [userType, setUserType] = useState<"admin" | "guest">("admin");
   const [currentUserType, setCurrentUserType] = useState<string>("guest");
 
@@ -58,13 +57,11 @@ export default function PortalLoginPage() {
 
   const handleUserTypeChange = (type: "admin" | "guest") => {
     setUserType(type);
-    setError(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError(null);
 
     try {
       const response = await fetch("/api/auth/login", {
@@ -94,10 +91,11 @@ export default function PortalLoginPage() {
           window.location.reload();
         }, 100);
       } else {
-        setError(data.message || "로그인에 실패했습니다.");
+        alert(data.message || "로그인에 실패했습니다.");
       }
-    } catch (err) {
-      setError("서버 오류가 발생했습니다.");
+    } catch (error) {
+      console.error("로그인 중 오류:", error);
+      alert("서버 오류가 발생했습니다.");
     } finally {
       setIsLoading(false);
     }
@@ -193,12 +191,6 @@ export default function PortalLoginPage() {
                   required
                 />
               </div>
-
-              {error && (
-                <div className="portal-login__error">
-                  <p>{error}</p>
-                </div>
-              )}
 
               <button
                 type="submit"

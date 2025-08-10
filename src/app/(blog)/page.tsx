@@ -94,6 +94,10 @@ export default function PublicHomePage() {
                       height={128}
                       className="w-full h-full object-cover"
                       priority={false}
+                      style={{
+                        objectFit: "cover",
+                        objectPosition: "center",
+                      }}
                     />
                   </figure>
                 )}

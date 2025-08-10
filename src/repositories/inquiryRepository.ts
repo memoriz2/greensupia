@@ -1,17 +1,17 @@
-import { PrismaClient, Inquiry } from "@prisma/client";
+import { PrismaClient, inquiry } from "@prisma/client";
 import { IRepository } from "./baseRepository";
 import { Id } from "@/types/utils";
 
-export class InquiryRepository implements IRepository<Inquiry> {
+export class InquiryRepository implements IRepository<inquiry> {
   constructor(private prisma: PrismaClient) {}
 
-  async findAll(): Promise<Inquiry[]> {
+  async findAll(): Promise<inquiry[]> {
     return this.prisma.inquiry.findMany({
       orderBy: { createdAt: "desc" },
     });
   }
 
-  async findById(id: Id): Promise<Inquiry | null> {
+  async findById(id: Id): Promise<inquiry | null> {
     return this.prisma.inquiry.findUnique({
       where: { id },
     });
@@ -24,13 +24,16 @@ export class InquiryRepository implements IRepository<Inquiry> {
     email?: string;
     isSecret: boolean;
     password?: string;
-  }): Promise<Inquiry> {
+  }): Promise<inquiry> {
     return this.prisma.inquiry.create({
-      data,
+      data: {
+        ...data,
+        updatedAt: new Date(),
+      },
     });
   }
 
-  async update(id: Id, data: Partial<Inquiry>): Promise<Inquiry> {
+  async update(id: Id, data: Partial<inquiry>): Promise<inquiry> {
     return this.prisma.inquiry.update({
       where: { id },
       data,
@@ -52,21 +55,21 @@ export class InquiryRepository implements IRepository<Inquiry> {
   }
 
   //추가 메서드들
-  async findByAnswerStatus(isAnswered: boolean): Promise<Inquiry[]> {
+  async findByAnswerStatus(isAnswered: boolean): Promise<inquiry[]> {
     return this.prisma.inquiry.findMany({
       where: { isAnswered },
       orderBy: { createdAt: "desc" },
     });
   }
 
-  async findBySecretStatus(isSecret: boolean): Promise<Inquiry[]> {
+  async findBySecretStatus(isSecret: boolean): Promise<inquiry[]> {
     return this.prisma.inquiry.findMany({
       where: { isSecret },
       orderBy: { createdAt: "desc" },
     });
   }
 
-  async addAnswer(id: Id, answer: string): Promise<Inquiry> {
+  async addAnswer(id: Id, answer: string): Promise<inquiry> {
     return this.prisma.inquiry.update({
       where: { id },
       data: {

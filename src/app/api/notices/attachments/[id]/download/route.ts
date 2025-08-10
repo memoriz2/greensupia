@@ -38,12 +38,17 @@ export async function GET(
       const fileBuffer = await readFile(fullPath);
 
       // 파일 다운로드 응답 생성
-      const response = new NextResponse(fileBuffer);
-      response.headers.set(
-        "Content-Disposition",
-        `attachment; filename="${encodeURIComponent(attachmentInfo.fileName)}"`
+      const response = new NextResponse(
+        new Blob([new Uint8Array(fileBuffer)]),
+        {
+          headers: {
+            "Content-Disposition": `attachment; filename="${encodeURIComponent(
+              attachmentInfo.fileName
+            )}"`,
+            "Content-Type": "application/octet-stream",
+          },
+        }
       );
-      response.headers.set("Content-Type", "application/octet-stream");
 
       return response;
     } catch (fileError) {

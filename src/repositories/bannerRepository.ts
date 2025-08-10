@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { Banner } from "@prisma/client";
+import { banner } from "@prisma/client";
 import {
   BannerCreateRequest,
   BannerUpdateRequest,
@@ -11,13 +11,13 @@ import { Id } from "@/types/utils";
 export class BannerRepository
   implements
     IFilterableRepository<
-      Banner,
+      banner,
       Record<string, unknown>,
       BannerCreateRequest,
       BannerUpdateRequest
     >
 {
-  async findAll(): Promise<Banner[]> {
+  async findAll(): Promise<banner[]> {
     try {
       return await prisma.banner.findMany({
         orderBy: { sortOrder: "asc" },
@@ -27,7 +27,7 @@ export class BannerRepository
     }
   }
 
-  async findById(id: Id): Promise<Banner | null> {
+  async findById(id: Id): Promise<banner | null> {
     try {
       return await prisma.banner.findUnique({
         where: { id },
@@ -37,7 +37,7 @@ export class BannerRepository
     }
   }
 
-  async create(data: BannerCreateRequest): Promise<Banner> {
+  async create(data: BannerCreateRequest): Promise<banner> {
     try {
       return await prisma.banner.create({
         data: {
@@ -46,6 +46,7 @@ export class BannerRepository
           linkUrl: data.linkUrl,
           sortOrder: data.sortOrder || 0,
           isActive: data.isActive ?? true,
+          updatedAt: new Date(),
         },
       });
     } catch (error) {
@@ -53,7 +54,7 @@ export class BannerRepository
     }
   }
 
-  async update(id: Id, data: BannerUpdateRequest): Promise<Banner> {
+  async update(id: Id, data: BannerUpdateRequest): Promise<banner> {
     try {
       return await prisma.banner.update({
         where: { id },
@@ -82,11 +83,11 @@ export class BannerRepository
 
   async exists(id: Id): Promise<boolean> {
     try {
-      const banner = await prisma.banner.findUnique({
+      const bannerItem = await prisma.banner.findUnique({
         where: { id },
         select: { id: true },
       });
-      return !!banner;
+      return !!bannerItem;
     } catch (error) {
       throw new Error(
         `Failed to check banner existence with id ${id}: ${error}`
@@ -94,7 +95,7 @@ export class BannerRepository
     }
   }
 
-  async findByFilters(filters: Record<string, unknown>): Promise<Banner[]> {
+  async findByFilters(filters: Record<string, unknown>): Promise<banner[]> {
     try {
       const where: Record<string, unknown> = {};
 
@@ -123,7 +124,7 @@ export class BannerRepository
     page: number,
     limit: number
   ): Promise<{
-    data: Banner[];
+    data: banner[];
     pagination: {
       page: number;
       limit: number;
@@ -159,7 +160,7 @@ export class BannerRepository
     }
   }
 
-  async findActive(): Promise<Banner[]> {
+  async findActive(): Promise<banner[]> {
     try {
       return await prisma.banner.findMany({
         where: { isActive: true },
@@ -170,7 +171,7 @@ export class BannerRepository
     }
   }
 
-  async toggleActive(id: Id): Promise<Banner> {
+  async toggleActive(id: Id): Promise<banner> {
     try {
       const banner = await prisma.banner.findUnique({ where: { id } });
       if (!banner) {
@@ -213,7 +214,7 @@ export class BannerRepository
     }
   }
 
-  toResponse(banner: Banner): BannerResponse {
+  toResponse(banner: banner): BannerResponse {
     return {
       id: banner.id,
       title: banner.title,

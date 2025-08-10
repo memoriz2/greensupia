@@ -12,7 +12,6 @@ export default function NoticeWritePage() {
   const [isPinned, setIsPinned] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(event.target.files || []);
@@ -27,17 +26,16 @@ export default function NoticeWritePage() {
     e.preventDefault();
 
     if (!title.trim()) {
-      setError("제목을 입력해주세요.");
+      alert("제목을 입력해주세요.");
       return;
     }
 
     if (!content.trim()) {
-      setError("내용을 입력해주세요.");
+      alert("내용을 입력해주세요.");
       return;
     }
 
     setLoading(true);
-    setError(null);
 
     try {
       const formData = new FormData();
@@ -60,10 +58,11 @@ export default function NoticeWritePage() {
       if (result.success) {
         router.push("/greensupia/notice");
       } else {
-        setError(result.error || "공지사항을 저장하는 중 오류가 발생했습니다.");
+        alert(result.error || "공지사항을 저장하는 중 오류가 발생했습니다.");
       }
     } catch (error) {
-      setError("공지사항을 저장하는 중 오류가 발생했습니다.");
+      console.error("공지사항 저장 중 오류:", error);
+      alert("공지사항을 저장하는 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);
     }
@@ -91,12 +90,6 @@ export default function NoticeWritePage() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <p className="text-red-800">{error}</p>
-            </div>
-          )}
-
           {/* 제목 입력 */}
           <div>
             <label

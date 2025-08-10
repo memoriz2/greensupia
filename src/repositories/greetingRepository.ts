@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { Greeting } from "@prisma/client";
+import { greeting } from "@prisma/client";
 import {
   GreetingCreateRequest,
   GreetingUpdateRequest,
@@ -11,13 +11,13 @@ import { Id } from "@/types/utils";
 export class GreetingRepository
   implements
     IFilterableRepository<
-      Greeting,
+      greeting,
       Record<string, unknown>,
       GreetingCreateRequest,
       GreetingUpdateRequest
     >
 {
-  async findAll(): Promise<Greeting[]> {
+  async findAll(): Promise<greeting[]> {
     try {
       return await prisma.greeting.findMany({
         orderBy: { createdAt: "desc" },
@@ -27,7 +27,7 @@ export class GreetingRepository
     }
   }
 
-  async findById(id: Id): Promise<Greeting | null> {
+  async findById(id: Id): Promise<greeting | null> {
     try {
       return await prisma.greeting.findUnique({
         where: { id },
@@ -37,13 +37,14 @@ export class GreetingRepository
     }
   }
 
-  async create(data: GreetingCreateRequest): Promise<Greeting> {
+  async create(data: GreetingCreateRequest): Promise<greeting> {
     try {
       return await prisma.greeting.create({
         data: {
           title: data.title,
           content: data.content,
           isActive: data.isActive ?? true,
+          updatedAt: new Date(),
         },
       });
     } catch (error) {
@@ -51,7 +52,7 @@ export class GreetingRepository
     }
   }
 
-  async update(id: Id, data: GreetingUpdateRequest): Promise<Greeting> {
+  async update(id: Id, data: GreetingUpdateRequest): Promise<greeting> {
     try {
       return await prisma.greeting.update({
         where: { id },
@@ -90,7 +91,7 @@ export class GreetingRepository
     }
   }
 
-  async findByFilters(filters: Record<string, unknown>): Promise<Greeting[]> {
+  async findByFilters(filters: Record<string, unknown>): Promise<greeting[]> {
     try {
       const where: Record<string, unknown> = {};
 
@@ -125,7 +126,7 @@ export class GreetingRepository
     page: number,
     limit: number
   ): Promise<{
-    data: Greeting[];
+    data: greeting[];
     pagination: {
       page: number;
       limit: number;
@@ -161,7 +162,7 @@ export class GreetingRepository
     }
   }
 
-  async findActive(): Promise<Greeting[]> {
+  async findActive(): Promise<greeting[]> {
     try {
       return await prisma.greeting.findMany({
         where: { isActive: true },
@@ -172,7 +173,7 @@ export class GreetingRepository
     }
   }
 
-  async toggleActive(id: Id): Promise<Greeting> {
+  async toggleActive(id: Id): Promise<greeting> {
     try {
       const greeting = await prisma.greeting.findUnique({ where: { id } });
       if (!greeting) {
@@ -188,7 +189,7 @@ export class GreetingRepository
     }
   }
 
-  toResponse(greeting: Greeting): GreetingResponse {
+  toResponse(greeting: greeting): GreetingResponse {
     return {
       id: greeting.id,
       title: greeting.title,

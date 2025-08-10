@@ -10,8 +10,8 @@ export default function WriteNoticePage() {
   const router = useRouter();
   const params = useParams();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // 폼 상태
   const [title, setTitle] = useState("");
@@ -45,7 +45,7 @@ export default function WriteNoticePage() {
           setIsPinned(notice.isPinned);
           setExistingAttachments(notice.attachments || []);
         } catch (err) {
-          setError(
+          console.error(
             err instanceof Error
               ? err.message
               : "알 수 없는 오류가 발생했습니다."
@@ -62,7 +62,7 @@ export default function WriteNoticePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-    setError(null);
+    setError(null); // 제출 시 에러 초기화
 
     try {
       const formData = new FormData();
@@ -103,9 +103,23 @@ export default function WriteNoticePage() {
 
       router.push("/portal/notices");
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다."
-      );
+      // 더 구체적인 에러 메시지 처리
+      let errorMessage = "알 수 없는 오류가 발생했습니다.";
+
+      if (err instanceof Error) {
+        if (err.message.includes("네트워크")) {
+          errorMessage = "네트워크 연결을 확인해주세요.";
+        } else if (err.message.includes("권한")) {
+          errorMessage = "권한이 없습니다. 관리자에게 문의해주세요.";
+        } else if (err.message.includes("파일")) {
+          errorMessage =
+            "파일 업로드 중 오류가 발생했습니다. 파일 크기와 형식을 확인해주세요.";
+        } else {
+          errorMessage = err.message;
+        }
+      }
+
+      setError(errorMessage);
     } finally {
       setSubmitting(false);
     }
@@ -159,8 +173,37 @@ export default function WriteNoticePage() {
       <div className="card">
         <form onSubmit={handleSubmit} className="modal-form">
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-600">
-              {error}
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <div className="flex items-start">
+                <div className="flex-shrink-0">
+                  <svg
+                    className="h-5 w-5 text-red-400"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <h3 className="text-sm font-medium text-red-800">
+                    오류가 발생했습니다
+                  </h3>
+                  <div className="mt-2 text-sm text-red-700">{error}</div>
+                  <div className="mt-4">
+                    <button
+                      type="button"
+                      onClick={() => setError(null)}
+                      className="text-sm font-medium text-red-800 hover:text-red-900 underline"
+                    >
+                      닫기
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 
