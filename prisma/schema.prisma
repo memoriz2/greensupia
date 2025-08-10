@@ -7,6 +7,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model admin {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+}
+
 model banner {
   id        Int      @id @default(autoincrement())
   title     String
@@ -115,21 +123,4 @@ model video {
   isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime
-}
-
-model todo {
-  id          Int           @id @default(autoincrement())
-  title       String
-  description String?
-  completed   Boolean       @default(false)
-  priority    todo_priority @default(MEDIUM)
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime
-  dueDate     DateTime?
-}
-
-enum todo_priority {
-  LOW
-  MEDIUM
-  HIGH
 }

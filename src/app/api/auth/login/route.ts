@@ -1,72 +1,48 @@
 import { NextRequest, NextResponse } from "next/server";
-import bcrypt from "bcryptjs";
+import { PrismaClient } from "@prisma/client";
+import { verifyPassword } from "@/utils/encryption";
 import jwt from "jsonwebtoken";
 
 interface LoginRequest {
   username: string;
   password: string;
-  userType: "admin" | "guest";
 }
 
-interface User {
-  id: number;
-  username: string;
-  password: string;
-  userType: "admin" | "guest";
-  name: string;
-}
-
-// 임시 사용자 데이터 (실제로는 데이터베이스에서 관리)
-const users: User[] = [
-  {
-    id: 1,
-    username: "admin",
-    password: "$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi", // "password"
-    userType: "admin",
-    name: "관리자",
-  },
-  {
-    id: 2,
-    username: "guest",
-    password: "$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi", // "password"
-    userType: "guest",
-    name: "게스트",
-  },
-];
+const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
   try {
     const body: LoginRequest = await request.json();
-    const { username, password, userType } = body;
+    const { username, password } = body;
 
     // 입력 검증
-    if (!username || !password || !userType) {
+    if (!username || !password) {
       return NextResponse.json(
         {
           success: false,
-          message: "사용자명, 비밀번호, 사용자 타입을 모두 입력해주세요.",
+          message: "사용자명과 비밀번호를 입력해주세요.",
         },
         { status: 400 }
       );
     }
 
-    // 사용자 찾기
-    const user = users.find(
-      (u) => u.username === username && u.userType === userType
-    );
+    // 데이터베이스에서 관리자 찾기
+    const admin = await prisma.admin.findUnique({
+      where: { username },
+    });
 
-    if (!user) {
+    if (!admin) {
       return NextResponse.json(
         {
           success: false,
-          message: "사용자명 또는 사용자 타입이 올바르지 않습니다.",
+          message: "사용자명이 올바르지 않습니다.",
         },
         { status: 401 }
       );
     }
 
     // 비밀번호 검증
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = verifyPassword(password, admin.password);
 
     if (!isPasswordValid) {
       return NextResponse.json(
@@ -82,10 +58,10 @@ export async function POST(request: NextRequest) {
     const jwtSecret = process.env.JWT_SECRET || "your-secret-key";
     const token = jwt.sign(
       {
-        userId: user.id,
-        username: user.username,
-        userType: user.userType,
-        name: user.name,
+        userId: admin.id,
+        username: admin.username,
+        userType: "admin",
+        name: "관리자",
       },
       jwtSecret,
       { expiresIn: "24h" }
@@ -95,12 +71,12 @@ export async function POST(request: NextRequest) {
       success: true,
       message: "로그인에 성공했습니다.",
       token,
-      userType: user.userType,
+      userType: "admin",
       user: {
-        id: user.id,
-        username: user.username,
-        name: user.name,
-        userType: user.userType,
+        id: admin.id,
+        username: admin.username,
+        name: "관리자",
+        userType: "admin",
       },
     });
 
@@ -123,5 +99,7 @@ export async function POST(request: NextRequest) {
       },
       { status: 500 }
     );
+  } finally {
+    await prisma.$disconnect();
   }
 }

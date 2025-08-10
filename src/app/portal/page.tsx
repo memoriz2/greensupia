@@ -226,11 +226,8 @@ export default function AdminDashboard() {
 
   if (loading) {
     return (
-      <section
-        className="flex items-center justify-center h-64"
-        aria-label="로딩 중"
-      >
-        <div className="text-lg font-medium" role="status" aria-live="polite">
+      <section className="dashboard-loading" aria-label="로딩 중">
+        <div className="loading-text" role="status" aria-live="polite">
           📊 대시보드 데이터를 불러오는 중...
         </div>
       </section>
@@ -239,43 +236,34 @@ export default function AdminDashboard() {
 
   if (!stats) {
     return (
-      <section
-        className="text-center text-red-600"
-        role="alert"
-        aria-live="assertive"
-      >
+      <section className="dashboard-error" role="alert" aria-live="assertive">
         <p>데이터를 불러올 수 없습니다.</p>
       </section>
     );
   }
 
   return (
-    <div className="portal space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">
+    <div className="dashboard">
+      <div className="dashboard-header">
+        <h1 className="dashboard-title">
           {userType === "admin" ? "관리자" : "게스트"} 대시보드
         </h1>
 
-        <p className="text-gray-600">
+        <p className="dashboard-subtitle">
           {userType === "admin"
             ? "시스템 현황을 한눈에 확인하세요"
             : "읽기 전용 모드로 시스템 현황을 확인하세요"}
         </p>
-        <div className="mt-2 flex items-center gap-3">
+        <div className="dashboard-status">
           <span
-            className={`px-3 py-1 text-sm rounded-full ${
-              userType === "admin"
-                ? "bg-blue-100 text-blue-800"
-                : "bg-gray-100 text-gray-800"
+            className={`status-badge ${
+              userType === "admin" ? "status-admin" : "status-guest"
             }`}
           >
             {userType === "admin" ? "관리자 권한" : "게스트 권한"}
           </span>
           {userType === "admin" && (
-            <button
-              onClick={handleLogout}
-              className="px-3 py-1 text-sm bg-red-100 text-red-800 rounded-full hover:bg-red-200 transition-colors"
-            >
+            <button onClick={handleLogout} className="logout-button">
               로그아웃
             </button>
           )}
@@ -283,25 +271,22 @@ export default function AdminDashboard() {
       </div>
 
       {/* 통계 카드들 */}
-      <section
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
-        aria-label="시스템 통계"
-      >
+      <section className="stats-section" aria-label="시스템 통계">
         {/* Todo 통계 */}
         <div className="card card-stats">
           <div className="stat-number">{stats.todos.total}</div>
           <div className="stat-label">전체 할일</div>
-          <div className="mt-2 text-sm text-gray-500">
+          <div className="stat-details">
             완료: {stats.todos.completed} | 진행중: {stats.todos.pending}
           </div>
-          <div className="mt-2">
-            <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className="progress-container">
+            <div className="progress-bar">
               <div
-                className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-500"
+                className="progress-fill"
                 style={{ width: `${stats.todos.completionRate}%` }}
               ></div>
             </div>
-            <div className="text-xs text-gray-500 mt-1">
+            <div className="progress-text">
               완료율: {stats.todos.completionRate}%
             </div>
           </div>
@@ -311,23 +296,20 @@ export default function AdminDashboard() {
         <div className="card card-stats">
           <div className="stat-number">{stats.organization.total}</div>
           <div className="stat-label">조직 구성원</div>
-          <div className="mt-2 text-sm text-gray-500">
+          <div className="stat-details">
             부서: {stats.organization.departments?.length || 0}개
           </div>
-          <div className="mt-2">
-            <div className="flex flex-wrap gap-1">
+          <div className="department-tags">
+            <div className="tag-container">
               {stats.organization.departments
                 ?.slice(0, 3)
                 .map((dept, index) => (
-                  <span
-                    key={index}
-                    className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full"
-                  >
+                  <span key={index} className="department-tag">
                     {dept}
                   </span>
                 ))}
               {(stats.organization.departments?.length || 0) > 3 && (
-                <span className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full">
+                <span className="department-tag-more">
                   +{(stats.organization.departments?.length || 0) - 3}
                 </span>
               )}
@@ -339,11 +321,11 @@ export default function AdminDashboard() {
         <div className="card card-stats">
           <div className="stat-number">{stats.history.total}</div>
           <div className="stat-label">회사 히스토리</div>
-          <div className="mt-2 text-sm text-gray-500">
+          <div className="stat-details">
             {stats.history.yearRange.min} - {stats.history.yearRange.max}
           </div>
-          <div className="mt-2">
-            <div className="text-xs text-gray-500">
+          <div className="history-info">
+            <div className="status-text">
               총 {stats.history.yearRange.max - stats.history.yearRange.min + 1}
               년간의 기록
             </div>
@@ -354,16 +336,16 @@ export default function AdminDashboard() {
         <div className="card card-stats">
           <div className="stat-number">{stats.bannerNews.total}</div>
           <div className="stat-label">배너뉴스</div>
-          <div className="mt-2 text-sm text-gray-500">
+          <div className="stat-details">
             활성: {stats.bannerNews.active} | 비활성:{" "}
             {stats.bannerNews.inactive}
           </div>
-          <div className="mt-2">
-            <div className="flex gap-2">
-              <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">
+          <div className="status-tags">
+            <div className="tag-container">
+              <span className="status-tag status-active">
                 활성 {stats.bannerNews.active}
               </span>
-              <span className="px-2 py-1 text-xs bg-red-100 text-red-800 rounded-full">
+              <span className="status-tag status-inactive">
                 비활성 {stats.bannerNews.inactive}
               </span>
             </div>
@@ -374,19 +356,19 @@ export default function AdminDashboard() {
         <div className="card card-stats">
           <div className="stat-number">{stats.notices.total}</div>
           <div className="stat-label">공지사항</div>
-          <div className="mt-2 text-sm text-gray-500">
+          <div className="stat-details">
             고정: {stats.notices.pinned} | 활성: {stats.notices.active} |
             비활성: {stats.notices.inactive}
           </div>
-          <div className="mt-2">
-            <div className="flex gap-2">
-              <span className="px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full">
+          <div className="status-tags">
+            <div className="tag-container">
+              <span className="status-tag status-pinned">
                 고정 {stats.notices.pinned}
               </span>
-              <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">
+              <span className="status-tag status-active">
                 활성 {stats.notices.active}
               </span>
-              <span className="px-2 py-1 text-xs bg-red-100 text-red-800 rounded-full">
+              <span className="status-tag status-inactive">
                 비활성 {stats.notices.inactive}
               </span>
             </div>
@@ -397,27 +379,27 @@ export default function AdminDashboard() {
         <div className="card card-stats">
           <div className="stat-number">{stats.inquiries.total}</div>
           <div className="stat-label">문의글</div>
-          <div className="mt-2 text-sm text-gray-500">
+          <div className="stat-details">
             답변대기: {stats.inquiries.pending} | 답변완료:{" "}
             {stats.inquiries.answered}
           </div>
-          <div className="mt-2">
-            <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className="progress-container">
+            <div className="progress-bar">
               <div
-                className="bg-gradient-to-r from-green-500 to-emerald-600 h-2 rounded-full transition-all duration-500"
+                className="progress-fill progress-success"
                 style={{ width: `${stats.inquiries.answerRate}%` }}
               ></div>
             </div>
-            <div className="text-xs text-gray-500 mt-1">
+            <div className="progress-text">
               답변율: {stats.inquiries.answerRate}%
             </div>
           </div>
-          <div className="mt-2">
-            <div className="flex gap-2">
-              <span className="px-2 py-1 text-xs bg-purple-100 text-purple-800 rounded-full">
+          <div className="inquiry-tags">
+            <div className="tag-container">
+              <span className="status-tag status-secret">
                 비밀글 {stats.inquiries.secret}
               </span>
-              <span className="px-2 py-1 text-xs bg-gray-100 text-gray-800 rounded-full">
+              <span className="status-tag status-public">
                 일반글 {stats.inquiries.public}
               </span>
             </div>
@@ -426,64 +408,79 @@ export default function AdminDashboard() {
       </section>
 
       {/* 빠른 액션 */}
-      <section className="card">
-        <h2 className="text-xl font-semibold mb-4">
+      <section className="action-section card card-stats">
+        <h2 className="section-title">
           {userType === "admin" ? "빠른 액션" : "메뉴"}
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
+        <div className="action-buttons">
           {userType === "admin" ? (
             <>
-              <button className="btn btn-primary">
-                <span>📝</span>새 할일 추가
-              </button>
-              <button className="btn btn-secondary">
+              <Link
+                href="/portal/banner"
+                className="action-button action-primary"
+              >
+                <span>🎨</span>배너 관리
+              </Link>
+              <Link
+                href="/portal/organization"
+                className="action-button action-secondary"
+              >
                 <span>👥</span>
                 조직도 관리
-              </button>
-              <button className="btn btn-success">
+              </Link>
+              <Link
+                href="/portal/history"
+                className="action-button action-success"
+              >
                 <span>📅</span>
                 히스토리 추가
-              </button>
-              <button className="btn btn-warning">
+              </Link>
+              <Link
+                href="/portal/banner-news"
+                className="action-button action-warning"
+              >
                 <span>📰</span>
-                배너뉴스 등록
-              </button>
-              <button className="btn btn-info">
+                배너
+              </Link>
+              <Link
+                href="/portal/notices"
+                className="action-button action-info"
+              >
                 <span>📢</span>
                 공지사항 관리
-              </button>
+              </Link>
             </>
           ) : (
             <>
               <button
-                className="btn btn-primary opacity-50 cursor-pointer hover:opacity-70"
+                className="action-button action-primary action-disabled"
                 onClick={handleButtonClick}
               >
-                <span>📝</span>새 할일 추가
+                <span>🎨</span>배너 관리
               </button>
               <button
-                className="btn btn-secondary opacity-50 cursor-pointer hover:opacity-70"
+                className="action-button action-secondary action-disabled"
                 onClick={handleButtonClick}
               >
                 <span>👥</span>
                 조직도 관리
               </button>
               <button
-                className="btn btn-success opacity-50 cursor-pointer hover:opacity-70"
+                className="action-button action-success action-disabled"
                 onClick={handleButtonClick}
               >
                 <span>📅</span>
                 히스토리 추가
               </button>
               <button
-                className="btn btn-warning opacity-50 cursor-pointer hover:opacity-70"
+                className="action-button action-warning action-disabled"
                 onClick={handleButtonClick}
               >
                 <span>📰</span>
-                배너뉴스 등록
+                배너
               </button>
               <button
-                className="btn btn-info opacity-50 cursor-pointer hover:opacity-70"
+                className="action-button action-info action-disabled"
                 onClick={handleButtonClick}
               >
                 <span>📢</span>
@@ -492,87 +489,48 @@ export default function AdminDashboard() {
             </>
           )}
           {userType === "admin" ? (
-            <Link href="/portal/inquiry" className="btn btn-purple">
-              <span>💬</span>
-              문의글 관리
-            </Link>
+            <>
+              <Link
+                href="/portal/inquiry"
+                className="action-button action-purple"
+              >
+                <span>💬</span>
+                문의글 관리
+              </Link>
+              <Link
+                href="/portal/admin/add"
+                className="action-button action-dark"
+              >
+                <span>👤</span>
+                관리자 추가
+              </Link>
+            </>
           ) : (
-            <button
-              className="btn btn-purple opacity-50 cursor-pointer hover:opacity-70"
-              onClick={handleButtonClick}
-            >
-              <span>💬</span>
-              문의글 관리
-            </button>
+            <>
+              <button
+                className="action-button action-purple action-disabled"
+                onClick={handleButtonClick}
+              >
+                <span>💬</span>
+                문의글 관리
+              </button>
+              <button
+                className="action-button action-dark action-disabled"
+                onClick={handleButtonClick}
+              >
+                <span>👤</span>
+                관리자 추가
+              </button>
+            </>
           )}
         </div>
         {userType === "guest" && (
-          <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-            <p className="text-sm text-blue-800">
+          <div className="guest-notice">
+            <p className="guest-notice-text">
               💡 편집 기능을 사용하려면 버튼을 클릭하여 관리자로 로그인하세요.
             </p>
           </div>
         )}
-      </section>
-
-      {/* 최근 활동 */}
-      <section className="card">
-        <h2 className="text-xl font-semibold mb-4">최근 활동</h2>
-        <div className="space-y-3">
-          <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-            <span className="text-sm">새로운 할일이 추가되었습니다</span>
-            <span className="text-xs text-gray-500 ml-auto">방금 전</span>
-          </div>
-          <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-            <span className="text-sm">조직도가 업데이트되었습니다</span>
-            <span className="text-xs text-gray-500 ml-auto">5분 전</span>
-          </div>
-          <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-            <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-            <span className="text-sm">배너뉴스가 활성화되었습니다</span>
-            <span className="text-xs text-gray-500 ml-auto">10분 전</span>
-          </div>
-          <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-            <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
-            <span className="text-sm">새로운 문의글이 등록되었습니다</span>
-            <span className="text-xs text-gray-500 ml-auto">15분 전</span>
-          </div>
-          <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-            <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-            <span className="text-sm">문의글에 답변이 완료되었습니다</span>
-            <span className="text-xs text-gray-500 ml-auto">30분 전</span>
-          </div>
-        </div>
-      </section>
-
-      {/* 시스템 상태 */}
-      <section className="card">
-        <h2 className="text-xl font-semibold mb-4">시스템 상태</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="flex items-center gap-3 p-4 bg-green-50 rounded-lg">
-            <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-            <div>
-              <div className="font-medium text-green-800">데이터베이스</div>
-              <div className="text-sm text-green-600">정상 작동</div>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 p-4 bg-blue-50 rounded-lg">
-            <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
-            <div>
-              <div className="font-medium text-blue-800">API 서버</div>
-              <div className="text-sm text-blue-600">정상 작동</div>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 p-4 bg-purple-50 rounded-lg">
-            <div className="w-3 h-3 bg-purple-500 rounded-full animate-pulse"></div>
-            <div>
-              <div className="font-medium text-purple-800">웹 서버</div>
-              <div className="text-sm text-purple-600">정상 작동</div>
-            </div>
-          </div>
-        </div>
       </section>
     </div>
   );

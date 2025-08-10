@@ -698,22 +698,22 @@ if [[ "$PRODUCTION_MODE" == false ]]; then
         reset_seed_data
     fi
     
-    if [[ -f "prisma/seed.ts" ]]; then
-        # 시드 중복 실행 방지: 시드 실행 플래그 파일 확인
-        SEED_FLAG_FILE=".seed_completed"
-        if [[ -f "$SEED_FLAG_FILE" ]] && [[ "$RESET_SEED" == false ]]; then
-            log_info "Seed data already generated (flag file exists), skipping seed generation"
-        else
-            log_info "Generating seed data..."
-            if npx tsx prisma/seed.ts; then
-                log_success "Seed data generated successfully"
-                # 시드 완료 플래그 파일 생성
-                touch "$SEED_FLAG_FILE"
-                log_info "Seed completion flag created: $SEED_FLAG_FILE"
+            if [[ -f "prisma/seed.ts" ]]; then
+            # 시드 중복 실행 방지: 시드 실행 플래그 파일 확인
+            SEED_FLAG_FILE=".seed_completed"
+            if [[ -f "$SEED_FLAG_FILE" ]] && [[ "$RESET_SEED" == false ]]; then
+                log_info "Seed data already generated (flag file exists), skipping seed generation"
             else
-                log_warning "Seed data generation failed, continuing without seed data"
+                log_info "Generating seed data..."
+                if npx prisma db seed; then
+                    log_success "Seed data generated successfully"
+                    # 시드 완료 플래그 파일 생성
+                    touch "$SEED_FLAG_FILE"
+                    log_info "Seed completion flag created: $SEED_FLAG_FILE"
+                else
+                    log_warning "Seed data generation failed, continuing without seed data"
+                fi
             fi
-        fi
     else
         log_warning "Seed file not found (prisma/seed.ts)"
     fi

@@ -23,11 +23,8 @@ export default function AdminLayout({
         <nav>
           <div className="header-content">
             <div className="header-left">
-              <Link
-                href="/portal"
-                className="hover:opacity-80 transition-opacity"
-              >
-                <h1 className="text-xl cursor-pointer">JSEO 관리자 포털</h1>
+              <Link href="/portal" className="portal-logo">
+                <h1 className="portal-title">JSEO 관리자 포털</h1>
               </Link>
             </div>
             <div className="header-right">
@@ -65,9 +62,6 @@ export default function AdminLayout({
               </li>
               <li>
                 <Link href="/portal/banner-news">📰 배너뉴스 관리</Link>
-              </li>
-              <li>
-                <Link href="/portal/todos">✅ Todo 관리</Link>
               </li>
               <li>
                 <Link href="/portal/inquiry">💬 문의하기 관리</Link>

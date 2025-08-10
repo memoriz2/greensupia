@@ -17,6 +17,8 @@
 @use "components/portal-inquiry-detail";
 @use "components/portal-login";
 @use "components/portal";
+@use "components/dashboard";
+@use "components/admin";
 // TipTap 에디터 스타일
 @use "components/tiptap-editor";
 // CSS 변수 정의 - 백조 브랜드 컬러 팔레트
@@ -368,6 +370,11 @@ button {
     flex: 1;
     overflow-y: auto;
     margin-left: 0; // 사이드바가 있을 때도 왼쪽 여백 제거
+    // 최대 너비 제한으로 가로 길이 조정
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+    box-sizing: border-box;
 
     h1 {
       font-size: 2rem;
@@ -833,110 +840,6 @@ button {
         color: var(--warning);
       }
     }
-  }
-
-  // 그리드 시스템
-  .grid {
-    display: grid;
-    gap: var(--spacing-lg);
-
-    &.grid-cols-1 {
-      grid-template-columns: 1fr;
-    }
-
-    &.grid-cols-2 {
-      grid-template-columns: repeat(2, 1fr);
-    }
-
-    &.grid-cols-3 {
-      grid-template-columns: repeat(3, 1fr);
-    }
-
-    &.grid-cols-4 {
-      grid-template-columns: repeat(4, 1fr);
-    }
-
-    @media (max-width: 768px) {
-      &.grid-cols-2,
-      &.grid-cols-3,
-      &.grid-cols-4 {
-        grid-template-columns: 1fr;
-      }
-    }
-  }
-
-  // 유틸리티 클래스
-  .text-center {
-    text-align: center;
-  }
-  .text-left {
-    text-align: left;
-  }
-  .text-right {
-    text-align: right;
-  }
-
-  .font-bold {
-    font-weight: 700;
-  }
-  .font-semibold {
-    font-weight: 600;
-  }
-  .font-medium {
-    font-weight: 500;
-  }
-
-  .text-sm {
-    font-size: 0.875rem;
-  }
-  .text-base {
-    font-size: 1rem;
-  }
-  .text-lg {
-    font-size: 1.125rem;
-  }
-  .text-xl {
-    font-size: 1.25rem;
-  }
-  .text-2xl {
-    font-size: 1.5rem;
-  }
-
-  .space-y-6 > * + * {
-    margin-top: var(--spacing-xl);
-  }
-  .space-y-4 > * + * {
-    margin-top: var(--spacing-lg);
-  }
-  .space-y-2 > * + * {
-    margin-top: var(--spacing-sm);
-  }
-
-  .flex {
-    display: flex;
-  }
-  .flex-col {
-    flex-direction: column;
-  }
-  .items-center {
-    align-items: center;
-  }
-  .justify-center {
-    justify-content: center;
-  }
-  .justify-between {
-    justify-content: space-between;
-  }
-  .gap-4 {
-    gap: var(--spacing-lg);
-  }
-  .gap-2 {
-    gap: var(--spacing-sm);
-  }
-
-  // 유틸리티 클래스 추가
-  .hidden {
-    display: none !important;
   }
 
   // 푸터 스타일

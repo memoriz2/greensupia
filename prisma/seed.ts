@@ -1,23 +1,9 @@
 import { PrismaClient } from "@prisma/client";
+import { hashPassword } from "../src/utils/encryption";
 
 const prisma = new PrismaClient();
 
 async function main() {
-  // 시드 실행 확인 (개발 환경에서만)
-  if (process.env.NODE_ENV === "production") {
-    console.log("❌ Seed script cannot run in production environment");
-    process.exit(1);
-  }
-
-  // 추가 보안: FORCE_SEED 환경 변수 확인
-  if (!process.env.FORCE_SEED && process.env.NODE_ENV !== "development") {
-    console.log(
-      "❌ Seed script requires FORCE_SEED=true or NODE_ENV=development"
-    );
-    console.log("❌ To force run: FORCE_SEED=true npm run db:seed");
-    process.exit(1);
-  }
-
   console.log("🌱 Starting database seeding...");
   console.log("⚠️  This will DELETE ALL existing data and recreate seed data!");
   console.log(
@@ -29,11 +15,23 @@ async function main() {
 
   // 0. 기존 시드 데이터 정리 (중복 방지)
   console.log("Cleaning up existing seed data...");
+  await prisma.admin.deleteMany({});
   await prisma.organizationchart.deleteMany({});
   await prisma.history.deleteMany({});
   await prisma.bannernews.deleteMany({});
 
   console.log("✅ Existing data cleaned up");
+
+  // 1. Admin 계정 생성
+  console.log("Creating admin account...");
+  await prisma.admin.create({
+    data: {
+      username: "admin",
+      password: hashPassword("admin123"),
+      updatedAt: new Date(),
+    },
+  });
+  console.log("✅ Admin account created (username: admin, password: admin123)");
 
   // 1. Organization Chart 데이터 생성
   console.log("Creating organization chart data...");

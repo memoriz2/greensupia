@@ -1,32 +1,31 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist } from "next/font/google";
 import "@/styles/globals.scss";
-import {
-  WebSiteStructuredData,
-  OrganizationStructuredData,
-} from "@/components/StructuredData";
+import Header from "@/components/Header";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const geist = Geist({
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  variable: "--font-geist",
 });
 
 export const metadata: Metadata = {
   title: {
-    default: "JSEO - 회사 소개",
-    template: "%s | JSEO",
+    default: "Greensupia - 친환경 비닐 제작업체",
+    template: "%s | Greensupia",
   },
   description:
-    "JSEO는 전문적인 웹 개발 및 디지털 마케팅 서비스를 제공하는 회사입니다. 최신 기술과 창의적인 솔루션으로 고객의 비즈니스 성장을 지원합니다.",
-  keywords: ["웹개발", "디지털마케팅", "SEO", "웹디자인", "JSEO"],
-  authors: [{ name: "JSEO" }],
-  creator: "JSEO",
-  publisher: "JSEO",
+    "Greensupia는 친환경 비닐 제작업체로, 지속가능한 농업을 위한 혁신적인 솔루션을 제공합니다. 환경을 생각하는 농업인의 선택입니다.",
+  keywords: [
+    "친환경 비닐",
+    "농업",
+    "지속가능",
+    "환경보호",
+    "Greensupia",
+    "농사용품",
+  ],
+  authors: [{ name: "Greensupia" }],
+  creator: "Greensupia",
+  publisher: "Greensupia",
   formatDetection: {
     email: false,
     address: false,
@@ -40,25 +39,25 @@ export const metadata: Metadata = {
     type: "website",
     locale: "ko_KR",
     url: "https://jseo.shop",
-    title: "JSEO - 회사 소개",
+    title: "Greensupia - 친환경 비닐 제작업체",
     description:
-      "JSEO는 전문적인 웹 개발 및 디지털 마케팅 서비스를 제공하는 회사입니다.",
-    siteName: "JSEO",
+      "Greensupia는 친환경 비닐 제작업체로, 지속가능한 농업을 위한 혁신적인 솔루션을 제공합니다.",
+    siteName: "Greensupia",
     images: [
       {
-        url: "/og-image.jpg",
+        url: "/greensupia-og.jpg",
         width: 1200,
         height: 630,
-        alt: "JSEO 회사 소개",
+        alt: "Greensupia 친환경 비닐",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "JSEO - 회사 소개",
+    title: "Greensupia - 친환경 비닐 제작업체",
     description:
-      "JSEO는 전문적인 웹 개발 및 디지털 마케팅 서비스를 제공하는 회사입니다.",
-    images: ["/og-image.jpg"],
+      "Greensupia는 친환경 비닐 제작업체로, 지속가능한 농업을 위한 혁신적인 솔루션을 제공합니다.",
+    images: ["/greensupia-og.jpg"],
   },
   robots: {
     index: true,
@@ -71,43 +70,25 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-  verification: {
-    google: "your-google-verification-code",
-  },
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="ko">
-      <head>
-        <WebSiteStructuredData
-          data={{
-            name: "JSEO",
-            url: "https://jseo.shop",
-            description:
-              "JSEO는 전문적인 웹 개발 및 디지털 마케팅 서비스를 제공하는 회사입니다.",
-          }}
-        />
-        <OrganizationStructuredData
-          data={{
-            name: "JSEO",
-            url: "https://jseo.shop",
-            description:
-              "JSEO는 전문적인 웹 개발 및 디지털 마케팅 서비스를 제공하는 회사입니다.",
-            logo: "https://jseo.shop/logo.png",
-            contactPoint: {
-              telephone: "+82-XXX-XXXX-XXXX",
-              contactType: "customer service",
-            },
-          }}
-        />
-      </head>
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        {children}
+      <body className={`${geist.variable} greensupia-layout`}>
+        <Header />
+        <main>{children}</main>
+        <footer>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center text-gray-600">
+              <p>&copy; 2024 Greensupia. All rights reserved.</p>
+            </div>
+          </div>
+        </footer>
       </body>
     </html>
   );

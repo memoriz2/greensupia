@@ -46,9 +46,9 @@ export default function Header() {
   // 메뉴 아이템 메모이제이션
   const menuItems = useMemo(
     () => [
-      { href: "/greensupia", label: "홈" },
-      { href: "/greensupia/notice", label: "공지사항" },
-      { href: "/greensupia/inquiry", label: "문의하기" },
+      { href: "/", label: "홈" },
+      { href: "/notice", label: "공지사항" },
+      { href: "/inquiry", label: "문의하기" },
     ],
     []
   );
@@ -62,7 +62,7 @@ export default function Header() {
       <div className="greensupia-header__container">
         <div className="greensupia-header__content">
           {/* 로고 */}
-          <Link href="/greensupia" className="greensupia-header__logo">
+          <Link href="/" className="greensupia-header__logo">
             <div className="greensupia-header__logo-icon">G</div>
             <span className="greensupia-header__logo-text">Greensupia</span>
           </Link>
