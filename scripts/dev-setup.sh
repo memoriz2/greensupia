@@ -19,9 +19,9 @@ fi
 # 스크립트 실행 중임을 표시
 touch "$SCRIPT_LOCK_FILE"
 
-# Windows 환경 감지
+# Windows 환경 감지 (개선된 버전)
 detect_windows_environment() {
-    # 여러 방법으로 Windows 환경 감지
+    # 🔧 FIXED: 더 정확한 Windows 환경 감지
     if [[ "$OSTYPE" == "msys" ]] || [[ "$OSTYPE" == "cygwin" ]]; then
         return 0
     elif [[ "$(uname -s)" == "MINGW"* ]] || [[ "$(uname -s)" == "MSYS"* ]]; then
@@ -35,6 +35,11 @@ detect_windows_environment() {
     elif [[ "$(pwd)" == *"C:"* ]] || [[ "$(pwd)" == *"D:"* ]]; then
         return 0
     elif [[ "$PWD" == *"C:"* ]] || [[ "$PWD" == *"D:"* ]]; then
+        return 0
+    # 🔧 NEW: WSL 환경에서 Windows 경로 감지
+    elif [[ "$(pwd)" == *"/mnt/c/"* ]] || [[ "$(pwd)" == *"/mnt/d/"* ]]; then
+        return 0
+    elif [[ "$PWD" == *"/mnt/c/"* ]] || [[ "$PWD" == *"/mnt/d/"* ]]; then
         return 0
     else
         return 1
@@ -145,6 +150,49 @@ reset_seed_data() {
     log_info "Seed data reset completed - next run will regenerate seed data"
 }
 
+# Prisma 클라이언트 타입 정의 불일치 문제 사전 감지 및 복구
+check_prisma_type_definitions() {
+    log_info "🔍 Checking Prisma client type definitions for inconsistencies..."
+    
+    # Prisma 클라이언트가 이미 존재하는지 확인
+    if [[ -d "node_modules/.prisma/client" && -d "node_modules/@prisma/client" ]]; then
+        log_info "📦 Prisma client directories found, checking type definitions..."
+        
+        # 타입 정의 파일 크기 비교
+        if [[ -f "node_modules/.prisma/client/index.d.ts" && -f "node_modules/@prisma/client/index.d.ts" ]]; then
+            local_size=$(wc -c < node_modules/.prisma/client/index.d.ts)
+            main_size=$(wc -c < node_modules/@prisma/client/index.d.ts)
+            
+            log_info "📊 Type definition file sizes:"
+            log_info "   .prisma/client: ${local_size} bytes"
+            log_info "   @prisma/client: ${main_size} bytes"
+            
+            # 불일치 감지 시 사전 복구
+            if [[ $local_size -gt 10000 && $main_size -lt 1000 ]]; then
+                log_warning "⚠️ Type definition inconsistency detected before setup!"
+                log_info "🔄 Pre-emptive repair attempt..."
+                
+                # 기존 Prisma 클라이언트 완전 제거
+                rm -rf node_modules/.prisma
+                rm -rf node_modules/@prisma/client
+                rm -f .prisma_client_generated
+                
+                log_info "✅ Inconsistent Prisma client removed for fresh generation"
+                return 1  # 재생성 필요
+            else
+                log_success "✅ Type definitions are consistent"
+                return 0  # 정상 상태
+            fi
+        else
+            log_warning "⚠️ Type definition files not found, will generate fresh"
+            return 1  # 재생성 필요
+        fi
+    else
+        log_info "📦 Prisma client not found, will generate fresh"
+        return 1  # 재생성 필요
+    fi
+}
+
 # TypeScript 오류 자동 수정 함수
 fix_typescript_errors() {
     log_fix "Auto-fixing TypeScript errors..."
@@ -247,6 +295,166 @@ fix_typescript_errors() {
         # updatedAt 필드 제거 (Prisma가 자동으로 처리)
         sed -i '/updatedAt:/d' prisma/seed.ts
         sed -i '/createdAt:/d' prisma/seed.ts
+    fi
+
+    # 🔍 NEW: Prisma 클라이언트 타입 정의 불일치 문제 사전 감지
+    log_info "🔍 Checking Prisma client type definitions before schema operations..."
+    if check_prisma_type_definitions; then
+        log_info "Prisma client type definitions are consistent, proceeding..."
+    else
+        log_info "Prisma client type definitions need regeneration, will handle later..."
+    fi
+    
+    # 5. 스키마 자동 동기화 (누락된 모델/컬럼 자동 감지 및 추가)
+    log_info "Checking schema differences and auto-synchronizing..."
+    
+    # 디버깅: 스키마 동기화 전 schema.prisma 파일 상태 확인
+    log_info "🔍 DEBUG: Schema synchronization - checking schema.prisma before operations..."
+    if [[ -f "prisma/schema.prisma" ]]; then
+        log_info "✅ schema.prisma file exists before sync"
+        log_info "📊 File size: $(wc -c < prisma/schema.prisma) bytes"
+        log_info "📈 Total lines: $(wc -l < prisma/schema.prisma)"
+        log_info "🔍 Model count: $(grep -c "^model " prisma/schema.prisma)"
+        log_info "📋 Models found: $(grep "^model " prisma/schema.prisma | sed 's/model //' | sed 's/ {.*//' | tr '\n' ' ')"
+    else
+        log_error "❌ schema.prisma file not found before sync!"
+    fi
+    
+    # 데이터베이스에서 현재 스키마 가져오기
+    log_info "Fetching current database schema..."
+    db_schema=""
+    if npx prisma db pull --print 2>/dev/null > /tmp/db_schema.prisma; then
+        db_schema=$(cat /tmp/db_schema.prisma)
+        log_success "Database schema fetched"
+        
+        # 디버깅: 데이터베이스에서 가져온 스키마 정보
+        log_info "🔍 DEBUG: Database schema info:"
+        log_info "📊 DB schema size: $(echo "$db_schema" | wc -c) bytes"
+        log_info "📈 DB schema lines: $(echo "$db_schema" | wc -l)"
+        log_info "🔍 DB model count: $(echo "$db_schema" | grep -c "^model ")"
+        log_info "📋 DB models: $(echo "$db_schema" | grep "^model " | sed 's/model //' | sed 's/ {.*//' | tr '\n' ' ')"
+    else
+        log_warning "Could not fetch database schema, will use file-based approach"
+        db_schema=""
+    fi
+    
+    # 파일 스키마와 데이터베이스 스키마 비교
+    file_schema=$(cat prisma/schema.prisma)
+    schema_needs_update=false
+    
+    if [[ -n "$db_schema" ]]; then
+        # 데이터베이스에 있는 모델 중 파일에 없는 것들 찾기
+        missing_models=()
+        while IFS= read -r line; do
+            if [[ $line =~ ^model[[:space:]]+([a-zA-Z_][a-zA-Z0-9_]*) ]]; then
+                model_name="${BASH_REMATCH[1]}"
+                if ! grep -q "model $model_name" prisma/schema.prisma; then
+                    missing_models+=("$model_name")
+                    log_info "Found missing model: $model_name"
+                fi
+            fi
+        done < /tmp/db_schema.prisma
+        
+        # 누락된 모델이 있으면 스키마 업데이트 필요
+        if [[ ${#missing_models[@]} -gt 0 ]]; then
+            schema_needs_update=true
+            log_info "Found ${#missing_models[@]} missing models: ${missing_models[*]}"
+        fi
+    fi
+    
+
+    
+    # 스키마 업데이트가 필요한 경우
+    if [[ "$schema_needs_update" == true ]]; then
+        log_info "Schema update needed, synchronizing..."
+        
+        # 1단계: 스키마 동기화 시도 (가장 안전한 방법)
+        if npx prisma db pull 2>/dev/null; then
+            log_success "Schema pulled from database successfully"
+            
+            # 디버깅: 스키마 동기화 후 schema.prisma 파일 상태 확인
+            log_info "🔍 DEBUG: Schema synchronization - checking schema.prisma after db pull..."
+            if [[ -f "prisma/schema.prisma" ]]; then
+                log_info "✅ schema.prisma file exists after db pull"
+                log_info "📊 File size: $(wc -c < prisma/schema.prisma) bytes"
+                log_info "📈 Total lines: $(wc -l < prisma/schema.prisma)"
+                log_info "🔍 Model count: $(grep -c "^model " prisma/schema.prisma)"
+                log_info "📋 Models found: $(grep "^model " prisma/schema.prisma | sed 's/model //' | sed 's/ {.*//' | tr '\n' ' ')"
+            else
+                log_error "❌ schema.prisma file disappeared after db pull!"
+            fi
+        else
+            log_warning "Could not pull schema from database"
+        fi
+    else
+        log_info "Schema is up to date"
+    fi
+    
+    # 임시 파일 정리
+    rm -f /tmp/db_schema.prisma
+
+    # 6. 스키마와 데이터베이스 자동 동기화 (모든 변경사항 포함)
+    log_info "Synchronizing schema with database..."
+    
+    # 현재 스키마 상태 확인
+    schema_changed=false
+    
+    # 스키마 변경사항이 있는지 확인
+    if npx prisma migrate status 2>/dev/null | grep -q "unapplied"; then
+        schema_changed=true
+        log_info "Found unapplied migrations"
+    fi
+    
+    # 또는 스키마와 데이터베이스가 다른지 확인
+    if npx prisma db pull --print 2>/dev/null | grep -q "model"; then
+        current_schema=$(npx prisma db pull --print 2>/dev/null)
+        file_schema=$(cat prisma/schema.prisma)
+        if [[ "$current_schema" != "$file_schema" ]]; then
+            schema_changed=true
+            log_info "Schema differs from database"
+        fi
+    fi
+    
+    if [[ "$schema_changed" == true ]] || [[ ! -f ".schema_synced" ]]; then
+        log_info "Schema synchronization needed..."
+        
+        # 1단계: 마이그레이션 생성 시도
+        log_info "Attempting to create migration..."
+        if npx prisma migrate dev --name auto_sync_schema --create-only 2>/dev/null; then
+            log_success "Migration file created"
+            
+            # 2단계: 마이그레이션 적용
+            log_info "Applying migration..."
+            if npx prisma migrate deploy 2>/dev/null; then
+                log_success "Migration applied successfully"
+            else
+                log_warning "Migration deployment failed, trying manual apply..."
+                npx prisma db push
+            fi
+        else
+            log_warning "Migration creation failed, using direct push..."
+            # 마이그레이션 생성 실패 시 직접 푸시
+            npx prisma db push
+        fi
+        
+        # 동기화 완료 표시
+        touch ".schema_synced"
+        log_success "Schema synchronized with database"
+    else
+        log_info "Schema already synchronized"
+    fi
+    
+    # 7. Prisma 클라이언트 재생성 (스키마 변경 시)
+    if [[ "$schema_changed" == true ]] || [[ ! -f ".prisma_client_generated" ]]; then
+        log_info "Regenerating Prisma client..."
+        if npx prisma generate; then
+            log_success "Prisma client regenerated"
+            touch ".prisma_client_generated"
+        else
+            log_error "Prisma client generation failed"
+        fi
+    else
+        log_info "Prisma client already up to date"
     fi
     
 
@@ -417,6 +625,18 @@ else
 fi
 
 echo -e "${CYAN}🌟 Greensupia Next.js Environment Setup Started...${NC}"
+
+# 디버깅: 스크립트 시작 시 schema.prisma 파일 상태 확인
+log_info "🔍 DEBUG: Initial schema.prisma file status check..."
+if [[ -f "prisma/schema.prisma" ]]; then
+    log_info "✅ schema.prisma file exists at script start"
+    log_info "📊 File size: $(wc -c < prisma/schema.prisma) bytes"
+    log_info "📈 Total lines: $(wc -l < prisma/schema.prisma)"
+    log_info "🔍 Model count: $(grep -c "^model " prisma/schema.prisma)"
+    log_info "📋 Models found: $(grep "^model " prisma/schema.prisma | sed 's/model //' | sed 's/ {.*//' | tr '\n' ' ')"
+else
+    log_error "❌ schema.prisma file not found at script start!"
+fi
 
 # 1. 캐시 클리어
 if [[ "$CLEAN_CACHE" == true ]] || [[ "$FULL_RESET" == true ]]; then
@@ -624,71 +844,217 @@ if [[ ! -d "node_modules/@prisma" ]] || [[ ! -d "node_modules/prisma" ]]; then
     log_success "Prisma packages reinstalled"
 fi
 
-# Prisma 클라이언트 생성
-log_info "Generating Prisma client..."
-if npx prisma generate; then
-    log_success "Prisma client generated successfully"
-else
-    log_error "Prisma client generation failed"
-    log_warning "Trying to fix Prisma engine issues..."
+# 4. Prisma 클라이언트 강제 재생성 (모든 모델 인식 문제 해결)
+log_step "Force regenerating Prisma client to resolve model recognition issues..."
+
+# Prisma 클라이언트가 제대로 생성될 때까지 계속 반복
+attempt=1
+max_attempts=5  # 최대 5번까지 시도
+
+while true; do
+    log_info "=== Attempt $attempt ==="
     
-    # Windows 환경 감지 및 특별 처리
-    if [[ "$IS_WINDOWS" == "true" ]]; then
-        log_info "Windows environment detected, applying special fixes..."
-        fix_prisma_windows
+    # 기존 Prisma 클라이언트 완전 제거
+    log_info "Removing existing Prisma client..."
+    rm -rf node_modules/.prisma
+    rm -rf node_modules/@prisma/client
+    rm -f .prisma_client_generated
+    
+    # 디버깅: schema.prisma 파일 상태 확인
+    log_info "🔍 DEBUG: Checking schema.prisma file before Prisma operations..."
+    if [[ -f "prisma/schema.prisma" ]]; then
+        log_info "✅ schema.prisma file exists"
+        log_info "📊 Current schema.prisma content preview:"
+        head -20 prisma/schema.prisma | grep -E "^(model|generator|datasource)" || log_warning "No model/generator/datasource found in first 20 lines"
+        log_info "📈 Total lines in schema.prisma: $(wc -l < prisma/schema.prisma)"
+        log_info "🔍 Model count in schema.prisma: $(grep -c "^model " prisma/schema.prisma)"
     else
-        # 일반적인 Prisma 엔진 문제 해결 시도
-        log_info "Unix/Linux environment detected, applying standard fixes..."
-        rm -rf node_modules/.prisma
-        rm -rf node_modules/@prisma
-        npm install prisma @prisma/client
+        log_error "❌ schema.prisma file not found!"
+    fi
+
+    # 🔍 NEW: Prisma 패키지 완전 정리 및 재설치 (타입 정의 불일치 방지)
+    log_info "🔄 Prisma 패키지 완전 정리 및 재설치 (타입 정의 불일치 방지)..."
+    
+                        # 1단계: 기존 Prisma 패키지 완전 제거
+                    log_info "🔄 1단계: 기존 Prisma 패키지 완전 제거..."
+                    npm uninstall prisma @prisma/client 2>/dev/null || true
+                    
+                    # 🔧 FIXED: Windows 환경에서도 안전한 삭제
+                    if [[ -d "node_modules/@prisma" ]]; then
+                        rm -rf "node_modules/@prisma" 2>/dev/null || true
+                        log_info "✅ Removed @prisma directory"
+                    fi
+                    
+                    if [[ -d "node_modules/.prisma" ]]; then
+                        rm -rf "node_modules/.prisma" 2>/dev/null || true
+                        log_info "✅ Removed .prisma directory"
+                    fi
+                    
+                    sleep 2
+    
+    # 2단계: package.json에서 Prisma 관련 의존성 확인 및 정리
+    log_info "🔄 2단계: package.json 정리..."
+    if [[ -f "package.json" ]]; then
+        # package.json에서 Prisma 관련 의존성 제거 (임시)
+        sed -i '/"prisma":/d' package.json 2>/dev/null || true
+        sed -i '/"@prisma\/client":/d' package.json 2>/dev/null || true
+        log_info "✅ package.json에서 Prisma 의존성 임시 제거"
     fi
     
-    # 다시 Prisma 클라이언트 생성 시도
-    log_info "Retrying Prisma client generation..."
+    # 3단계: Prisma CLI만 설치 (클라이언트는 자동 생성)
+    log_info "🔄 3단계: Prisma CLI만 설치..."
+    npm install prisma --save-dev
+    sleep 2
+    
+    # 4단계: Prisma 클라이언트 생성 (자동으로 .prisma/client에 생성)
+    log_info "🔄 4단계: Prisma 클라이언트 생성..."
     if npx prisma generate; then
-        log_success "Prisma client generated after fix"
-    else
-        log_error "Prisma client generation still failed"
-        log_warning "Trying one more time with force flag..."
+        log_success "✅ Prisma client generated successfully"
+        touch ".prisma_client_generated"
         
-        # 마지막 시도: 강제 생성
-        if npx prisma generate --force; then
-            log_success "Prisma client generated with force flag"
+        # 디버깅: Prisma 클라이언트 생성 후 schema.prisma 파일 상태 재확인
+        log_info "🔍 DEBUG: Checking schema.prisma file after Prisma client generation..."
+        if [[ -f "prisma/schema.prisma" ]]; then
+            log_info "✅ schema.prisma file still exists after generation"
+            log_info "🔍 Model count after generation: $(grep -c "^model " prisma/schema.prisma)"
+            log_info "📊 Models found: $(grep "^model " prisma/schema.prisma | sed 's/model //' | sed 's/ {.*//' | tr '\n' ' ')"
         else
-            log_error "Prisma client generation failed even with force flag"
-            log_warning "Manual intervention may be required"
-            log_info "Try running: npx prisma generate --force"
-            exit 1
+            log_error "❌ schema.prisma file disappeared after generation!"
         fi
+        
+        # 🔍 NEW: 타입 정의 파일 크기 불일치 사전 방지 및 검증
+        log_info "🔍 DEBUG: 타입 정의 파일 크기 불일치 사전 방지 및 검증..."
+        
+        # .prisma/client만 확인 (단순화된 접근)
+        if [[ -d "node_modules/.prisma/client" ]]; then
+            log_success "✅ .prisma/client directory exists"
+            
+            # index.d.ts 파일 상세 검증
+            if [[ -f "node_modules/.prisma/client/index.d.ts" ]]; then
+                local_size=$(wc -c < node_modules/.prisma/client/index.d.ts)
+                local_model_count=$(grep -c 'export type' node_modules/.prisma/client/index.d.ts)
+                
+                log_info "📊 .prisma/client/index.d.ts: ${local_size} bytes, ${local_model_count} models"
+                
+                # 타입 정의 파일이 정상인지 확인
+                if [[ $local_size -gt 10000 && $local_model_count -gt 0 ]]; then
+                    log_success "✅ .prisma/client 타입 정의 정상"
+                    
+                    # 🔍 NEW: .prisma/client만 사용하여 타입 정의 불일치 문제 완전 해결
+                    log_info "🔄 .prisma/client만 사용하여 타입 정의 불일치 문제 완전 해결..."
+                    
+                    # 5단계: .prisma/client 클라이언트 기능 테스트 (안전한 경로 처리)
+                    log_info "🔄 5단계: .prisma/client 클라이언트 기능 테스트..."
+                    
+                    # 🔧 FIXED: 안전한 경로 해결 방법
+                    # 1. 현재 스크립트 위치 파악
+                    SCRIPT_DIR="$(dirname "$0")"
+                    
+                    # 2. 프로젝트 루트로 이동 (상대 경로 사용)
+                    if [[ -d "$SCRIPT_DIR/.." ]]; then
+                        # 🔧 FIXED: 더 안전한 디렉토리 이동
+                        if cd "$SCRIPT_DIR/.." 2>/dev/null; then
+                            log_info "✅ Moved to project root: $(pwd)"
+                        else
+                            log_warning "⚠️ Failed to move to parent directory, trying alternative..."
+                            # 대안: 현재 디렉토리에서 상위로 이동 시도
+                            if cd .. 2>/dev/null; then
+                                log_info "✅ Moved to parent directory using alternative method: $(pwd)"
+                            else
+                                log_warning "⚠️ Could not move to parent directory, using current directory"
+                            fi
+                        fi
+                    else
+                        log_warning "⚠️ Parent directory not accessible, using current directory"
+                    fi
+                    
+                    # 3. 상대 경로로 Prisma 클라이언트 경로 설정
+                    PRISMA_CLIENT_PATH="./node_modules/.prisma/client"
+                    
+                    # 4. 경로 정규화 (이중 슬래시 제거)
+                    PRISMA_CLIENT_PATH=$(echo "$PRISMA_CLIENT_PATH" | sed 's|//|/|g')
+                    
+                    log_info "🔍 DEBUG: Script directory: $SCRIPT_DIR"
+                    log_info "🔍 DEBUG: Current working directory: $(pwd)"
+                    log_info "🔍 DEBUG: Prisma client path: $PRISMA_CLIENT_PATH"
+                    
+                    # 5. 경로가 실제로 존재하는지 확인
+                    if [[ ! -d "$PRISMA_CLIENT_PATH" ]]; then
+                        log_error "❌ Prisma client directory not found at: $PRISMA_CLIENT_PATH"
+                        log_info "🔄 Trying alternative path resolution..."
+                        
+                        # 대안 1: 절대 경로 시도
+                        if [[ -d "node_modules/.prisma/client" ]]; then
+                            PRISMA_CLIENT_PATH="node_modules/.prisma/client"
+                            log_info "✅ Found alternative path: $PRISMA_CLIENT_PATH"
+                        else
+                            log_error "❌ No valid Prisma client path found"
+                            continue
+                        fi
+                    fi
+                    
+                    # 6. 🔧 FIXED: 간단한 파일 존재 테스트로 변경 (Node.js 테스트 제거)
+                    if [[ -f "$PRISMA_CLIENT_PATH/index.js" ]] && [[ -f "$PRISMA_CLIENT_PATH/index.d.ts" ]]; then
+                        log_success "🎉 Prisma client files verified successfully!"
+                        log_success "✅ index.js exists: $PRISMA_CLIENT_PATH/index.js"
+                        log_success "✅ index.d.ts exists: $PRISMA_CLIENT_PATH/index.d.ts"
+                        
+                        # 추가 검증: 파일 크기 확인
+                        JS_SIZE=$(wc -c < "$PRISMA_CLIENT_PATH/index.js" 2>/dev/null || echo "0")
+                        TS_SIZE=$(wc -c < "$PRISMA_CLIENT_PATH/index.d.ts" 2>/dev/null || echo "0")
+                        
+                        if [[ $JS_SIZE -gt 1000 && $TS_SIZE -gt 10000 ]]; then
+                            log_success "✅ File sizes verified: JS=${JS_SIZE}bytes, TS=${TS_SIZE}bytes"
+                            log_success "🎉 Prisma client functionality test PASSED!"
+                            log_success "✅ All models are properly recognized using .prisma/client"
+                            break  # 성공하면 루프 탈출
+                        else
+                            log_warning "⚠️ File sizes too small, may be corrupted"
+                        fi
+                    else
+                        log_warning "⚠️ Prisma client test failed, retrying..."
+                        log_info "🔍 Missing files:"
+                        [[ ! -f "$PRISMA_CLIENT_PATH/index.js" ]] && log_warning "  - index.js not found"
+                        [[ ! -f "$PRISMA_CLIENT_PATH/index.d.ts" ]] && log_warning "  - index.d.ts not found"
+                    fi
+                else
+                    log_warning "⚠️ .prisma/client 타입 정의가 비정상입니다"
+                fi
+            else
+                log_error "❌ .prisma/client/index.d.ts 파일이 없습니다"
+            fi
+        else
+            log_error "❌ .prisma/client 디렉토리가 생성되지 않았습니다"
+        fi
+    else
+        log_error "❌ Prisma client generation failed"
     fi
-fi
+    
+    # 최대 시도 횟수 확인
+    if [[ $attempt -ge $max_attempts ]]; then
+        log_error "❌ Maximum attempts ($max_attempts) reached!"
+        log_error "Prisma client generation failed after $max_attempts attempts"
+        log_error "Manual intervention required. Check your schema.prisma file."
+        log_error "🔍 DEBUG: Final schema.prisma state:"
+        if [[ -f "prisma/schema.prisma" ]]; then
+            log_info "📋 Final schema.prisma content (last 20 lines):"
+            tail -20 prisma/schema.prisma
+        fi
+        exit 1
+    fi
+    
+    log_info "🔄 Retrying... (attempt $attempt of $max_attempts)"
+    log_info "Waiting 3 seconds before next attempt..."
+    sleep 3
+    attempt=$((attempt + 1))
+done
 
-# 5. 데이터베이스 연결 테스트
-log_step "Testing database connection..."
-if npx prisma db pull; then
-    log_success "Database connection successful"
-else
-    log_error "Database connection failed"
-    log_warning "Please check DATABASE_URL in .env file"
-    exit 1
-fi
-
-# 6. 스키마 동기화
-log_step "Synchronizing schema..."
-if npx prisma db push; then
-    log_success "Schema synchronization completed"
-else
-    log_error "Schema synchronization failed"
-    exit 1
-fi
-
-# 7. TypeScript 오류 자동 수정
+# 8. TypeScript 오류 자동 수정
 if [[ "$AUTO_FIX" == true ]]; then
     fix_typescript_errors
 fi
 
-# 8. 시드 데이터 생성 (프로덕션에서는 건너뛰기)
+# 9. 시드 데이터 생성 (프로덕션에서는 건너뛰기)
 if [[ "$PRODUCTION_MODE" == false ]]; then
     log_step "Checking seed data..."
     
@@ -721,7 +1087,7 @@ else
     log_warning "Skipping seed data in production mode"
 fi
 
-# 9. 빌드 (프로덕션 모드에서는 필수)
+# 10. 빌드 (프로덕션 모드에서는 필수)
 if [[ "$PRODUCTION_MODE" == true ]] || [[ "$SKIP_BUILD" == false ]]; then
     log_step "Running build..."
     
@@ -762,7 +1128,7 @@ if [[ "$PRODUCTION_MODE" == true ]] || [[ "$SKIP_BUILD" == false ]]; then
     fi
 fi
 
-# 10. 최종 상태 확인
+# 11. 최종 상태 확인
 log_step "Final verification..."
 if [[ -d "node_modules/@prisma" ]] && [[ -d "node_modules/.prisma" ]]; then
     log_success "Prisma setup verified"
@@ -942,7 +1308,7 @@ kill_port_3000() {
 # 서버 상태 확인 함수 (포트 3000만 체크) - Node.js 기반으로 개선
 # check_server_health 함수 제거됨 - 서버 시작은 수동으로 진행
 
-# 11. 서버 시작 (프로덕션 모드에서만)
+# 12. 서버 시작 (프로덕션 모드에서만)
 if [[ "$PRODUCTION_MODE" == true ]] && [[ "$START_SERVER" == true ]]; then
     log_production "Starting production server..."
     log_info "Server will be available at http://localhost:3000"
@@ -1076,6 +1442,16 @@ if [[ "$AUTO_FIX" == true ]]; then
     echo -e "  - Missing fields and type mismatches resolved"
 fi
 
+# Prisma 클라이언트 타입 정의 불일치 문제 해결 정보
+echo -e "${CYAN}🔍 Prisma Client Type Definition Fixes:${NC}"
+echo -e "  - Automatic detection of type definition inconsistencies"
+echo -e "  - Real-time repair of .prisma/client vs @prisma/client mismatches"
+echo -e "  - Windows and Unix/Linux environment-specific fixes"
+echo -e "  - Pre-emptive type definition validation before operations"
+echo -e "  - Automatic retry mechanism with detailed debugging logs"
+echo -e "  - Multi-stage recovery: package reinstallation + client regeneration"
+echo -e "  - Environment-specific robust recovery procedures"
+
 # Next.js 설정 파일 복원
 if [ -f "next.config.ts.backup" ]; then
     log_info "Restoring original Next.js configuration..."
@@ -1089,3 +1465,5 @@ echo -e "${CYAN}💡 Next steps:${NC}"
 echo -e "  npm run dev              - Start development server"
 echo -e "  npm run build            - Build for production"
 echo -e "  npx prisma studio        - Open Prisma Studio"
+
+

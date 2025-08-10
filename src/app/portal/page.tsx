@@ -5,6 +5,20 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 interface DashboardStats {
+  // 방문자 통계 (새로 추가)
+  visitors: {
+    total: number;
+    today: number;
+    thisWeek: number;
+    thisMonth: number;
+  };
+  searchBots: {
+    total: number;
+    today: number;
+    thisWeek: number;
+    thisMonth: number;
+    topBots: string[];
+  };
   todos: {
     total: number;
     completed: number;
@@ -88,6 +102,8 @@ export default function AdminDashboard() {
 
         // 각 API에서 기본 데이터 가져오기
         const [
+          visitorData,
+          searchBotData,
           todoData,
           orgData,
           historyData,
@@ -95,6 +111,8 @@ export default function AdminDashboard() {
           noticeData,
           inquiryStats,
         ] = await Promise.all([
+          fetch("/api/stats/visitors").then((res) => res.json()),
+          fetch("/api/stats/searchbots").then((res) => res.json()),
           fetch("/api/todos").then((res) => res.json()),
           fetch("/api/organization").then((res) => res.json()),
           fetch("/api/history").then((res) => res.json()),
@@ -116,6 +134,19 @@ export default function AdminDashboard() {
         };
 
         setStats({
+          visitors: visitorData || {
+            total: 0,
+            today: 0,
+            thisWeek: 0,
+            thisMonth: 0,
+          },
+          searchBots: searchBotData || {
+            total: 0,
+            today: 0,
+            thisWeek: 0,
+            thisMonth: 0,
+            topBots: [],
+          },
           todos: {
             total: todos.length,
             completed: todos.filter(
@@ -202,6 +233,14 @@ export default function AdminDashboard() {
         console.error("대시보드 데이터 로딩 실패:", error);
         // 에러가 발생해도 기본값으로 설정
         setStats({
+          visitors: { total: 0, today: 0, thisWeek: 0, thisMonth: 0 },
+          searchBots: {
+            total: 0,
+            today: 0,
+            thisWeek: 0,
+            thisMonth: 0,
+            topBots: [],
+          },
           todos: { total: 0, completed: 0, pending: 0, completionRate: 0 },
           organization: { total: 0, departments: [] },
           history: { total: 0, yearRange: { min: 2024, max: 2024 } },
@@ -269,6 +308,75 @@ export default function AdminDashboard() {
           )}
         </div>
       </div>
+
+      {/* 방문자 통계 (상단 2개 큰 카드) */}
+      <section className="visitor-stats-section" aria-label="방문자 통계">
+        {/* 방문자 수 카드 */}
+        <div className="card card-visitor-stats">
+          <div className="stat-accent-line"></div>
+          <div className="visitor-stat-header">
+            <div className="visitor-icon">👥</div>
+            <div className="visitor-title">방문자 통계</div>
+          </div>
+          <div className="visitor-main-number">
+            {stats.visitors.total.toLocaleString()}
+          </div>
+          <div className="visitor-main-label">총 방문자</div>
+          <div className="visitor-details">
+            <div className="visitor-period">
+              <span className="period-label">오늘</span>
+              <span className="period-value">{stats.visitors.today}</span>
+            </div>
+            <div className="visitor-period">
+              <span className="period-label">이번 주</span>
+              <span className="period-value">{stats.visitors.thisWeek}</span>
+            </div>
+            <div className="visitor-period">
+              <span className="period-label">이번 달</span>
+              <span className="period-value">{stats.visitors.thisMonth}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* 검색봇 방문 수 카드 */}
+        <div className="card card-visitor-stats">
+          <div className="stat-accent-line"></div>
+          <div className="visitor-stat-header">
+            <div className="visitor-icon">🤖</div>
+            <div className="visitor-title">검색봇 방문</div>
+          </div>
+          <div className="visitor-main-number">{stats.searchBots.total}</div>
+          <div className="visitor-main-label">총 봇 방문</div>
+          <div className="visitor-details">
+            <div className="visitor-period">
+              <span className="period-label">오늘</span>
+              <span className="period-value">{stats.searchBots.today}</span>
+            </div>
+            <div className="visitor-period">
+              <span className="period-label">이번 주</span>
+              <span className="period-value">{stats.searchBots.thisWeek}</span>
+            </div>
+            <div className="visitor-period">
+              <span className="period-label">이번 달</span>
+              <span className="period-value">{stats.searchBots.thisMonth}</span>
+            </div>
+          </div>
+          <div className="bot-tags">
+            <div className="tag-container">
+              {stats.searchBots.topBots.slice(0, 3).map((bot, index) => (
+                <span key={index} className="bot-tag">
+                  {bot}
+                </span>
+              ))}
+              {stats.searchBots.topBots.length > 3 && (
+                <span className="bot-tag-more">
+                  +{stats.searchBots.topBots.length - 3}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* 통계 카드들 */}
       <section className="stats-section" aria-label="시스템 통계">
