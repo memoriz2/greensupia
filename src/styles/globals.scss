@@ -196,6 +196,14 @@ button {
   }
 }
 
+// 관리자 포털에서 사용자 헤더와 푸터 숨기기
+body.admin-portal {
+  > header,
+  > footer {
+    display: none !important;
+  }
+}
+
 // 관리자 포털 공통 스타일 - 모던 CMS 디자인
 .admin-portal {
   min-height: 100vh;
@@ -222,7 +230,7 @@ button {
         justify-content: space-between;
         align-items: center;
         height: 100%;
-        padding: 0 var(--spacing-xl);
+        padding: 0 var(--spacing-xl) 0 calc(250px + var(--spacing-xl)); // 사이드바 너비만큼 왼쪽 패딩 추가
         // max-width와 margin 제거하여 메인 콘텐츠와 동일한 정렬
       }
 
@@ -239,7 +247,15 @@ button {
       }
 
       .text-xl {
-        color: var(--primary);
+        color: #f8c300; // 노란색으로 변경
+        font-weight: 700;
+        font-size: 1.25rem;
+        margin: 0;
+        padding: 0;
+      }
+
+      .portal-title {
+        color: #f8c300; // 노란색으로 변경
         font-weight: 700;
         font-size: 1.25rem;
         margin: 0;
@@ -250,6 +266,7 @@ button {
         display: flex;
         align-items: center;
         gap: 0.75rem;
+        margin-right: 5.5rem; // 카드의 오른쪽 패딩만큼 오른쪽 마진 추가
       }
 
       .user-info {
@@ -862,7 +879,7 @@ button {
       gap: var(--spacing-md);
 
       .footer-logo {
-        color: var(--primary);
+        color: #f8c300; // 노란색으로 변경
         font-weight: 700;
       }
 

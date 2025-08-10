@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import "@/styles/globals.scss";
-import Header from "@/components/Header";
+import ConditionalLayout from "@/components/ConditionalLayout";
 
 const geist = Geist({
   subsets: ["latin"],
@@ -80,15 +80,7 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className={`${geist.variable} greensupia-layout`}>
-        <Header />
-        <main>{children}</main>
-        <footer>
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center text-gray-600">
-              <p>&copy; 2024 Greensupia. All rights reserved.</p>
-            </div>
-          </div>
-        </footer>
+        <ConditionalLayout>{children}</ConditionalLayout>
       </body>
     </html>
   );

@@ -24,7 +24,7 @@ export default function AdminLayout({
           <div className="header-content">
             <div className="header-left">
               <Link href="/portal" className="portal-logo">
-                <h1 className="portal-title">JSEO 관리자 포털</h1>
+                <h1 className="portal-title">Greensupia 관리자 포털</h1>
               </Link>
             </div>
             <div className="header-right">
@@ -77,7 +77,7 @@ export default function AdminLayout({
       {/* 푸터 */}
       <footer>
         <div className="footer-content">
-          <span className="footer-logo">JSEO</span>
+          <span className="footer-logo">Greensupia</span>
           <span className="footer-text">관리자 포털</span>
           <span className="footer-year">© 2024</span>
         </div>
