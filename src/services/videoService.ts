@@ -1,9 +1,9 @@
 import { VideoRepository } from "@/repositories/videoRepository";
 import {
-  VideoCreateRequest,
-  VideoUpdateRequest,
-  VideoResponse,
-  VideoListResponse,
+  videoCreateRequest,
+  videoUpdateRequest,
+  videoResponse,
+  videoListResponse,
 } from "@/types/video";
 import { extractThumbnailFromUrl, normalizeVideoUrl } from "@/utils/videoUtils";
 
@@ -17,7 +17,7 @@ export class VideoService {
   async getAllVideos(
     page: number = 0,
     size: number = 10
-  ): Promise<VideoListResponse> {
+  ): Promise<videoListResponse> {
     const result = await this.videoRepository.findWithPagination(page, size);
     return {
       content: result.data.map((video) =>
@@ -30,12 +30,12 @@ export class VideoService {
     };
   }
 
-  async getActiveVideos(): Promise<VideoResponse[]> {
+  async getActiveVideos(): Promise<videoResponse[]> {
     const videos = await this.videoRepository.findActive();
     return videos.map((video) => this.videoRepository.toResponse(video));
   }
 
-  async getVideoById(id: number): Promise<VideoResponse> {
+  async getVideoById(id: number): Promise<videoResponse> {
     const video = await this.videoRepository.findById(id);
     if (!video) {
       throw new Error("Video not found");
@@ -43,7 +43,7 @@ export class VideoService {
     return this.videoRepository.toResponse(video);
   }
 
-  async createVideo(data: VideoCreateRequest): Promise<VideoResponse> {
+  async createVideo(data: videoCreateRequest): Promise<videoResponse> {
     // URL 정규화 (iframe 코드는 그대로 유지)
     if (data.videoUrl) {
       data.videoUrl = normalizeVideoUrl(data.videoUrl);
@@ -68,8 +68,8 @@ export class VideoService {
 
   async updateVideo(
     id: number,
-    data: VideoUpdateRequest
-  ): Promise<VideoResponse> {
+    data: videoUpdateRequest
+  ): Promise<videoResponse> {
     // URL 정규화 (iframe 코드는 그대로 유지)
     if (data.videoUrl) {
       data.videoUrl = normalizeVideoUrl(data.videoUrl);
@@ -96,7 +96,7 @@ export class VideoService {
     await this.videoRepository.delete(id);
   }
 
-  async toggleVideoActive(id: number): Promise<VideoResponse> {
+  async toggleVideoActive(id: number): Promise<videoResponse> {
     // 현재 비디오 정보 가져오기
     const currentVideo = await this.videoRepository.findById(id);
     if (!currentVideo) {

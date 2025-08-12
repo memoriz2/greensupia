@@ -1,9 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import {
-  BannerNews,
-  CreateBannerNewsRequest,
-  UpdateBannerNewsRequest,
-  BannerNewsFilters,
+  bannerNews,
+  createBannerNewsRequest,
+  updateBannerNewsRequest,
+  bannerNewsFilters,
 } from "@/types/bannerNews";
 import { IFilterableRepository } from "./baseRepository";
 import { Id } from "@/types/utils";
@@ -11,13 +11,13 @@ import { Id } from "@/types/utils";
 export class bannerNewsRepository
   implements
     IFilterableRepository<
-      BannerNews,
-      BannerNewsFilters,
-      CreateBannerNewsRequest,
-      UpdateBannerNewsRequest
+      bannerNews,
+      bannerNewsFilters,
+      createBannerNewsRequest,
+      updateBannerNewsRequest
     >
 {
-  async findAll(): Promise<BannerNews[]> {
+  async findAll(): Promise<bannerNews[]> {
     try {
       return await prisma.bannernews.findMany({
         orderBy: { createdAt: "desc" },
@@ -27,7 +27,7 @@ export class bannerNewsRepository
     }
   }
 
-  async findById(id: Id): Promise<BannerNews | null> {
+  async findById(id: Id): Promise<bannerNews | null> {
     try {
       return await prisma.bannernews.findUnique({
         where: { id },
@@ -37,7 +37,7 @@ export class bannerNewsRepository
     }
   }
 
-  async create(data: CreateBannerNewsRequest): Promise<BannerNews> {
+  async create(data: createBannerNewsRequest): Promise<bannerNews> {
     try {
       return await prisma.bannernews.create({
         data: {
@@ -51,7 +51,7 @@ export class bannerNewsRepository
     }
   }
 
-  async update(id: Id, data: UpdateBannerNewsRequest): Promise<BannerNews> {
+  async update(id: Id, data: updateBannerNewsRequest): Promise<bannerNews> {
     try {
       return await prisma.bannernews.update({
         where: { id },
@@ -86,7 +86,7 @@ export class bannerNewsRepository
     }
   }
 
-  async findByFilters(filters: BannerNewsFilters): Promise<BannerNews[]> {
+  async findByFilters(filters: bannerNewsFilters): Promise<bannerNews[]> {
     try {
       const where: Record<string, unknown> = {};
 
@@ -115,7 +115,7 @@ export class bannerNewsRepository
     }
   }
 
-  async findActive(): Promise<BannerNews[]> {
+  async findActive(): Promise<bannerNews[]> {
     try {
       return await prisma.bannernews.findMany({
         where: { isActive: true },

@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Notice } from "@/types/notice";
+import { notice } from "@/types/notice";
 import Pagination from "@/components/Pagination";
 
 export default function NoticePage() {
-  const [notices, setNotices] = useState<Notice[]>([]);
+  const [notices, setNotices] = useState<notice[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);

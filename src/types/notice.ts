@@ -1,4 +1,4 @@
-export interface Notice {
+export interface notice {
   id: number;
   title: string;
   content: string;
@@ -8,10 +8,10 @@ export interface Notice {
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
-  attachments?: NoticeAttachment[];
+  attachments?: noticeattachment[];
 }
 
-export interface NoticeAttachment {
+export interface noticeattachment {
   id: number;
   noticeId: number;
   fileName: string;
@@ -22,7 +22,7 @@ export interface NoticeAttachment {
   createdAt: string;
 }
 
-export interface CreateNoticeRequest {
+export interface createNoticeRequest {
   title: string;
   content: string;
   author?: string;
@@ -30,15 +30,15 @@ export interface CreateNoticeRequest {
   attachments?: File[];
 }
 
-export interface UpdateNoticeRequest {
+export interface updateNoticeRequest {
   title?: string;
   content?: string;
   isPinned?: boolean;
   isActive?: boolean;
 }
 
-export interface NoticeListResponse {
-  notices: Notice[];
+export interface noticeListResponse {
+  notices: notice[];
   total: number;
   page: number;
   limit: number;

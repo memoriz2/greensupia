@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import TipTapEditor from "@/components/TipTapEditor";
-import { Notice } from "@/types/notice";
+import { notice } from "@/types/notice";
 
 function WriteNoticeContent() {
   const router = useRouter();
@@ -35,12 +35,12 @@ function WriteNoticeContent() {
             throw new Error("공지사항을 불러올 수 없습니다.");
           }
           const data = await response.json();
-          const notice: Notice = data.data;
+          const noticeData: notice = data.data;
 
-          setTitle(notice.title);
-          setContent(notice.content);
-          setIsPinned(notice.isPinned);
-          setIsActive(notice.isActive);
+          setTitle(noticeData.title);
+          setContent(noticeData.content);
+          setIsPinned(noticeData.isPinned);
+          setIsActive(noticeData.isActive);
         } catch (err) {
           console.error("공지사항 불러오기 오류:", err);
         } finally {

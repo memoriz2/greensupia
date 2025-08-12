@@ -1,9 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import { video } from "@prisma/client";
 import {
-  VideoCreateRequest,
-  VideoUpdateRequest,
-  VideoResponse,
+  videoCreateRequest,
+  videoUpdateRequest,
+  videoResponse,
 } from "@/types/video";
 import { IFilterableRepository } from "./baseRepository";
 import { Id } from "@/types/utils";
@@ -13,8 +13,8 @@ export class VideoRepository
     IFilterableRepository<
       video,
       Record<string, unknown>,
-      VideoCreateRequest,
-      VideoUpdateRequest
+      videoCreateRequest,
+      videoUpdateRequest
     >
 {
   async findAll(): Promise<video[]> {
@@ -37,7 +37,7 @@ export class VideoRepository
     }
   }
 
-  async create(data: VideoCreateRequest): Promise<video> {
+  async create(data: videoCreateRequest): Promise<video> {
     try {
       return await prisma.video.create({
         data: {
@@ -56,7 +56,7 @@ export class VideoRepository
     }
   }
 
-  async update(id: Id, data: VideoUpdateRequest): Promise<video> {
+  async update(id: Id, data: videoUpdateRequest): Promise<video> {
     try {
       return await prisma.video.update({
         where: { id },
@@ -227,18 +227,18 @@ export class VideoRepository
     }
   }
 
-  toResponse(video: video): VideoResponse {
+  toResponse(videoItem: video): videoResponse {
     return {
-      id: video.id,
-      title: video.title,
-      description: video.description || undefined,
-      videoUrl: video.videoUrl,
-      thumbnailUrl: video.thumbnailUrl || undefined,
-      duration: video.duration || undefined,
-      sortOrder: video.sortOrder,
-      isActive: video.isActive,
-      createdAt: video.createdAt.toISOString(),
-      updatedAt: video.updatedAt.toISOString(),
+      id: videoItem.id,
+      title: videoItem.title,
+      description: videoItem.description || undefined,
+      videoUrl: videoItem.videoUrl,
+      thumbnailUrl: videoItem.thumbnailUrl || undefined,
+      duration: videoItem.duration || undefined,
+      sortOrder: videoItem.sortOrder,
+      isActive: videoItem.isActive,
+      createdAt: videoItem.createdAt.toISOString(),
+      updatedAt: videoItem.updatedAt.toISOString(),
     };
   }
 }

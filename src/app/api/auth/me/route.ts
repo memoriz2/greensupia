@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getJWTSecret } from "@/lib/env";
 import jwt from "jsonwebtoken";
 
 interface JWTPayload {
@@ -16,7 +17,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ userType: "guest" }, { status: 200 });
     }
 
-    const jwtSecret = process.env.JWT_SECRET || "your-secret-key";
+    const jwtSecret = getJWTSecret();
     const decoded = jwt.verify(authToken, jwtSecret) as JWTPayload;
 
     return NextResponse.json({

@@ -1,9 +1,9 @@
 import { BannerRepository } from "@/repositories/bannerRepository";
 import {
-  BannerCreateRequest,
-  BannerUpdateRequest,
-  BannerResponse,
-  BannerListResponse,
+  bannerCreateRequest,
+  bannerUpdateRequest,
+  bannerResponse,
+  bannerListResponse,
 } from "@/types/banner";
 
 export class BannerService {
@@ -16,7 +16,7 @@ export class BannerService {
   async getAllBanners(
     page: number = 0,
     size: number = 10
-  ): Promise<BannerListResponse> {
+  ): Promise<bannerListResponse> {
     const result = await this.bannerRepository.findWithPagination(page, size);
     return {
       content: result.data.map((banner) =>
@@ -29,12 +29,12 @@ export class BannerService {
     };
   }
 
-  async getActiveBanners(): Promise<BannerResponse[]> {
+  async getActiveBanners(): Promise<bannerResponse[]> {
     const banners = await this.bannerRepository.findActive();
     return banners.map((banner) => this.bannerRepository.toResponse(banner));
   }
 
-  async getBannerById(id: number): Promise<BannerResponse> {
+  async getBannerById(id: number): Promise<bannerResponse> {
     const banner = await this.bannerRepository.findById(id);
     if (!banner) {
       throw new Error("Banner not found");
@@ -42,7 +42,7 @@ export class BannerService {
     return this.bannerRepository.toResponse(banner);
   }
 
-  async createBanner(data: BannerCreateRequest): Promise<BannerResponse> {
+  async createBanner(data: bannerCreateRequest): Promise<bannerResponse> {
     // 활성화하려는 경우 기존 활성 배너들을 모두 비활성화
     if (data.isActive) {
       await this.bannerRepository.deactivateAll();
@@ -53,8 +53,8 @@ export class BannerService {
 
   async updateBanner(
     id: number,
-    data: BannerUpdateRequest
-  ): Promise<BannerResponse> {
+    data: bannerUpdateRequest
+  ): Promise<bannerResponse> {
     // 활성화하려는 경우 기존 활성 배너들을 모두 비활성화
     if (data.isActive) {
       await this.bannerRepository.deactivateAllExcept(id);
@@ -67,7 +67,7 @@ export class BannerService {
     await this.bannerRepository.delete(id);
   }
 
-  async toggleBannerActive(id: number): Promise<BannerResponse> {
+  async toggleBannerActive(id: number): Promise<bannerResponse> {
     const banner = await this.bannerRepository.findById(id);
     if (!banner) {
       throw new Error("Banner not found");

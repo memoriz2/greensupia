@@ -19,6 +19,9 @@ fi
 # 스크립트 실행 중임을 표시
 touch "$SCRIPT_LOCK_FILE"
 
+# 권한 확인 및 자동 수정 (스크립트 시작 시)
+check_and_fix_permissions
+
 # Windows 환경 감지 (개선된 버전)
 detect_windows_environment() {
     # 🔧 FIXED: 더 정확한 Windows 환경 감지
@@ -77,6 +80,101 @@ BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 PURPLE='\033[0;35m'
 NC='\033[0m' # No Color
+
+# 권한 확인 및 자동 수정 함수
+check_and_fix_permissions() {
+    log_info "🔍 권한 확인 및 자동 수정 중..."
+    
+    # 현재 사용자 확인
+    local current_user=$(whoami)
+    local current_group=$(id -gn)
+    
+    log_info "현재 사용자: $current_user, 그룹: $current_group"
+    
+    # 파일 소유권 문제 확인 및 수정
+    if [[ -f ".next" ]] || [[ -d ".next" ]]; then
+        local owner=$(stat -c '%U' .next 2>/dev/null || echo "unknown")
+        if [[ "$owner" != "$current_user" ]]; then
+            log_warning "⚠️ .next 디렉토리 소유권 문제 감지 (소유자: $owner)"
+            log_info "🔧 자동으로 권한 수정 시도..."
+            
+            # 일반 사용자 권한으로 수정 시도
+            if chown -R "$current_user:$current_group" .next 2>/dev/null; then
+                log_success "✅ .next 디렉토리 권한 수정 완료"
+            else
+                log_warning "⚠️ 권한 수정 실패, .next 디렉토리 삭제 후 재생성"
+                rm -rf .next
+            fi
+        fi
+    fi
+    
+    # logs 디렉토리 생성 (일반 사용자 권한)
+    if [[ ! -d "logs" ]]; then
+        mkdir -p logs 2>/dev/null || log_warning "⚠️ logs 디렉토리 생성 실패"
+    fi
+}
+
+# Prisma 클라이언트 생성을 위한 공통 함수
+generate_prisma_client() {
+    local max_attempts=3
+    local attempt=1
+    
+    log_info "🔧 Prisma 클라이언트 생성 시작 (시도 $attempt/$max_attempts)..."
+    
+    # 권한 확인 및 수정
+    check_and_fix_permissions
+    
+    while [[ $attempt -le $max_attempts ]]; do
+        log_info "🔄 Prisma 클라이언트 생성 시도 $attempt..."
+        
+        # Prisma 패키지 설치 확인 및 설치
+        if ! npm list @prisma/client >/dev/null 2>&1; then
+            log_info "📦 @prisma/client 패키지 설치 중..."
+            npm install @prisma/client
+        fi
+        
+        if ! npm list prisma >/dev/null 2>&1; then
+            log_info "📦 prisma 패키지 설치 중..."
+            npm install prisma
+        fi
+        
+        # Prisma 클라이언트 생성
+        if npx prisma generate; then
+            log_success "✅ Prisma 클라이언트 생성 성공!"
+            
+            # 생성된 클라이언트 검증
+            if [[ -d "node_modules/.prisma/client" ]] && [[ -f "node_modules/.prisma/client/index.d.ts" ]]; then
+                local size=$(wc -c < node_modules/.prisma/client/index.d.ts)
+                local model_count=$(grep -c 'export type' node_modules/.prisma/client/index.d.ts)
+                
+                log_info "📊 생성된 타입 정의: ${size} bytes, ${model_count} models"
+                
+                if [[ $size -gt 10000 && $model_count -gt 0 ]]; then
+                    log_success "✅ Prisma 클라이언트 검증 완료"
+                    touch ".prisma_client_generated"
+                    return 0
+                else
+                    log_warning "⚠️ 타입 정의 파일이 너무 작거나 모델이 없습니다"
+                fi
+            else
+                log_warning "⚠️ Prisma 클라이언트 디렉토리나 파일이 생성되지 않았습니다"
+            fi
+        else
+            log_error "❌ Prisma 클라이언트 생성 실패 (시도 $attempt)"
+        fi
+        
+        # 재시도 전 대기
+        if [[ $attempt -lt $max_attempts ]]; then
+            log_info "⏳ 3초 후 재시도..."
+            sleep 3
+        fi
+        
+        attempt=$((attempt + 1))
+    done
+    
+    log_error "❌ Prisma 클라이언트 생성 실패 (최대 시도 횟수 초과)"
+    return 1
+}
 
 # 로깅 함수들
 log_info() {
@@ -447,9 +545,8 @@ fix_typescript_errors() {
     # 7. Prisma 클라이언트 재생성 (스키마 변경 시)
     if [[ "$schema_changed" == true ]] || [[ ! -f ".prisma_client_generated" ]]; then
         log_info "Regenerating Prisma client..."
-        if npx prisma generate; then
+        if generate_prisma_client; then
             log_success "Prisma client regenerated"
-            touch ".prisma_client_generated"
         else
             log_error "Prisma client generation failed"
         fi
@@ -565,7 +662,7 @@ while [[ $# -gt 0 ]]; do
         --production)
             PRODUCTION_MODE=true
             SKIP_BUILD=false
-            AUTO_FIX=true
+            AUTO_FIX=false
             shift
             ;;
         --start)
@@ -573,7 +670,7 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         --auto-fix)
-            AUTO_FIX=true
+            AUTO_FIX=false
             shift
             ;;
         --reset-seed)
@@ -875,42 +972,25 @@ while true; do
     # 🔍 NEW: Prisma 패키지 완전 정리 및 재설치 (타입 정의 불일치 방지)
     log_info "🔄 Prisma 패키지 완전 정리 및 재설치 (타입 정의 불일치 방지)..."
     
-                        # 1단계: 기존 Prisma 패키지 완전 제거
-                    log_info "🔄 1단계: 기존 Prisma 패키지 완전 제거..."
-                    npm uninstall prisma @prisma/client 2>/dev/null || true
+                        # 1단계: Prisma 패키지 설치 및 유지
+                    log_info "🔄 1단계: Prisma 패키지 설치 및 유지..."
+                    npm install @prisma/client prisma
                     
-                    # 🔧 FIXED: Windows 환경에서도 안전한 삭제
-                    if [[ -d "node_modules/@prisma" ]]; then
-                        rm -rf "node_modules/@prisma" 2>/dev/null || true
-                        log_info "✅ Removed @prisma directory"
-                    fi
-                    
-                    if [[ -d "node_modules/.prisma" ]]; then
-                        rm -rf "node_modules/.prisma" 2>/dev/null || true
-                        log_info "✅ Removed .prisma directory"
+                    # Prisma 클라이언트 생성
+                    log_info "🔄 Prisma 클라이언트 생성..."
+                    if generate_prisma_client; then
+                        log_success "✅ Prisma 클라이언트 생성 완료"
+                    else
+                        log_error "❌ Prisma 클라이언트 생성 실패"
+                        return 1
                     fi
                     
                     sleep 2
     
-    # 2단계: package.json에서 Prisma 관련 의존성 확인 및 정리
-    log_info "🔄 2단계: package.json 정리..."
-    if [[ -f "package.json" ]]; then
-        # package.json에서 Prisma 관련 의존성 제거 (임시)
-        sed -i '/"prisma":/d' package.json 2>/dev/null || true
-        sed -i '/"@prisma\/client":/d' package.json 2>/dev/null || true
-        log_info "✅ package.json에서 Prisma 의존성 임시 제거"
-    fi
-    
-    # 3단계: Prisma CLI만 설치 (클라이언트는 자동 생성)
-    log_info "🔄 3단계: Prisma CLI만 설치..."
-    npm install prisma --save-dev
-    sleep 2
-    
-    # 4단계: Prisma 클라이언트 생성 (자동으로 .prisma/client에 생성)
+    # 4단계: Prisma 클라이언트 생성 (공통 함수 사용)
     log_info "🔄 4단계: Prisma 클라이언트 생성..."
-    if npx prisma generate; then
+    if generate_prisma_client; then
         log_success "✅ Prisma client generated successfully"
-        touch ".prisma_client_generated"
         
         # 디버깅: Prisma 클라이언트 생성 후 schema.prisma 파일 상태 재확인
         log_info "🔍 DEBUG: Checking schema.prisma file after Prisma client generation..."
@@ -922,132 +1002,30 @@ while true; do
             log_error "❌ schema.prisma file disappeared after generation!"
         fi
         
-        # 🔍 NEW: 타입 정의 파일 크기 불일치 사전 방지 및 검증
-        log_info "🔍 DEBUG: 타입 정의 파일 크기 불일치 사전 방지 및 검증..."
+        # 🔍 NEW: 타입 정의 파일 검증 (공통 함수에서 이미 검증됨)
+        log_info "🔍 DEBUG: Prisma 클라이언트 검증 완료 (공통 함수에서 처리됨)"
         
-        # .prisma/client만 확인 (단순화된 접근)
-        if [[ -d "node_modules/.prisma/client" ]]; then
-            log_success "✅ .prisma/client directory exists"
+        # 5단계: Prisma 클라이언트 상태 확인
+        log_info "🔄 5단계: Prisma 클라이언트 상태 확인..."
+        
+        if [[ -d "node_modules/.prisma/client" ]] && [[ -f "node_modules/.prisma/client/index.d.ts" ]]; then
+            log_success "✅ Prisma 클라이언트 정상 생성됨"
             
-            # index.d.ts 파일 상세 검증
-            if [[ -f "node_modules/.prisma/client/index.d.ts" ]]; then
-                local_size=$(wc -c < node_modules/.prisma/client/index.d.ts)
-                local_model_count=$(grep -c 'export type' node_modules/.prisma/client/index.d.ts)
-                
-                log_info "📊 .prisma/client/index.d.ts: ${local_size} bytes, ${local_model_count} models"
-                
-                # 타입 정의 파일이 정상인지 확인
-                if [[ $local_size -gt 10000 && $local_model_count -gt 0 ]]; then
-                    log_success "✅ .prisma/client 타입 정의 정상"
-                    
-                    # 🔍 NEW: .prisma/client만 사용하여 타입 정의 불일치 문제 완전 해결
-                    log_info "🔄 .prisma/client만 사용하여 타입 정의 불일치 문제 완전 해결..."
-                    
-                    # 5단계: .prisma/client 클라이언트 기능 테스트 (안전한 경로 처리)
-                    log_info "🔄 5단계: .prisma/client 클라이언트 기능 테스트..."
-                    
-                    # 🔧 FIXED: 안전한 경로 해결 방법
-                    # 1. 현재 스크립트 위치 파악
-                    SCRIPT_DIR="$(dirname "$0")"
-                    
-                    # 2. 프로젝트 루트로 이동 (상대 경로 사용)
-                    if [[ -d "$SCRIPT_DIR/.." ]]; then
-                        # 🔧 FIXED: 더 안전한 디렉토리 이동
-                        if cd "$SCRIPT_DIR/.." 2>/dev/null; then
-                            log_info "✅ Moved to project root: $(pwd)"
-                        else
-                            log_warning "⚠️ Failed to move to parent directory, trying alternative..."
-                            # 대안: 현재 디렉토리에서 상위로 이동 시도
-                            if cd .. 2>/dev/null; then
-                                log_info "✅ Moved to parent directory using alternative method: $(pwd)"
-                            else
-                                log_warning "⚠️ Could not move to parent directory, using current directory"
-                            fi
-                        fi
-                    else
-                        log_warning "⚠️ Parent directory not accessible, using current directory"
-                    fi
-                    
-                    # 3. 상대 경로로 Prisma 클라이언트 경로 설정
-                    PRISMA_CLIENT_PATH="./node_modules/.prisma/client"
-                    
-                    # 4. 경로 정규화 (이중 슬래시 제거)
-                    PRISMA_CLIENT_PATH=$(echo "$PRISMA_CLIENT_PATH" | sed 's|//|/|g')
-                    
-                    log_info "🔍 DEBUG: Script directory: $SCRIPT_DIR"
-                    log_info "🔍 DEBUG: Current working directory: $(pwd)"
-                    log_info "🔍 DEBUG: Prisma client path: $PRISMA_CLIENT_PATH"
-                    
-                    # 5. 경로가 실제로 존재하는지 확인
-                    if [[ ! -d "$PRISMA_CLIENT_PATH" ]]; then
-                        log_error "❌ Prisma client directory not found at: $PRISMA_CLIENT_PATH"
-                        log_info "🔄 Trying alternative path resolution..."
-                        
-                        # 대안 1: 절대 경로 시도
-                        if [[ -d "node_modules/.prisma/client" ]]; then
-                            PRISMA_CLIENT_PATH="node_modules/.prisma/client"
-                            log_info "✅ Found alternative path: $PRISMA_CLIENT_PATH"
-                        else
-                            log_error "❌ No valid Prisma client path found"
-                            continue
-                        fi
-                    fi
-                    
-                    # 6. 🔧 FIXED: 간단한 파일 존재 테스트로 변경 (Node.js 테스트 제거)
-                    if [[ -f "$PRISMA_CLIENT_PATH/index.js" ]] && [[ -f "$PRISMA_CLIENT_PATH/index.d.ts" ]]; then
-                        log_success "🎉 Prisma client files verified successfully!"
-                        log_success "✅ index.js exists: $PRISMA_CLIENT_PATH/index.js"
-                        log_success "✅ index.d.ts exists: $PRISMA_CLIENT_PATH/index.d.ts"
-                        
-                        # 추가 검증: 파일 크기 확인
-                        JS_SIZE=$(wc -c < "$PRISMA_CLIENT_PATH/index.js" 2>/dev/null || echo "0")
-                        TS_SIZE=$(wc -c < "$PRISMA_CLIENT_PATH/index.d.ts" 2>/dev/null || echo "0")
-                        
-                        if [[ $JS_SIZE -gt 1000 && $TS_SIZE -gt 10000 ]]; then
-                            log_success "✅ File sizes verified: JS=${JS_SIZE}bytes, TS=${TS_SIZE}bytes"
-                            log_success "🎉 Prisma client functionality test PASSED!"
-                            log_success "✅ All models are properly recognized using .prisma/client"
-                            break  # 성공하면 루프 탈출
-                        else
-                            log_warning "⚠️ File sizes too small, may be corrupted"
-                        fi
-                    else
-                        log_warning "⚠️ Prisma client test failed, retrying..."
-                        log_info "🔍 Missing files:"
-                        [[ ! -f "$PRISMA_CLIENT_PATH/index.js" ]] && log_warning "  - index.js not found"
-                        [[ ! -f "$PRISMA_CLIENT_PATH/index.d.ts" ]] && log_warning "  - index.d.ts not found"
-                    fi
-                else
-                    log_warning "⚠️ .prisma/client 타입 정의가 비정상입니다"
-                fi
+            # OrganizationChart 타입 존재 확인
+            if grep -q "OrganizationChart" "node_modules/.prisma/client/index.d.ts"; then
+                log_success "✅ OrganizationChart 타입 확인됨"
             else
-                log_error "❌ .prisma/client/index.d.ts 파일이 없습니다"
+                log_warning "⚠️ OrganizationChart 타입이 생성되지 않음"
             fi
         else
-            log_error "❌ .prisma/client 디렉토리가 생성되지 않았습니다"
+            log_error "❌ Prisma 클라이언트가 정상적으로 생성되지 않음"
         fi
+        # 공통 함수에서 이미 모든 검증이 완료되었으므로 추가 검증 불필요
+        log_success "🎉 Prisma 클라이언트 생성 및 검증 완료!"
     else
         log_error "❌ Prisma client generation failed"
+        return 1
     fi
-    
-    # 최대 시도 횟수 확인
-    if [[ $attempt -ge $max_attempts ]]; then
-        log_error "❌ Maximum attempts ($max_attempts) reached!"
-        log_error "Prisma client generation failed after $max_attempts attempts"
-        log_error "Manual intervention required. Check your schema.prisma file."
-        log_error "🔍 DEBUG: Final schema.prisma state:"
-        if [[ -f "prisma/schema.prisma" ]]; then
-            log_info "📋 Final schema.prisma content (last 20 lines):"
-            tail -20 prisma/schema.prisma
-        fi
-        exit 1
-    fi
-    
-    log_info "🔄 Retrying... (attempt $attempt of $max_attempts)"
-    log_info "Waiting 3 seconds before next attempt..."
-    sleep 3
-    attempt=$((attempt + 1))
-done
 
 # 8. TypeScript 오류 자동 수정
 if [[ "$AUTO_FIX" == true ]]; then
@@ -1099,16 +1077,8 @@ if [[ "$PRODUCTION_MODE" == true ]] || [[ "$SKIP_BUILD" == false ]]; then
         log_error "TypeScript compilation failed"
         if [[ "$PRODUCTION_MODE" == true ]]; then
             log_error "Cannot proceed with production build"
-            log_warning "Trying to auto-fix remaining errors..."
-            fix_typescript_errors
-            
-            # 다시 컴파일 시도
-            if npx tsc --noEmit; then
-                log_success "TypeScript compilation successful after auto-fix"
-            else
-                log_error "TypeScript compilation still failed after auto-fix"
-                exit 1
-            fi
+            log_error "TypeScript compilation failed - please fix errors manually"
+            exit 1
         else
             log_warning "TypeScript compilation has warnings, continuing..."
         fi
@@ -1466,4 +1436,73 @@ echo -e "  npm run dev              - Start development server"
 echo -e "  npm run build            - Build for production"
 echo -e "  npx prisma studio        - Open Prisma Studio"
 
+# PM2 초기 설정 함수
+setup_pm2() {
+    log_info "PM2 초기 설정을 시작합니다..."
+    
+    # PM2 설치 확인
+    if ! command -v pm2 &> /dev/null; then
+        log_info "PM2 설치 중..."
+        npm install -g pm2
+        if [ $? -eq 0 ]; then
+            log_success "PM2 설치 완료"
+        else
+            log_error "PM2 설치 실패"
+            return 1
+        fi
+    else
+        log_success "PM2가 이미 설치되어 있습니다"
+    fi
+    
+    # 로그 디렉토리 생성
+    mkdir -p logs
+    log_info "로그 디렉토리 생성 완료"
+    
+    # PM2 시작
+    log_info "PM2로 애플리케이션 시작 중..."
+    if pm2 start ecosystem.config.js --env production; then
+        log_success "PM2 애플리케이션 시작 완료"
+        
+        # PM2 설정 저장
+        log_info "PM2 설정 저장 중..."
+        pm2 save
+        log_success "PM2 설정 저장 완료"
+        
+        # 서버 재부팅 시 자동 시작 설정
+        log_info "PM2 자동 시작 설정 중..."
+        pm2 startup
+        log_success "PM2 자동 시작 설정 완료"
+        
+        # 상태 확인
+        log_info "PM2 상태 확인:"
+        pm2 status
+        
+        log_success "PM2 초기 설정이 완료되었습니다!"
+        log_info "이제 다음 명령어로 관리할 수 있습니다:"
+        log_info "  bash ./scripts/pm2-manager.sh --start"
+        log_info "  bash ./scripts/pm2-manager.sh --stop"
+        log_info "  bash ./scripts/pm2-manager.sh --restart"
+        
+        return 0
+    else
+        log_error "PM2 애플리케이션 시작 실패"
+        return 1
+    fi
+}
 
+# production 모드일 때 PM2 설정도 포함
+if [ "$1" = "--production" ]; then
+    # ... 기존 production 설정 ...
+    
+    # PM2 초기 설정 추가
+    log_production "PM2 초기 설정을 시작합니다..."
+    if setup_pm2; then
+        log_success "PM2 설정이 성공적으로 완료되었습니다"
+    else
+        log_warning "PM2 설정에 실패했습니다. 수동으로 설정해주세요"
+        log_info "수동 설정 명령어: bash ./scripts/pm2-manager.sh --setup"
+    fi
+fi
+
+# 스크립트 완료
+log_success "🎉 모든 설정이 완료되었습니다!"

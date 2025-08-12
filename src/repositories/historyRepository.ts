@@ -1,9 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import {
-  History,
-  CreateHistoryRequest,
-  UpdateHistoryRequest,
-  HistoryFilters,
+  history,
+  createHistoryRequest,
+  updateHistoryRequest,
+  historyFilters,
 } from "@/types/history";
 import { IFilterableRepository } from "./baseRepository";
 import { Id } from "@/types/utils";
@@ -11,13 +11,13 @@ import { Id } from "@/types/utils";
 export class HistoryRepository
   implements
     IFilterableRepository<
-      History,
-      HistoryFilters,
-      CreateHistoryRequest,
-      UpdateHistoryRequest
+      history,
+      historyFilters,
+      createHistoryRequest,
+      updateHistoryRequest
     >
 {
-  async findAll(): Promise<History[]> {
+  async findAll(): Promise<history[]> {
     try {
       return await prisma.history.findMany({
         orderBy: { year: "desc" },
@@ -27,7 +27,7 @@ export class HistoryRepository
     }
   }
 
-  async findById(id: Id): Promise<History | null> {
+  async findById(id: Id): Promise<history | null> {
     try {
       return await prisma.history.findUnique({
         where: { id },
@@ -37,7 +37,7 @@ export class HistoryRepository
     }
   }
 
-  async create(data: CreateHistoryRequest): Promise<History> {
+  async create(data: createHistoryRequest): Promise<history> {
     try {
       return await prisma.history.create({
         data: {
@@ -50,7 +50,7 @@ export class HistoryRepository
     }
   }
 
-  async update(id: Id, data: UpdateHistoryRequest): Promise<History> {
+  async update(id: Id, data: updateHistoryRequest): Promise<history> {
     try {
       return await prisma.history.update({
         where: { id },
@@ -85,7 +85,7 @@ export class HistoryRepository
     }
   }
 
-  async findByFilters(filters: HistoryFilters): Promise<History[]> {
+  async findByFilters(filters: historyFilters): Promise<history[]> {
     try {
       const where: Record<string, unknown> = {};
 
@@ -120,7 +120,7 @@ export class HistoryRepository
   async findByYearRange(
     startYear: string,
     endYear: string
-  ): Promise<History[]> {
+  ): Promise<history[]> {
     try {
       return await prisma.history.findMany({
         where: {

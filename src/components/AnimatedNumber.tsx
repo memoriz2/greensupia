@@ -16,7 +16,7 @@ export function AnimatedNumber({
   const [displayValue, setDisplayValue] = useState(value);
   const [isUpdating, setIsUpdating] = useState(false);
   const prevValueRef = useRef(value);
-  const animationRef = useRef<number>();
+  const animationRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (prevValueRef.current !== value) {

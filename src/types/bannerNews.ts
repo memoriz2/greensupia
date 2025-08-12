@@ -1,4 +1,4 @@
-export interface BannerNews {
+export interface bannerNews {
   id: number;
   title: string;
   content: string;
@@ -12,7 +12,7 @@ export interface BannerNews {
   updatedAt: Date;
 }
 
-export interface CreateBannerNewsRequest {
+export interface createBannerNewsRequest {
   title: string;
   content: string;
   imageUrl?: string;
@@ -23,7 +23,7 @@ export interface CreateBannerNewsRequest {
   isActive?: boolean;
 }
 
-export interface UpdateBannerNewsRequest {
+export interface updateBannerNewsRequest {
   title?: string;
   content?: string;
   imageUrl?: string;
@@ -34,16 +34,16 @@ export interface UpdateBannerNewsRequest {
   isActive?: boolean;
 }
 
-export interface BannerNewsFilters {
+export interface bannerNewsFilters {
   isActive?: boolean;
   search?: string;
   sortBy?: "createdAt" | "updatedAt" | "title";
   sortOrder?: "asc" | "desc";
 }
 
-export interface BannerNewsState {
-  bannerNews: BannerNews[];
+export interface bannerNewsState {
+  bannerNewsItem: bannerNews[];
   loading: boolean;
   error: string | null;
-  filters: BannerNewsFilters;
+  filters: bannerNewsFilters;
 }

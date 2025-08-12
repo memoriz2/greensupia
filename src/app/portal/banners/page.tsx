@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { Banner } from "@/types/banner";
+import { banner } from "@/types/banner";
 import ToggleSwitch from "@/components/ToggleSwitch";
 import Modal from "@/components/Modal";
 import LoadingSpinner from "@/components/LoadingSpinner";
@@ -11,7 +11,7 @@ import Pagination from "@/components/Pagination";
 import { usePagination } from "@/hooks/usePagination";
 
 export default function BannerManagementPage() {
-  const [banners, setBanners] = useState<Banner[]>([]);
+  const [banners, setBanners] = useState<banner[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [stats, setStats] = useState<{
@@ -38,7 +38,7 @@ export default function BannerManagementPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // 편집 상태
-  const [editingBanner, setEditingBanner] = useState<Banner | null>(null);
+  const [editingBanner, setEditingBanner] = useState<banner | null>(null);
   const [showEditForm, setShowEditForm] = useState(false);
 
   // 편집용 파일 업로드 상태
@@ -184,9 +184,9 @@ export default function BannerManagementPage() {
   };
 
   // 토글 활성화/비활성화
-  const handleToggleActive = async (banner: Banner) => {
+  const handleToggleActive = async (bannerItem: banner) => {
     try {
-      const response = await fetch(`/api/banners/${banner.id}/toggle`, {
+      const response = await fetch(`/api/banners/${bannerItem.id}/toggle`, {
         method: "PUT",
       });
       if (!response.ok) {
@@ -289,12 +289,12 @@ export default function BannerManagementPage() {
   };
 
   // 배너 삭제
-  const handleDeleteBanner = async (banner: Banner) => {
+  const handleDeleteBanner = async (bannerItem: banner) => {
     showModal(
-      `"${banner.title}" 배너를 삭제하시겠습니까?`,
+      `"${bannerItem.title}" 배너를 삭제하시겠습니까?`,
       async () => {
         try {
-          const response = await fetch(`/api/banners/${banner.id}`, {
+          const response = await fetch(`/api/banners/${bannerItem.id}`, {
             method: "DELETE",
           });
           if (!response.ok) {
@@ -315,13 +315,13 @@ export default function BannerManagementPage() {
   };
 
   // 편집 모드 시작
-  const handleEditClick = (banner: Banner) => {
-    setEditingBanner(banner);
+  const handleEditClick = (bannerItem: banner) => {
+    setEditingBanner(bannerItem);
     setFormData({
-      title: banner.title,
-      imageUrl: banner.imageUrl || "",
-      sortOrder: banner.sortOrder.toString(),
-      isActive: banner.isActive,
+      title: bannerItem.title,
+      imageUrl: bannerItem.imageUrl || "",
+      sortOrder: bannerItem.sortOrder.toString(),
+      isActive: bannerItem.isActive,
     });
     setShowEditForm(true);
   };

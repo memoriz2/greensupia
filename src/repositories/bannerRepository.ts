@@ -1,9 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import { banner } from "@prisma/client";
 import {
-  BannerCreateRequest,
-  BannerUpdateRequest,
-  BannerResponse,
+  bannerCreateRequest,
+  bannerUpdateRequest,
+  bannerResponse,
 } from "@/types/banner";
 import { IFilterableRepository } from "./baseRepository";
 import { Id } from "@/types/utils";
@@ -13,8 +13,8 @@ export class BannerRepository
     IFilterableRepository<
       banner,
       Record<string, unknown>,
-      BannerCreateRequest,
-      BannerUpdateRequest
+      bannerCreateRequest,
+      bannerUpdateRequest
     >
 {
   async findAll(): Promise<banner[]> {
@@ -37,7 +37,7 @@ export class BannerRepository
     }
   }
 
-  async create(data: BannerCreateRequest): Promise<banner> {
+  async create(data: bannerCreateRequest): Promise<banner> {
     try {
       return await prisma.banner.create({
         data: {
@@ -54,7 +54,7 @@ export class BannerRepository
     }
   }
 
-  async update(id: Id, data: BannerUpdateRequest): Promise<banner> {
+  async update(id: Id, data: bannerUpdateRequest): Promise<banner> {
     try {
       return await prisma.banner.update({
         where: { id },
@@ -214,16 +214,16 @@ export class BannerRepository
     }
   }
 
-  toResponse(banner: banner): BannerResponse {
+  toResponse(bannerItem: banner): bannerResponse {
     return {
-      id: banner.id,
-      title: banner.title,
-      imageUrl: banner.imageUrl,
-      linkUrl: banner.linkUrl || undefined,
-      sortOrder: banner.sortOrder,
-      isActive: banner.isActive,
-      createdAt: banner.createdAt.toISOString(),
-      updatedAt: banner.updatedAt.toISOString(),
+      id: bannerItem.id,
+      title: bannerItem.title,
+      imageUrl: bannerItem.imageUrl,
+      linkUrl: bannerItem.linkUrl || undefined,
+      sortOrder: bannerItem.sortOrder,
+      isActive: bannerItem.isActive,
+      createdAt: bannerItem.createdAt.toISOString(),
+      updatedAt: bannerItem.updatedAt.toISOString(),
     };
   }
 }

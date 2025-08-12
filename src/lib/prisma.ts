@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { checkSecurityStatus } from "./env";
 
 // 글로벌 타입 정의
 const globalForPrisma = globalThis as unknown as {
@@ -29,6 +30,16 @@ export const prisma =
 // 개발 환경에서만 글로벌에 저장 (핫 리로드 방지)
 if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = prisma;
+}
+
+// 환경변수 보안 상태 확인 (프로덕션에서만)
+if (process.env.NODE_ENV === "production") {
+  try {
+    checkSecurityStatus();
+  } catch (error) {
+    console.error("❌ 프로덕션 환경변수 보안 검증 실패:", error);
+    process.exit(1); // 보안 검증 실패 시 애플리케이션 종료
+  }
 }
 
 // 연결 테스트 및 상태 관리

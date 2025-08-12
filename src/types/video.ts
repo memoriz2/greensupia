@@ -1,4 +1,4 @@
-export interface Video {
+export interface video {
   id: number;
   title: string;
   description?: string;
@@ -11,7 +11,7 @@ export interface Video {
   updatedAt: string;
 }
 
-export interface VideoCreateRequest {
+export interface videoCreateRequest {
   title: string;
   description?: string;
   videoUrl: string;
@@ -21,7 +21,7 @@ export interface VideoCreateRequest {
   isActive?: boolean;
 }
 
-export interface VideoUpdateRequest {
+export interface videoUpdateRequest {
   title?: string;
   description?: string;
   videoUrl?: string;
@@ -31,7 +31,7 @@ export interface VideoUpdateRequest {
   isActive?: boolean;
 }
 
-export interface VideoResponse {
+export interface videoResponse {
   id: number;
   title: string;
   description?: string;
@@ -44,8 +44,8 @@ export interface VideoResponse {
   updatedAt: string;
 }
 
-export interface VideoListResponse {
-  content: VideoResponse[];
+export interface videoListResponse {
+  content: videoResponse[];
   totalElements: number;
   totalPages: number;
   size: number;

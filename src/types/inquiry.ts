@@ -1,4 +1,4 @@
-export interface Inquiry {
+export interface inquiry {
   id: number;
   title: string;
   content: string;
@@ -12,7 +12,7 @@ export interface Inquiry {
   updatedAt: string;
 }
 
-export interface CreateInquiryRequest {
+export interface createInquiryRequest {
   title: string;
   content: string;
   author: string;
@@ -20,7 +20,7 @@ export interface CreateInquiryRequest {
   password?: string;
 }
 
-export interface UpdateInquiryRequest {
+export interface updateInquiryRequest {
   title?: string;
   content?: string;
   author?: string;
@@ -29,10 +29,10 @@ export interface UpdateInquiryRequest {
   password?: string;
 }
 
-export interface InquiryPasswordRequest {
+export interface inquiryPasswordRequest {
   password: string;
 }
 
-export interface InquiryAnswerRequest {
+export interface inquiryAnswerRequest {
   answer: string;
 }

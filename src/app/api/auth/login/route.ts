@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { verifyPassword } from "@/utils/encryption";
+import { getJWTSecret } from "@/lib/env";
 import jwt from "jsonwebtoken";
 
 interface LoginRequest {
@@ -55,7 +56,7 @@ export async function POST(request: NextRequest) {
     }
 
     // JWT 토큰 생성
-    const jwtSecret = process.env.JWT_SECRET || "your-secret-key";
+    const jwtSecret = getJWTSecret();
     const token = jwt.sign(
       {
         userId: admin.id,

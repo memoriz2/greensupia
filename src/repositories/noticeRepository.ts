@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { Notice, NoticeAttachment } from "@/types/notice";
+import { notice, noticeattachment } from "@/types/notice";
 
 // Prisma 결과를 위한 타입 정의
 interface PrismaNotice {
@@ -31,7 +31,7 @@ export class NoticeRepository {
   async findAll(
     page: number = 1,
     limit: number = 10
-  ): Promise<{ notices: Notice[]; total: number }> {
+  ): Promise<{ notices: notice[]; total: number }> {
     const offset = (page - 1) * limit;
 
     const [notices, total] = await Promise.all([
@@ -66,13 +66,13 @@ export class NoticeRepository {
     }));
 
     return {
-      notices: convertedNotices as Notice[],
+      notices: convertedNotices as notice[],
       total,
     };
   }
 
   // 공지사항 상세 조회 (조회수 증가)
-  async findById(id: number): Promise<Notice | null> {
+  async findById(id: number): Promise<notice | null> {
     const notice = await prisma.notice.findFirst({
       where: { id, isActive: true },
       include: {
@@ -100,7 +100,7 @@ export class NoticeRepository {
         ),
       };
 
-      return convertedNotice as Notice;
+      return convertedNotice as notice;
     }
 
     return null;
@@ -112,7 +112,7 @@ export class NoticeRepository {
     content: string;
     author?: string;
     isPinned?: boolean;
-  }): Promise<Notice> {
+  }): Promise<notice> {
     const notice = await prisma.notice.create({
       data: {
         title: data.title,
@@ -139,7 +139,7 @@ export class NoticeRepository {
       ),
     };
 
-    return convertedNotice as Notice;
+    return convertedNotice as notice;
   }
 
   // 공지사항 수정
@@ -151,7 +151,7 @@ export class NoticeRepository {
       isPinned?: boolean;
       isActive?: boolean;
     }
-  ): Promise<Notice | null> {
+  ): Promise<notice | null> {
     const notice = await prisma.notice.update({
       where: { id },
       data,
@@ -173,7 +173,7 @@ export class NoticeRepository {
       ),
     };
 
-    return convertedNotice as Notice;
+    return convertedNotice as notice;
   }
 
   // 공지사항 삭제 (소프트 삭제)
@@ -190,7 +190,7 @@ export class NoticeRepository {
   }
 
   // 상단고정 토글
-  async togglePin(id: number): Promise<Notice | null> {
+  async togglePin(id: number): Promise<notice | null> {
     const notice = await prisma.notice.findUnique({
       where: { id },
     });
@@ -220,7 +220,7 @@ export class NoticeRepository {
       ),
     };
 
-    return convertedNotice as Notice;
+    return convertedNotice as notice;
   }
 
   // 첨부파일 추가
@@ -232,7 +232,7 @@ export class NoticeRepository {
       fileSize: number;
       mimeType: string;
     }
-  ): Promise<NoticeAttachment> {
+  ): Promise<noticeattachment> {
     const attachment = await prisma.noticeattachment.create({
       data: {
         noticeId,
@@ -249,7 +249,7 @@ export class NoticeRepository {
       createdAt: attachment.createdAt.toISOString(),
     };
 
-    return convertedAttachment as NoticeAttachment;
+    return convertedAttachment as noticeattachment;
   }
 
   // 첨부파일 다운로드 횟수 증가
@@ -275,7 +275,7 @@ export class NoticeRepository {
   // 첨부파일 조회
   async findAttachmentById(
     attachmentId: number
-  ): Promise<NoticeAttachment | null> {
+  ): Promise<noticeattachment | null> {
     const attachment = await prisma.noticeattachment.findUnique({
       where: { id: attachmentId },
     });
@@ -288,7 +288,7 @@ export class NoticeRepository {
       createdAt: attachment.createdAt.toISOString(),
     };
 
-    return convertedAttachment as NoticeAttachment;
+    return convertedAttachment as noticeattachment;
   }
 
   async deleteNotice(id: number): Promise<void> {

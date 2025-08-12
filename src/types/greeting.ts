@@ -1,4 +1,4 @@
-export interface Greeting {
+export interface greeting {
   id: number;
   title: string;
   content: string;
@@ -7,19 +7,19 @@ export interface Greeting {
   updatedAt: string;
 }
 
-export interface GreetingCreateRequest {
+export interface greetingCreateRequest {
   title: string;
   content: string;
   isActive?: boolean;
 }
 
-export interface GreetingUpdateRequest {
+export interface greetingUpdateRequest {
   title?: string;
   content?: string;
   isActive?: boolean;
 }
 
-export interface GreetingResponse {
+export interface greetingResponse {
   id: number;
   title: string;
   content: string;
@@ -28,8 +28,8 @@ export interface GreetingResponse {
   updatedAt: string;
 }
 
-export interface GreetingListResponse {
-  content: GreetingResponse[];
+export interface greetingListResponse {
+  content: greetingResponse[];
   totalElements: number;
   totalPages: number;
   size: number;

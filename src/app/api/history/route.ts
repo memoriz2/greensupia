@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { HistoryService } from "@/services/historyService";
-import { CreateHistoryRequest } from "@/types/history";
+import { createHistoryRequest } from "@/types/history";
 
 const historyService = new HistoryService();
 
@@ -73,7 +73,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const body: CreateHistoryRequest = await request.json();
+    const body: createHistoryRequest = await request.json();
     console.log("POST 요청 받은 데이터:", body);
 
     if (!body.year || body.year.trim().length === 0) {

@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         message: "관리자 계정이 성공적으로 생성되었습니다.",
-        admin: adminWithoutPassword,
+        adminItem: adminWithoutPassword,
       },
       { status: 201 }
     );

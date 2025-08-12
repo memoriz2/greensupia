@@ -1,9 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import { greeting } from "@prisma/client";
 import {
-  GreetingCreateRequest,
-  GreetingUpdateRequest,
-  GreetingResponse,
+  greetingCreateRequest,
+  greetingUpdateRequest,
+  greetingResponse,
 } from "@/types/greeting";
 import { IFilterableRepository } from "./baseRepository";
 import { Id } from "@/types/utils";
@@ -13,8 +13,8 @@ export class GreetingRepository
     IFilterableRepository<
       greeting,
       Record<string, unknown>,
-      GreetingCreateRequest,
-      GreetingUpdateRequest
+      greetingCreateRequest,
+      greetingUpdateRequest
     >
 {
   async findAll(): Promise<greeting[]> {
@@ -37,7 +37,7 @@ export class GreetingRepository
     }
   }
 
-  async create(data: GreetingCreateRequest): Promise<greeting> {
+  async create(data: greetingCreateRequest): Promise<greeting> {
     try {
       return await prisma.greeting.create({
         data: {
@@ -52,7 +52,7 @@ export class GreetingRepository
     }
   }
 
-  async update(id: Id, data: GreetingUpdateRequest): Promise<greeting> {
+  async update(id: Id, data: greetingUpdateRequest): Promise<greeting> {
     try {
       return await prisma.greeting.update({
         where: { id },
@@ -189,7 +189,7 @@ export class GreetingRepository
     }
   }
 
-  toResponse(greeting: greeting): GreetingResponse {
+  toResponse(greeting: greeting): greetingResponse {
     return {
       id: greeting.id,
       title: greeting.title,

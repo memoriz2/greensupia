@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { Video } from "@/types/video";
+import { video } from "@/types/video";
 import ToggleSwitch from "@/components/ToggleSwitch";
 import Modal from "@/components/Modal";
 import LoadingSpinner from "@/components/LoadingSpinner";
@@ -22,7 +22,7 @@ interface VideoStats {
 }
 
 export default function VideoManagementPage() {
-  const [videos, setVideos] = useState<Video[]>([]);
+  const [videos, setVideos] = useState<video[]>([]);
   const [stats, setStats] = useState<VideoStats>({
     total: 0,
     active: 0,
@@ -54,7 +54,7 @@ export default function VideoManagementPage() {
   }>({});
 
   // 편집 상태
-  const [editingVideo, setEditingVideo] = useState<Video | null>(null);
+  const [editingVideo, setEditingVideo] = useState<video | null>(null);
   const [showEditForm, setShowEditForm] = useState(false);
 
   // 모달 상태
@@ -78,7 +78,7 @@ export default function VideoManagementPage() {
 
       // 통계 계산
       const total = data.content?.length || 0;
-      const active = data.content?.filter((v: Video) => v.isActive).length || 0;
+      const active = data.content?.filter((v: video) => v.isActive).length || 0;
       const inactive = total - active;
       setStats({ total, active, inactive });
     } catch (err) {
@@ -108,10 +108,10 @@ export default function VideoManagementPage() {
   }, []);
 
   // 토글 활성화/비활성화 (1개만 활성화되도록)
-  const handleToggleActive = async (video: Video) => {
+  const handleToggleActive = async (videoItem: video) => {
     try {
       // 현재 비디오가 비활성 상태이고, 다른 활성 비디오가 있는 경우
-      if (!video.isActive) {
+      if (!videoItem.isActive) {
         const activeVideos = videos.filter((v) => v.isActive);
         if (activeVideos.length > 0) {
           // 기존 활성 비디오들을 모두 비활성화
@@ -124,7 +124,7 @@ export default function VideoManagementPage() {
       }
 
       // 현재 비디오 토글
-      const response = await fetch(`/api/videos/${video.id}/toggle`, {
+      const response = await fetch(`/api/videos/${videoItem.id}/toggle`, {
         method: "PUT",
       });
       if (!response.ok) {
@@ -351,12 +351,12 @@ export default function VideoManagementPage() {
   };
 
   // 비디오 삭제
-  const handleDeleteVideo = async (video: Video) => {
+  const handleDeleteVideo = async (videoItem: video) => {
     showModal(
-      `"${video.title}" 비디오를 삭제하시겠습니까?`,
+      `"${videoItem.title}" 비디오를 삭제하시겠습니까?`,
       async () => {
         try {
-          const response = await fetch(`/api/videos/${video.id}`, {
+          const response = await fetch(`/api/videos/${videoItem.id}`, {
             method: "DELETE",
           });
           if (!response.ok) {
@@ -382,16 +382,16 @@ export default function VideoManagementPage() {
   };
 
   // 편집 모드 시작
-  const handleEditClick = (video: Video) => {
-    setEditingVideo(video);
+  const handleEditClick = (videoItem: video) => {
+    setEditingVideo(videoItem);
     setFormData({
-      title: video.title,
-      description: video.description || "",
-      videoUrl: video.videoUrl,
-      thumbnailUrl: video.thumbnailUrl || "",
-      duration: video.duration?.toString() || "",
-      sortOrder: video.sortOrder.toString(),
-      isActive: video.isActive,
+      title: videoItem.title,
+      description: videoItem.description || "",
+      videoUrl: videoItem.videoUrl,
+      thumbnailUrl: videoItem.thumbnailUrl || "",
+      duration: videoItem.duration?.toString() || "",
+      sortOrder: videoItem.sortOrder.toString(),
+      isActive: videoItem.isActive,
     });
     setFormErrors({});
     setShowEditForm(true);

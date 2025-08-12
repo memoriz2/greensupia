@@ -1,9 +1,9 @@
 import { HistoryRepository } from "@/repositories/historyRepository";
 import {
-  History,
-  CreateHistoryRequest,
-  UpdateHistoryRequest,
-  HistoryFilters,
+  history,
+  createHistoryRequest,
+  updateHistoryRequest,
+  historyFilters,
 } from "@/types/history";
 import { ApiResponse } from "@/types/api";
 import { Id } from "@/types/utils";
@@ -15,7 +15,7 @@ export class HistoryService {
     this.historyRepository = new HistoryRepository();
   }
 
-  async getAllHistories(): Promise<ApiResponse<History[]>> {
+  async getAllHistories(): Promise<ApiResponse<history[]>> {
     try {
       const histories = await this.historyRepository.findAll();
       return {
@@ -31,7 +31,7 @@ export class HistoryService {
     }
   }
 
-  async getHistoryById(id: Id): Promise<ApiResponse<History>> {
+  async getHistoryById(id: Id): Promise<ApiResponse<history>> {
     try {
       const history = await this.historyRepository.findById(id);
       if (!history) {
@@ -54,8 +54,8 @@ export class HistoryService {
   }
 
   async createHistory(
-    data: CreateHistoryRequest
-  ): Promise<ApiResponse<History>> {
+    data: createHistoryRequest
+  ): Promise<ApiResponse<history>> {
     try {
       const history = await this.historyRepository.create(data);
       return {
@@ -73,8 +73,8 @@ export class HistoryService {
 
   async updateHistory(
     id: Id,
-    data: UpdateHistoryRequest
-  ): Promise<ApiResponse<History>> {
+    data: updateHistoryRequest
+  ): Promise<ApiResponse<history>> {
     try {
       const existingHistory = await this.historyRepository.findById(id);
       if (!existingHistory) {
@@ -123,8 +123,8 @@ export class HistoryService {
   }
 
   async getHistoriesByFilters(
-    filters: HistoryFilters
-  ): Promise<ApiResponse<History[]>> {
+    filters: historyFilters
+  ): Promise<ApiResponse<history[]>> {
     try {
       const histories = await this.historyRepository.findByFilters(filters);
       return {
@@ -143,7 +143,7 @@ export class HistoryService {
   async getHistoriesByYearRange(
     startYear: string,
     endYear: string
-  ): Promise<ApiResponse<History[]>> {
+  ): Promise<ApiResponse<history[]>> {
     try {
       const histories = await this.historyRepository.findByYearRange(
         startYear,
@@ -167,7 +167,7 @@ export class HistoryService {
       total: number;
       yearRange: { min: string; max: string };
       yearStats: { [key: string]: number };
-      recentHistories: History[];
+      recentHistories: history[];
     }>
   > {
     try {

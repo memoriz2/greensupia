@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Greeting } from "@/types/greeting";
+import { greeting } from "@/types/greeting";
 import ToggleSwitch from "@/components/ToggleSwitch";
 import Modal from "@/components/Modal";
 import LoadingSpinner from "@/components/LoadingSpinner";
@@ -9,7 +9,7 @@ import ErrorMessage from "@/components/ErrorMessage";
 import TipTapEditor from "@/components/TipTapEditor";
 
 export default function GreetingManagementPage() {
-  const [greetings, setGreetings] = useState<Greeting[]>([]);
+  const [greetings, setGreetings] = useState<greeting[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -22,7 +22,7 @@ export default function GreetingManagementPage() {
   });
 
   // 편집 상태
-  const [editingGreeting, setEditingGreeting] = useState<Greeting | null>(null);
+  const [editingGreeting, setEditingGreeting] = useState<greeting | null>(null);
   const [showEditForm, setShowEditForm] = useState(false);
 
   // 모달 상태
@@ -58,10 +58,10 @@ export default function GreetingManagementPage() {
   }, []);
 
   // 토글 활성화/비활성화 (활성화는 1개만 가능)
-  const handleToggleActive = async (greeting: Greeting) => {
+  const handleToggleActive = async (greetingItem: greeting) => {
     try {
       // 활성화하려는 경우, 다른 활성화된 인사말이 있는지 확인
-      if (!greeting.isActive) {
+      if (!greetingItem.isActive) {
         const activeGreetings = greetings.filter((g) => g.isActive);
         if (activeGreetings.length > 0) {
           showModal(
@@ -73,7 +73,7 @@ export default function GreetingManagementPage() {
         }
       }
 
-      const response = await fetch(`/api/greetings/${greeting.id}/toggle`, {
+      const response = await fetch(`/api/greetings/${greetingItem.id}/toggle`, {
         method: "PUT",
       });
       if (!response.ok) {
@@ -199,12 +199,12 @@ export default function GreetingManagementPage() {
   };
 
   // 인사말 삭제
-  const handleDeleteGreeting = async (greeting: Greeting) => {
+  const handleDeleteGreeting = async (greetingItem: greeting) => {
     showModal(
-      `"${greeting.title}" 인사말을 삭제하시겠습니까?`,
+      `"${greetingItem.title}" 인사말을 삭제하시겠습니까?`,
       async () => {
         try {
-          const response = await fetch(`/api/greetings/${greeting.id}`, {
+          const response = await fetch(`/api/greetings/${greetingItem.id}`, {
             method: "DELETE",
           });
           if (!response.ok) {
@@ -223,12 +223,12 @@ export default function GreetingManagementPage() {
   };
 
   // 편집 모드 시작
-  const handleEditClick = (greeting: Greeting) => {
-    setEditingGreeting(greeting);
+  const handleEditClick = (greetingItem: greeting) => {
+    setEditingGreeting(greetingItem);
     setFormData({
-      title: greeting.title,
-      content: greeting.content,
-      isActive: greeting.isActive,
+      title: greetingItem.title,
+      content: greetingItem.content,
+      isActive: greetingItem.isActive,
     });
     setShowEditForm(true);
   };

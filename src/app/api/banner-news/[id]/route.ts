@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { BannerNewsService } from "@/services/bannerNewsService";
-import { UpdateBannerNewsRequest } from "@/types/bannerNews";
+import { updateBannerNewsRequest } from "@/types/bannerNews";
 
 const bannerNewsService = new BannerNewsService();
 
@@ -43,7 +43,7 @@ export async function PUT(
       return NextResponse.json({ error: "Invalid ID format" }, { status: 400 });
     }
 
-    const body: UpdateBannerNewsRequest = await request.json();
+    const body: updateBannerNewsRequest = await request.json();
 
     const result = await bannerNewsService.updateBannerNews(bannerNewsId, body);
 

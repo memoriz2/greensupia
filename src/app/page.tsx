@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { BannerNews } from "@/types/bannerNews";
+import { bannerNews } from "@/types/bannerNews";
 
 import { OrganizationStructuredData } from "@/components/StructuredData";
 
@@ -122,7 +122,7 @@ export default function GreensupiaHomePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [greeting, setGreeting] = useState<Greeting | null>(null);
-  const [bannerNews, setBannerNews] = useState<BannerNews[] | null>(null);
+  const [bannerNews, setBannerNews] = useState<bannerNews[] | null>(null);
   const [organizationChart, setOrganizationChart] =
     useState<OrganizationChart | null>(null);
   const [histories, setHistories] = useState<History[]>([]);

@@ -1,13 +1,13 @@
 import { prisma } from "@/lib/prisma";
+import { organizationchart } from "@prisma/client";
 import {
-  OrganizationChart,
   CreateOrganizationChartRequest,
   UpdateOrganizationChartRequest,
 } from "@/types/organization";
 import { Id } from "@/types/utils";
 
 export class OrganizationChartRepository {
-  async findAll(): Promise<OrganizationChart[]> {
+  async findAll(): Promise<organizationchart[]> {
     try {
       return await prisma.organizationchart.findMany({
         orderBy: { createdAt: "desc" },
@@ -17,7 +17,7 @@ export class OrganizationChartRepository {
     }
   }
 
-  async findActive(): Promise<OrganizationChart | null> {
+  async findActive(): Promise<organizationchart | null> {
     try {
       return await prisma.organizationchart.findFirst({
         where: { isActive: true },
@@ -28,7 +28,7 @@ export class OrganizationChartRepository {
     }
   }
 
-  async findById(id: Id): Promise<OrganizationChart | null> {
+  async findById(id: Id): Promise<organizationchart | null> {
     try {
       return await prisma.organizationchart.findUnique({
         where: { id },
@@ -42,7 +42,7 @@ export class OrganizationChartRepository {
 
   async create(
     data: CreateOrganizationChartRequest
-  ): Promise<OrganizationChart> {
+  ): Promise<organizationchart> {
     try {
       return await prisma.organizationchart.create({
         data: {
@@ -59,7 +59,7 @@ export class OrganizationChartRepository {
   async update(
     id: Id,
     data: UpdateOrganizationChartRequest
-  ): Promise<OrganizationChart> {
+  ): Promise<organizationchart> {
     try {
       const updateData: Partial<{
         imageUrl: string;

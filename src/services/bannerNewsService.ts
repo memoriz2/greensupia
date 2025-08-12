@@ -1,9 +1,9 @@
 import { bannerNewsRepository } from "@/repositories/bannerNewsRepository";
 import {
-  BannerNews,
-  CreateBannerNewsRequest,
-  UpdateBannerNewsRequest,
-  BannerNewsFilters,
+  bannerNews,
+  createBannerNewsRequest,
+  updateBannerNewsRequest,
+  bannerNewsFilters,
 } from "@/types/bannerNews";
 import { ApiResponse } from "@/types/api";
 import { Id } from "@/types/utils";
@@ -15,7 +15,7 @@ export class BannerNewsService {
     this.bannerNewsRepository = new bannerNewsRepository();
   }
 
-  async getAllBannerNews(): Promise<ApiResponse<BannerNews[]>> {
+  async getAllBannerNews(): Promise<ApiResponse<bannerNews[]>> {
     try {
       const bannerNews = await this.bannerNewsRepository.findAll();
       return {
@@ -31,7 +31,7 @@ export class BannerNewsService {
     }
   }
 
-  async getBannerNewsById(id: Id): Promise<ApiResponse<BannerNews>> {
+  async getBannerNewsById(id: Id): Promise<ApiResponse<bannerNews>> {
     try {
       const bannerNews = await this.bannerNewsRepository.findById(id);
       if (!bannerNews) {
@@ -54,8 +54,8 @@ export class BannerNewsService {
   }
 
   async createBannerNews(
-    data: CreateBannerNewsRequest
-  ): Promise<ApiResponse<BannerNews>> {
+    data: createBannerNewsRequest
+  ): Promise<ApiResponse<bannerNews>> {
     try {
       const bannerNews = await this.bannerNewsRepository.create(data);
       return {
@@ -73,8 +73,8 @@ export class BannerNewsService {
 
   async updateBannerNews(
     id: Id,
-    data: UpdateBannerNewsRequest
-  ): Promise<ApiResponse<BannerNews>> {
+    data: updateBannerNewsRequest
+  ): Promise<ApiResponse<bannerNews>> {
     try {
       const existingBannerNews = await this.bannerNewsRepository.findById(id);
       if (!existingBannerNews) {
@@ -126,8 +126,8 @@ export class BannerNewsService {
   }
 
   async getBannerNewsByFilters(
-    filters: BannerNewsFilters
-  ): Promise<ApiResponse<BannerNews[]>> {
+    filters: bannerNewsFilters
+  ): Promise<ApiResponse<bannerNews[]>> {
     try {
       const bannerNews = await this.bannerNewsRepository.findByFilters(filters);
       return {
@@ -143,7 +143,7 @@ export class BannerNewsService {
     }
   }
 
-  async getActiveBannerNews(): Promise<ApiResponse<BannerNews[]>> {
+  async getActiveBannerNews(): Promise<ApiResponse<bannerNews[]>> {
     try {
       const activeBannerNews = await this.bannerNewsRepository.findActive();
       return {
@@ -159,7 +159,7 @@ export class BannerNewsService {
     }
   }
 
-  async toggleBannerNewsStatus(id: Id): Promise<ApiResponse<BannerNews>> {
+  async toggleBannerNewsStatus(id: Id): Promise<ApiResponse<bannerNews>> {
     try {
       const existingBannerNews = await this.bannerNewsRepository.findById(id);
       if (!existingBannerNews) {
@@ -194,7 +194,7 @@ export class BannerNewsService {
       active: number;
       inactive: number;
       activeRate: number;
-      recentBannerNews: BannerNews[];
+      recentBannerNews: bannerNews[];
     }>
   > {
     try {
@@ -202,14 +202,14 @@ export class BannerNewsService {
 
       const total = allBannerNews.length;
       const active = allBannerNews.filter(
-        (news: BannerNews) => news.isActive
+        (news: bannerNews) => news.isActive
       ).length;
       const inactive = total - active;
       const activeRate = total > 0 ? Math.round((active / total) * 100) : 0;
 
       const recentBannerNews = allBannerNews
         .sort(
-          (a: BannerNews, b: BannerNews) =>
+          (a: bannerNews, b: bannerNews) =>
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         )
         .slice(0, 5);

@@ -1,4 +1,4 @@
-export interface History {
+export interface history {
   id: number;
   year: string;
   description: string;
@@ -8,21 +8,21 @@ export interface History {
   updatedAt: Date;
 }
 
-export interface CreateHistoryRequest {
+export interface createHistoryRequest {
   year: string;
   description: string;
   sortOrder?: number;
   isActive?: boolean;
 }
 
-export interface UpdateHistoryRequest {
+export interface updateHistoryRequest {
   year?: string;
   description?: string;
   sortOrder?: number;
   isActive?: boolean;
 }
 
-export interface HistoryFilters {
+export interface historyFilters {
   year?: string;
   search?: string;
   isActive?: boolean;
@@ -30,9 +30,9 @@ export interface HistoryFilters {
   sortOrder?: "asc" | "desc";
 }
 
-export interface HistoryState {
-  histories: History[];
+export interface historyState {
+  histories: history[];
   loading: boolean;
   error: string | null;
-  filters: HistoryFilters;
+  filters: historyFilters;
 }

@@ -4,11 +4,11 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import Header from "@/components/Header";
-import { Notice } from "@/types/notice";
+import { notice } from "@/types/notice";
 
 export default function NoticeDetailPage() {
   const params = useParams();
-  const [notice, setNotice] = useState<Notice | null>(null);
+  const [notice, setNotice] = useState<notice | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

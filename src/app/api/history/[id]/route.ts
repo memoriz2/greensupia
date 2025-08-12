@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { HistoryService } from "@/services/historyService";
-import { UpdateHistoryRequest } from "@/types/history";
+import { updateHistoryRequest } from "@/types/history";
 
 const historyService = new HistoryService();
 
@@ -15,7 +15,7 @@ export async function PUT(
       return NextResponse.json({ error: "Invalid ID" }, { status: 400 });
     }
 
-    const body: UpdateHistoryRequest = await request.json();
+    const body: updateHistoryRequest = await request.json();
 
     // 연도 유효성 검사
     if (body.year) {

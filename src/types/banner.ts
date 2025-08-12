@@ -1,4 +1,4 @@
-export interface Banner {
+export interface banner {
   id: number;
   title: string;
   imageUrl: string;
@@ -9,7 +9,7 @@ export interface Banner {
   updatedAt: string;
 }
 
-export interface BannerCreateRequest {
+export interface bannerCreateRequest {
   title: string;
   imageUrl: string;
   linkUrl?: string;
@@ -17,7 +17,7 @@ export interface BannerCreateRequest {
   isActive?: boolean;
 }
 
-export interface BannerUpdateRequest {
+export interface bannerUpdateRequest {
   title?: string;
   imageUrl?: string;
   linkUrl?: string;
@@ -25,7 +25,7 @@ export interface BannerUpdateRequest {
   isActive?: boolean;
 }
 
-export interface BannerResponse {
+export interface bannerResponse {
   id: number;
   title: string;
   imageUrl: string;
@@ -36,8 +36,8 @@ export interface BannerResponse {
   updatedAt: string;
 }
 
-export interface BannerListResponse {
-  content: BannerResponse[];
+export interface bannerListResponse {
+  content: bannerResponse[];
   totalElements: number;
   totalPages: number;
   size: number;

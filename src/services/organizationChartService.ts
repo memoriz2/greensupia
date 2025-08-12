@@ -1,4 +1,5 @@
 import { OrganizationChartRepository } from "@/repositories/organizationChartRepository";
+import { organizationchart } from "@prisma/client";
 import {
   OrganizationChart,
   CreateOrganizationChartRequest,

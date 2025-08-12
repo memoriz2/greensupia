@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import TipTapEditor from "@/components/TipTapEditor";
-import { Notice, NoticeAttachment } from "@/types/notice";
+import { notice, noticeattachment } from "@/types/notice";
 
 export default function WriteNoticePage() {
   const router = useRouter();
@@ -19,7 +19,7 @@ export default function WriteNoticePage() {
   const [isPinned, setIsPinned] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [existingAttachments, setExistingAttachments] = useState<
-    NoticeAttachment[]
+    noticeattachment[]
   >([]);
   const [attachmentsToDelete, setAttachmentsToDelete] = useState<number[]>([]);
 
@@ -38,12 +38,12 @@ export default function WriteNoticePage() {
             throw new Error("공지사항을 불러올 수 없습니다.");
           }
           const data = await response.json();
-          const notice: Notice = data.data;
+          const noticeData: notice = data.data;
 
-          setTitle(notice.title);
-          setContent(notice.content);
-          setIsPinned(notice.isPinned);
-          setExistingAttachments(notice.attachments || []);
+          setTitle(noticeData.title);
+          setContent(noticeData.content);
+          setIsPinned(noticeData.isPinned);
+          setExistingAttachments(noticeData.attachments || []);
         } catch (err) {
           console.error(
             err instanceof Error
@@ -145,8 +145,8 @@ export default function WriteNoticePage() {
       fetch(`/api/notices/${noticeId}`)
         .then((response) => response.json())
         .then((data) => {
-          const notice: Notice = data.data;
-          setExistingAttachments(notice.attachments || []);
+          const noticeData: notice = data.data;
+          setExistingAttachments(noticeData.attachments || []);
         });
     }
   };

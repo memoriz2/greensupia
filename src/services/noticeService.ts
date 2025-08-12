@@ -1,9 +1,9 @@
-import { Notice } from "@/types/notice";
+import { notice } from "@/types/notice";
 import { NoticeRepository } from "@/repositories/noticeRepository";
 import {
-  CreateNoticeRequest,
-  UpdateNoticeRequest,
-  NoticeListResponse,
+  createNoticeRequest,
+  updateNoticeRequest,
+  noticeListResponse,
 } from "@/types/notice";
 import { writeFile, mkdir } from "fs/promises";
 import { join } from "path";
@@ -20,7 +20,7 @@ export class NoticeService {
   async getNotices(
     page: number = 1,
     limit: number = 10
-  ): Promise<NoticeListResponse> {
+  ): Promise<noticeListResponse> {
     const result = await this.repository.findAll(page, limit);
 
     return {
@@ -32,12 +32,12 @@ export class NoticeService {
   }
 
   // 공지사항 상세 조회
-  async getNoticeById(id: number): Promise<Notice | null> {
+  async getNoticeById(id: number): Promise<notice | null> {
     return await this.repository.findById(id);
   }
 
   // 공지사항 생성
-  async createNotice(data: CreateNoticeRequest): Promise<Notice> {
+  async createNotice(data: createNoticeRequest): Promise<notice> {
     const notice = await this.repository.create({
       title: data.title,
       content: data.content,
@@ -56,8 +56,8 @@ export class NoticeService {
   // 공지사항 수정
   async updateNotice(
     id: number,
-    data: UpdateNoticeRequest
-  ): Promise<Notice | null> {
+    data: updateNoticeRequest
+  ): Promise<notice | null> {
     return await this.repository.update(id, data);
   }
 
@@ -67,7 +67,7 @@ export class NoticeService {
   }
 
   // 상단고정 토글
-  async togglePin(id: number): Promise<Notice | null> {
+  async togglePin(id: number): Promise<notice | null> {
     return await this.repository.togglePin(id);
   }
 
@@ -166,7 +166,7 @@ export class NoticeService {
   }
 
   // 응답 형식 변환
-  toResponse(notice: Notice) {
+  toResponse(notice: notice) {
     return {
       id: notice.id,
       title: notice.title,

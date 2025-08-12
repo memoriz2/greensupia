@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { BannerNewsService } from "@/services/bannerNewsService";
-import { CreateBannerNewsRequest } from "@/types/bannerNews";
+import { createBannerNewsRequest } from "@/types/bannerNews";
 
 const bannerNewsService = new BannerNewsService();
 
@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const body: CreateBannerNewsRequest = await request.json();
+    const body: createBannerNewsRequest = await request.json();
 
     console.log("POST 요청 받은 데이터:", body);
 

@@ -3,6 +3,7 @@ import { Id } from "@/types/utils";
 import { encrypt, decrypt, hashPassword } from "@/utils/encryption";
 import { emailService } from "@/utils/emailService";
 import { prisma } from "@/lib/prisma";
+import { getEncryptionKey } from "@/lib/env";
 
 // Inquiry 인터페이스 정의
 interface Inquiry {
@@ -35,8 +36,7 @@ export class InquiryService {
     password: string;
   }) {
     // 1.이메일 암호화
-    const encryptionKey =
-      process.env.ENCRYPTION_KEY || "default-key-change-in-production";
+    const encryptionKey = getEncryptionKey();
     const encryptedEmail = data.email
       ? encrypt(data.email, encryptionKey)
       : undefined;
@@ -65,8 +65,7 @@ export class InquiryService {
     email?: string;
   }) {
     // 이메일 암호화
-    const encryptionKey =
-      process.env.ENCRYPTION_KEY || "default-key-change-in-production";
+    const encryptionKey = getEncryptionKey();
     const encryptedEmail = data.email
       ? encrypt(data.email, encryptionKey)
       : undefined;
@@ -120,8 +119,7 @@ export class InquiryService {
     }
 
     // 이메일 암호화 (새로 입력된 경우에만)
-    const encryptionKey =
-      process.env.ENCRYPTION_KEY || "default-key-change-in-production";
+    const encryptionKey = getEncryptionKey();
     const encryptedEmail = data.email
       ? encrypt(data.email, encryptionKey)
       : inquiry.email;
