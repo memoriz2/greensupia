@@ -598,12 +598,13 @@
   }
 }
 
-// 비디오 섹션 스타일
+// 비디오 섹션 스타일 - 반응형 비율 개선
 .greensupia-video {
   &__container {
-    max-width: 90rem; // 더 큰 최대 너비로 확대
+    max-width: 90rem;
     margin: 0 auto;
     text-align: center;
+    padding: 0 1rem; // 모바일 여백 추가
   }
 
   &__iframe-wrapper {
@@ -611,7 +612,19 @@
     width: 100%;
     padding-bottom: 56.25%; // 16:9 비율 유지
     margin: 0 auto;
-    max-width: 85rem; // iframe 최대 너비를 더 크게 설정
+    max-width: 85rem;
+
+    // 모바일 최적화
+    @media (max-width: 768px) {
+      padding-bottom: 56.25%; // 모바일에서도 16:9 비율 유지
+      margin: 0 0.5rem; // 좌우 여백 조정
+    }
+
+    // 태블릿 최적화
+    @media (min-width: 769px) and (max-width: 1024px) {
+      padding-bottom: 56.25%; // 태블릿에서도 16:9 비율 유지
+      margin: 0 1rem;
+    }
   }
 
   &__iframe {
@@ -629,6 +642,10 @@
       height: 100% !important;
       border: none;
       border-radius: 0.5rem;
+      // 모바일에서 더 나은 터치 경험
+      @media (max-width: 768px) {
+        border-radius: 0.25rem; // 모바일에서 더 작은 둥근 모서리
+      }
     }
   }
 }

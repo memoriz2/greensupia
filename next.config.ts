@@ -9,16 +9,52 @@ const nextConfig: NextConfig = {
   // 새로운 옵션으로 변경
   serverExternalPackages: ["prisma"],
 
-  // 이미지 최적화 설정
+  // 이미지 최적화 설정 - deprecated된 domains를 remotePatterns로 변경
   images: {
-    domains: [
-      "localhost",
-      "img.youtube.com",
-      "greensupia.com",
-      "www.greensupia.com",
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "www.greensupia.com",
+        port: "",
+        pathname: "/banner-news/**",
+      },
+      {
+        protocol: "https",
+        hostname: "greensupia.com",
+        port: "",
+        pathname: "/banner-news/**",
+      },
+      {
+        protocol: "http",
+        hostname: "localhost",
+        port: "3000",
+        pathname: "/banner-news/**",
+      },
+      {
+        protocol: "https",
+        hostname: "img.youtube.com",
+        port: "",
+        pathname: "/**",
+      },
     ],
     formats: ["image/webp", "image/avif"],
     minimumCacheTTL: 60,
+    // 임시 해결책으로 이미지 최적화 비활성화
+    unoptimized: true,
+  },
+
+  // 정적 파일 서빙을 위한 rewrites 설정
+  async rewrites() {
+    return [
+      {
+        source: "/banner-news/:path*",
+        destination: "/api/static/banner-news/:path*",
+      },
+      {
+        source: "/organizationcharts/:path*",
+        destination: "/api/static/organizationcharts/:path*",
+      },
+    ];
   },
 
   // 성능 최적화 강화
@@ -30,10 +66,6 @@ const nextConfig: NextConfig = {
       {
         source: "/(.*)",
         headers: [
-          {
-            key: "X-Frame-Options",
-            value: "DENY",
-          },
           {
             key: "X-Content-Type-Options",
             value: "nosniff",
@@ -53,6 +85,26 @@ const nextConfig: NextConfig = {
           {
             key: "Strict-Transport-Security",
             value: "max-age=31536000; includeSubDomains; preload",
+          },
+          // CSP 헤더 완전 제거 - YouTube iframe 문제 해결을 위해
+        ],
+      },
+      // 정적 파일 캐싱 설정 추가
+      {
+        source: "/banner-news/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
+        source: "/organizationcharts/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
           },
         ],
       },

@@ -4,6 +4,11 @@ import { logger } from "./logger";
 import { rateLimiter } from "./rateLimit";
 import os from "os";
 
+// Edge Runtime 타입 정의
+declare global {
+  var EdgeRuntime: string | undefined;
+}
+
 export interface SystemMetrics {
   timestamp: string;
   uptime: number;
@@ -53,7 +58,32 @@ export interface PerformanceMetric {
   requestId?: string;
 }
 
-export class MonitoringSystem {
+// 모니터링 시스템 인터페이스 정의
+export interface IMonitoringSystem {
+  recordPerformanceMetric(metric: PerformanceMetric): void;
+  recordError(error: Error, context?: string): void;
+  getCurrentStatus(): SystemMetrics | null;
+  getMetricsHistory(limit?: number): SystemMetrics[];
+  getPerformanceHistory(limit?: number): PerformanceMetric[];
+  getSystemSummary(): {
+    status: "healthy" | "warning" | "critical" | "unknown";
+    uptime: number;
+    memoryUsage: number;
+    errorRate: number;
+    activeRequests: number;
+    blockedIPs: number;
+  };
+  exportMetrics(): {
+    system: SystemMetrics[];
+    performance: PerformanceMetric[];
+    summary: ReturnType<IMonitoringSystem["getSystemSummary"]>;
+  };
+  resetMetrics(): void;
+  stopMonitoring(): void;
+  checkAlerts(): void;
+}
+
+export class MonitoringSystem implements IMonitoringSystem {
   private static instance: MonitoringSystem;
   private metrics: SystemMetrics[] = [];
   private performanceMetrics: PerformanceMetric[] = [];
@@ -63,10 +93,16 @@ export class MonitoringSystem {
   private requestCount: number = 0;
   private startTime: number = Date.now();
   private intervalId?: NodeJS.Timeout;
-  private readonly MAX_METRICS = 100; // 1000 → 100으로 감소하여 메모리 사용량 제한
-  private readonly MAX_PERFORMANCE_METRICS = 50; // 500 → 50으로 감소하여 메모리 사용량 제한
+  private readonly MAX_METRICS = 50; // 100 → 50으로 감소하여 메모리 사용량 제한
+  private readonly MAX_PERFORMANCE_METRICS = 25; // 500 → 25로 감소하여 메모리 사용량 제한
+  private readonly MEMORY_CLEANUP_THRESHOLD = 0.8; // 메모리 정리 임계값
 
   private constructor() {
+    // Edge Runtime 환경 체크
+    if (this.isEdgeRuntime()) {
+      logger.info("Edge Runtime 환경에서 모니터링 시스템을 비활성화합니다.");
+      return;
+    }
     this.startMonitoring();
   }
 
@@ -78,9 +114,26 @@ export class MonitoringSystem {
   }
 
   /**
+   * Edge Runtime 환경인지 확인
+   */
+  private isEdgeRuntime(): boolean {
+    return (
+      typeof globalThis.EdgeRuntime !== "undefined" ||
+      process.env.NEXT_RUNTIME === "edge" ||
+      process.env.NODE_ENV === "development"
+    );
+  }
+
+  /**
    * 모니터링 시작
    */
   private startMonitoring(): void {
+    // Edge Runtime 환경에서는 모니터링 비활성화
+    if (this.isEdgeRuntime()) {
+      logger.info("Edge Runtime 환경에서 모니터링을 비활성화합니다.");
+      return;
+    }
+
     logger.info("모니터링 시스템을 시작합니다.");
 
     // 5분마다 시스템 메트릭 수집 (1분 → 5분으로 증가하여 시스템 부하 감소)
@@ -101,10 +154,42 @@ export class MonitoringSystem {
   }
 
   /**
+   * 메모리 압박 시 자동 정리
+   */
+  private cleanupMemory(): void {
+    if (
+      this.metrics.length >
+      this.MAX_METRICS * this.MEMORY_CLEANUP_THRESHOLD
+    ) {
+      const newLength = Math.floor(this.MAX_METRICS / 2);
+      this.metrics = this.metrics.slice(-newLength);
+      logger.warn(
+        `메모리 압박으로 인해 메트릭을 ${newLength}개로 정리했습니다.`
+      );
+    }
+
+    if (
+      this.performanceMetrics.length >
+      this.MAX_PERFORMANCE_METRICS * this.MEMORY_CLEANUP_THRESHOLD
+    ) {
+      const newLength = Math.floor(this.MAX_PERFORMANCE_METRICS / 2);
+      this.performanceMetrics = this.performanceMetrics.slice(-newLength);
+      logger.warn(
+        `메모리 압박으로 인해 성능 메트릭을 ${newLength}개로 정리했습니다.`
+      );
+    }
+  }
+
+  /**
    * 시스템 메트릭 수집
    */
   private async collectSystemMetrics(): Promise<void> {
     try {
+      // Edge Runtime 환경 체크
+      if (this.isEdgeRuntime()) {
+        return;
+      }
+
       const metrics: SystemMetrics = {
         timestamp: new Date().toISOString(),
         uptime: process.uptime(),
@@ -126,6 +211,9 @@ export class MonitoringSystem {
       if (this.metrics.length > this.MAX_METRICS) {
         this.metrics = this.metrics.slice(-this.MAX_METRICS);
       }
+
+      // 메모리 정리 실행
+      this.cleanupMemory();
 
       // 로그 레벨에 따른 메트릭 출력
       if (process.env.NODE_ENV === "development") {
@@ -172,6 +260,14 @@ export class MonitoringSystem {
    */
   private async getDatabaseMetrics(): Promise<SystemMetrics["database"]> {
     try {
+      // Edge Runtime 환경에서는 데이터베이스 체크 건너뛰기
+      if (this.isEdgeRuntime()) {
+        return {
+          status: "unknown",
+          responseTime: 0,
+        };
+      }
+
       const startTime = Date.now();
 
       // Prisma 클라이언트를 동적으로 import
@@ -184,7 +280,10 @@ export class MonitoringSystem {
         status: "connected",
         responseTime,
       };
-    } catch {
+    } catch (error) {
+      logger.error("데이터베이스 메트릭 수집 실패", {
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
       return {
         status: "disconnected",
         responseTime: 0,
@@ -196,13 +295,24 @@ export class MonitoringSystem {
    * 요청 메트릭 수집
    */
   private getRequestMetrics(): SystemMetrics["requests"] {
-    const stats = rateLimiter.getStats();
+    try {
+      const stats = rateLimiter.getStats();
 
-    return {
-      total: this.requestCount,
-      active: stats.activeIPs,
-      blocked: stats.blockedIPs,
-    };
+      return {
+        total: this.requestCount,
+        active: stats.activeIPs,
+        blocked: stats.blockedIPs,
+      };
+    } catch (error) {
+      logger.error("요청 메트릭 수집 실패", {
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+      return {
+        total: this.requestCount,
+        active: 0,
+        blocked: 0,
+      };
+    }
   }
 
   /**
@@ -222,6 +332,11 @@ export class MonitoringSystem {
    * 성능 메트릭 기록
    */
   public recordPerformanceMetric(metric: PerformanceMetric): void {
+    // Edge Runtime 환경에서는 메트릭 기록 건너뛰기
+    if (this.isEdgeRuntime()) {
+      return;
+    }
+
     this.performanceMetrics.push(metric);
     this.requestCount++;
 
@@ -231,6 +346,9 @@ export class MonitoringSystem {
         -this.MAX_PERFORMANCE_METRICS
       );
     }
+
+    // 메모리 정리 실행
+    this.cleanupMemory();
 
     // 느린 요청 로깅 (1초 이상)
     if (metric.responseTime > 1000) {
@@ -247,6 +365,11 @@ export class MonitoringSystem {
    * 에러 기록
    */
   public recordError(error: Error, context?: string): void {
+    // Edge Runtime 환경에서는 에러 기록 건너뛰기
+    if (this.isEdgeRuntime()) {
+      return;
+    }
+
     this.errorCount++;
     this.lastError = error.message;
     this.lastErrorTime = new Date().toISOString();
@@ -263,7 +386,7 @@ export class MonitoringSystem {
    * 현재 시스템 상태 반환
    */
   public getCurrentStatus(): SystemMetrics | null {
-    if (this.metrics.length === 0) {
+    if (this.isEdgeRuntime() || this.metrics.length === 0) {
       return null;
     }
     return this.metrics[this.metrics.length - 1];
@@ -272,15 +395,23 @@ export class MonitoringSystem {
   /**
    * 메트릭 히스토리 반환
    */
-  public getMetricsHistory(limit: number = 100): SystemMetrics[] {
-    return this.metrics.slice(-limit);
+  public getMetricsHistory(limit: number = 50): SystemMetrics[] {
+    if (this.isEdgeRuntime()) {
+      return [];
+    }
+    return this.metrics.slice(-Math.min(limit, this.MAX_METRICS));
   }
 
   /**
    * 성능 메트릭 히스토리 반환
    */
-  public getPerformanceHistory(limit: number = 100): PerformanceMetric[] {
-    return this.performanceMetrics.slice(-limit);
+  public getPerformanceHistory(limit: number = 25): PerformanceMetric[] {
+    if (this.isEdgeRuntime()) {
+      return [];
+    }
+    return this.performanceMetrics.slice(
+      -Math.min(limit, this.MAX_PERFORMANCE_METRICS)
+    );
   }
 
   /**
@@ -294,6 +425,18 @@ export class MonitoringSystem {
     activeRequests: number;
     blockedIPs: number;
   } {
+    // Edge Runtime 환경에서는 기본값 반환
+    if (this.isEdgeRuntime()) {
+      return {
+        status: "unknown",
+        uptime: 0,
+        memoryUsage: 0,
+        errorRate: 0,
+        activeRequests: 0,
+        blockedIPs: 0,
+      };
+    }
+
     const current = this.getCurrentStatus();
     if (!current) {
       return {
@@ -335,6 +478,11 @@ export class MonitoringSystem {
    * 알림 조건 확인
    */
   public checkAlerts(): void {
+    // Edge Runtime 환경에서는 알림 확인 건너뛰기
+    if (this.isEdgeRuntime()) {
+      return;
+    }
+
     const summary = this.getSystemSummary();
 
     if (summary.status === "critical") {
@@ -353,6 +501,14 @@ export class MonitoringSystem {
     performance: PerformanceMetric[];
     summary: ReturnType<typeof MonitoringSystem.prototype.getSystemSummary>;
   } {
+    if (this.isEdgeRuntime()) {
+      return {
+        system: [],
+        performance: [],
+        summary: this.getSystemSummary(),
+      };
+    }
+
     return {
       system: this.metrics,
       performance: this.performanceMetrics,
@@ -364,6 +520,10 @@ export class MonitoringSystem {
    * 메트릭 초기화
    */
   public resetMetrics(): void {
+    if (this.isEdgeRuntime()) {
+      return;
+    }
+
     this.metrics = [];
     this.performanceMetrics = [];
     this.errorCount = 0;
@@ -373,15 +533,85 @@ export class MonitoringSystem {
   }
 }
 
-// 전역 모니터링 시스템 인스턴스
-export const monitoringSystem = MonitoringSystem.getInstance();
+// Edge Runtime 환경에서 안전한 더미 모니터링 시스템 생성
+const createDummyMonitoringSystem = (): IMonitoringSystem => ({
+  recordPerformanceMetric: () => {},
+  recordError: () => {},
+  getCurrentStatus: () => null,
+  getMetricsHistory: () => [],
+  getPerformanceHistory: () => [],
+  getSystemSummary: () => ({
+    status: "unknown" as const,
+    uptime: 0,
+    memoryUsage: 0,
+    errorRate: 0,
+    activeRequests: 0,
+    blockedIPs: 0,
+  }),
+  exportMetrics: () => ({
+    system: [],
+    performance: [],
+    summary: {
+      status: "unknown" as const,
+      uptime: 0,
+      memoryUsage: 0,
+      errorRate: 0,
+      activeRequests: 0,
+      blockedIPs: 0,
+    },
+  }),
+  resetMetrics: () => {},
+  stopMonitoring: () => {},
+  checkAlerts: () => {},
+});
 
-// 정기적인 알림 확인 (5분마다)
-setInterval(() => {
-  monitoringSystem.checkAlerts();
-}, 300000);
+// 환경별 모니터링 시스템 인스턴스 생성
+export const monitoringSystem: IMonitoringSystem = (() => {
+  // Edge Runtime이나 개발 환경에서는 더미 모니터링 시스템 반환
+  if (
+    typeof globalThis.EdgeRuntime !== "undefined" ||
+    process.env.NEXT_RUNTIME === "edge" ||
+    process.env.NODE_ENV === "development"
+  ) {
+    logger.info(
+      "Edge Runtime/개발 환경에서 더미 모니터링 시스템을 사용합니다."
+    );
+    return createDummyMonitoringSystem();
+  }
+
+  // 프로덕션 환경에서만 실제 모니터링 시스템 사용
+  try {
+    return MonitoringSystem.getInstance();
+  } catch (error) {
+    logger.error("모니터링 시스템 초기화 실패, 더미 시스템으로 대체", {
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+    return createDummyMonitoringSystem();
+  }
+})();
+
+// 정기적인 알림 확인 (5분마다) - Edge Runtime 환경에서는 비활성화
+if (
+  typeof globalThis.EdgeRuntime === "undefined" &&
+  process.env.NEXT_RUNTIME !== "edge" &&
+  process.env.NODE_ENV === "production"
+) {
+  setInterval(() => {
+    try {
+      monitoringSystem.checkAlerts();
+    } catch (error) {
+      logger.error("알림 확인 중 오류 발생", {
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  }, 300000);
+}
 
 // 프로덕션 환경에서만 자동 시작
-if (process.env.NODE_ENV === "production") {
+if (
+  typeof globalThis.EdgeRuntime === "undefined" &&
+  process.env.NEXT_RUNTIME !== "edge" &&
+  process.env.NODE_ENV === "production"
+) {
   logger.info("프로덕션 모니터링 시스템이 활성화되었습니다.");
 }

@@ -127,6 +127,32 @@ export default function GreensupiaHomePage() {
     useState<OrganizationChart | null>(null);
   const [histories, setHistories] = useState<History[]>([]);
 
+  // YouTube URL에서 비디오 ID 추출 함수
+  const extractVideoId = (videoUrl: string): string | null => {
+    try {
+      // iframe 코드에서 src 추출
+      const srcMatch = videoUrl.match(/src="([^"]+)"/);
+      if (srcMatch) {
+        const src = srcMatch[1];
+        // YouTube URL에서 비디오 ID 추출
+        const videoIdMatch = src.match(
+          /(?:youtube\.com\/embed\/|youtu\.be\/|youtube\.com\/watch\?v=)([^&\n?#]+)/
+        );
+        return videoIdMatch ? videoIdMatch[1] : null;
+      }
+      return null;
+    } catch (error) {
+      console.error("비디오 ID 추출 실패:", error);
+      return null;
+    }
+  };
+
+  // YouTube 직접 링크 생성 함수
+  const getYouTubeDirectLink = (videoUrl: string): string => {
+    const videoId = extractVideoId(videoUrl);
+    return videoId ? `https://www.youtube.com/watch?v=${videoId}` : "#";
+  };
+
   useEffect(() => {
     // CSS 스타일 주입
     const style = document.createElement("style");
@@ -610,20 +636,51 @@ export default function GreensupiaHomePage() {
         )}
 
         {/* 비디오 섹션 */}
+        {/* 디버깅 정보 (개발 환경에서만 표시) */}
+        {process.env.NODE_ENV === "development" && (
+          <div
+            style={{
+              backgroundColor: "#f0f0f0",
+              padding: "10px",
+              margin: "10px 0",
+              borderRadius: "5px",
+              fontSize: "12px",
+              fontFamily: "monospace",
+            }}
+          >
+            <strong>디버깅 정보:</strong>
+            <br />
+            Video 객체: {video ? "존재함" : "null"}
+            <br />
+            Video isActive: {video?.isActive ? "true" : "false"}
+            <br />
+            Video URL 길이: {video?.videoUrl?.length || 0}
+            <br />
+            Video URL 미리보기: {video?.videoUrl?.substring(0, 100) || "N/A"}...
+            <br />
+            추출된 비디오 ID:{" "}
+            {video ? extractVideoId(video.videoUrl) || "추출 실패" : "N/A"}
+            <br />
+            YouTube 직접 링크:{" "}
+            {video ? getYouTubeDirectLink(video.videoUrl) : "N/A"}
+          </div>
+        )}
+
         {video && video.isActive && (
           <section className="greensupia-video greensupia-section">
             <h2 className="greensupia-contact__title">회사 소개 영상</h2>
             <div className="bg-white rounded-lg shadow-sm border p-8 text-center">
               {/* <h3 className="text-2xl font-semibold text-gray-900 mb-4 text-center">
                 {video.title}
-              </h3>
-              {video.description && (
+              </h3> */}
+              {/* {video.description && (
                 <p className="text-gray-600 mb-6 text-center">
                   {video.description}
                 </p>
               )} */}
               <div className="greensupia-video__container">
                 <div className="greensupia-video__iframe-wrapper">
+                  {/* YouTube iframe 렌더링 */}
                   <div
                     className="greensupia-video__iframe"
                     dangerouslySetInnerHTML={{ __html: video.videoUrl }}
