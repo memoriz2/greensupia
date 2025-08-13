@@ -486,10 +486,10 @@ export default function GreensupiaHomePage() {
       <OrganizationStructuredData
         data={{
           name: "Greensupia",
-          url: "https://jseo.shop/greensupia",
+          url: "https://www.greensupia.com",
           description:
             "Greensupia는 친환경 비닐 제작업체로, 지속가능한 농업을 위한 혁신적인 솔루션을 제공합니다.",
-          logo: "https://jseo.shop/greensupia-logo.png",
+          logo: "https://www.greensupia.com/logo.png",
           address: {
             streetAddress: "테헤란로 123",
             addressLocality: "강남구",

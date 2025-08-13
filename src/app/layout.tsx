@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import "@/styles/globals.scss";
 import ConditionalLayout from "@/components/ConditionalLayout";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
+import NaverSearchAdvisor from "@/components/NaverSearchAdvisor";
+import VisitorLogger from "@/components/VisitorLogger";
 
 const geist = Geist({
   subsets: ["latin"],
@@ -31,14 +34,14 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL("https://jseo.shop"),
+  metadataBase: new URL("https://www.greensupia.com"),
   alternates: {
     canonical: "/",
   },
   openGraph: {
     type: "website",
     locale: "ko_KR",
-    url: "https://jseo.shop",
+    url: "https://www.greensupia.com",
     title: "Greensupia - 친환경 비닐 제작업체",
     description:
       "Greensupia는 친환경 비닐 제작업체로, 지속가능한 농업을 위한 혁신적인 솔루션을 제공합니다.",
@@ -70,6 +73,9 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
+  verification: {
+    google: "xEZ76J92M9LwzjzAuyiAbyg39cIZ7ywbgLQm4egg1aw",
+  },
 };
 
 export default function RootLayout({
@@ -81,6 +87,19 @@ export default function RootLayout({
     <html lang="ko">
       <body className={`${geist.variable} greensupia-layout`}>
         <ConditionalLayout>{children}</ConditionalLayout>
+
+        {/* 방문자 로그 자동 기록 */}
+        <VisitorLogger />
+
+        {/* Google Analytics */}
+        <GoogleAnalytics
+          GA_MEASUREMENT_ID={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || ""}
+        />
+
+        {/* 네이버 서치어드바이저 - 임시 비활성화 */}
+        {/* <NaverSearchAdvisor
+          NAVER_CLIENT_ID={process.env.NEXT_PUBLIC_NAVER_CLIENT_ID || ""}
+        /> */}
       </body>
     </html>
   );

@@ -27,7 +27,7 @@ export default function InquiryWritePage() {
       });
 
       if (response.ok) {
-        router.push("/greensupia/inquiry");
+        router.push("/inquiry");
       } else {
         const error = await response.json();
         alert(error.error);

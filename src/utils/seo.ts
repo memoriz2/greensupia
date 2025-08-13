@@ -22,15 +22,17 @@ export function generateMetadata(config: SEOConfig): Metadata {
     type = "website",
     publishedTime,
     modifiedTime,
-    author = "JSEO",
+    author = "Greensupia",
   } = config;
 
-  const fullUrl = url ? `https://jseo.shop${url}` : "https://jseo.shop";
+  const fullUrl = url
+    ? `https://www.greensupia.com${url}`
+    : "https://www.greensupia.com";
 
   return {
     title: {
       default: title,
-      template: "%s | JSEO",
+      template: "%s | Greensupia",
     },
     description,
     keywords,
@@ -42,7 +44,7 @@ export function generateMetadata(config: SEOConfig): Metadata {
       address: false,
       telephone: false,
     },
-    metadataBase: new URL("https://jseo.shop"),
+    metadataBase: new URL("https://www.greensupia.com"),
     alternates: {
       canonical: url || "/",
     },
@@ -52,7 +54,7 @@ export function generateMetadata(config: SEOConfig): Metadata {
       url: fullUrl,
       title,
       description,
-      siteName: "JSEO",
+      siteName: "Greensupia",
       images: [
         {
           url: image,
@@ -117,8 +119,8 @@ export function generateGreensupiaMetadata(config: SEOConfig): Metadata {
   } = config;
 
   const fullUrl = url
-    ? `https://jseo.shop${url}`
-    : "https://jseo.shop/greensupia";
+    ? `https://www.greensupia.com${url}`
+    : "https://www.greensupia.com";
 
   return {
     title: {
@@ -135,9 +137,9 @@ export function generateGreensupiaMetadata(config: SEOConfig): Metadata {
       address: false,
       telephone: false,
     },
-    metadataBase: new URL("https://jseo.shop"),
+    metadataBase: new URL("https://www.greensupia.com"),
     alternates: {
-      canonical: url || "/greensupia",
+      canonical: url || "/",
     },
     openGraph: {
       type,

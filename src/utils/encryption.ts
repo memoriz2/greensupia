@@ -102,7 +102,7 @@ export class EncryptionService {
       const salt = Buffer.from(saltHex, "hex");
       const hash = crypto.pbkdf2Sync(password, salt, ITERATIONS, 64, "sha512");
       return crypto.timingSafeEqual(hash, Buffer.from(hashHex, "hex"));
-    } catch (error) {
+    } catch {
       return false;
     }
   }

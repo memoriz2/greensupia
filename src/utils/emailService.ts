@@ -32,6 +32,21 @@ export class EmailService {
       },
     };
 
+    // 환경 변수 로딩 상태 확인
+    console.log("📧 Gmail 설정 확인:");
+    console.log(
+      "  - GMAIL_USER:",
+      process.env.GMAIL_USER ? "설정됨" : "설정되지 않음"
+    );
+    console.log(
+      "  - GMAIL_APP_PASSWORD:",
+      process.env.GMAIL_APP_PASSWORD ? "설정됨" : "설정되지 않음"
+    );
+    console.log(
+      "  - EMAIL_FROM_NAME:",
+      process.env.EMAIL_FROM_NAME || "Greensupia"
+    );
+
     this.transporter = nodemailer.createTransport(config);
   }
 
@@ -48,11 +63,38 @@ export class EmailService {
         text: content.text || this.htmlToText(content.html),
       };
 
+      console.log("📧 이메일 발송 시도:", {
+        from: mailOptions.from,
+        to: content.to,
+        subject: content.subject,
+        user: process.env.GMAIL_USER,
+        hasPassword: !!process.env.GMAIL_APP_PASSWORD,
+      });
+
       const info = await this.transporter.sendMail(mailOptions);
       console.log("📧 이메일 발송 성공:", info.messageId);
       return true;
     } catch (error) {
       console.error("📧 이메일 발송 실패:", error);
+
+      // 더 자세한 에러 정보
+      if (error instanceof Error) {
+        console.error("📧 에러 상세 정보:");
+        console.error("  - 메시지:", error.message);
+
+        // Nodemailer 에러 타입 정의
+        interface NodemailerError extends Error {
+          code?: string;
+          response?: string;
+          command?: string;
+        }
+
+        const nodemailerError = error as NodemailerError;
+        console.error("  - 코드:", nodemailerError.code);
+        console.error("  - 응답:", nodemailerError.response);
+        console.error("  - 명령어:", nodemailerError.command);
+      }
+
       return false;
     }
   }
@@ -131,7 +173,7 @@ export class EmailService {
             <div style="text-align: center; margin-top: 25px;">
               <a href="${
                 process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
-              }/greensupia/inquiry" class="btn">
+              }/inquiry" class="btn">
                 문의글 목록 보기
               </a>
             </div>

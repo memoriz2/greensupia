@@ -134,10 +134,7 @@ export default function InquiryListPage() {
           </div>
         </div>
 
-        <Link
-          href="/greensupia/inquiry/write"
-          className="inquiry-list__write-button"
-        >
+        <Link href="/inquiry/write" className="inquiry-list__write-button">
           문의글 작성
         </Link>
       </section>
@@ -150,10 +147,7 @@ export default function InquiryListPage() {
         ) : inquiries.length === 0 ? (
           <div className="inquiry-list__empty">
             <p>등록된 문의글이 없습니다.</p>
-            <Link
-              href="/greensupia/inquiry/write"
-              className="inquiry-list__write-link"
-            >
+            <Link href="/inquiry/write" className="inquiry-list__write-link">
               첫 번째 문의글을 작성해보세요
             </Link>
           </div>
@@ -178,7 +172,7 @@ export default function InquiryListPage() {
                       </td>
                       <td className="inquiry-list__cell inquiry-list__cell--title">
                         <Link
-                          href={`/greensupia/inquiry/${inquiry.id}`}
+                          href={`/inquiry/${inquiry.id}`}
                           className="inquiry-list__title-link"
                         >
                           {inquiry.title}

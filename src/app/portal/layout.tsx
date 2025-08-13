@@ -7,8 +7,8 @@ import "../../styles/globals.scss";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "관리자 포털 - JSEO",
-  description: "JSEO 관리자 포털",
+  title: "관리자 포털 - Greensupia",
+  description: "Greensupia 관리자 포털 - 콘텐츠 관리 및 시스템 운영",
 };
 
 export default function AdminLayout({
