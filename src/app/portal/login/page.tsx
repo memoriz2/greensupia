@@ -156,8 +156,8 @@ export default function PortalLoginPage() {
               <p className="portal-login__footer-text">
                 계정이 없으신가요? 관리자에게 문의하세요.
               </p>
-              <Link href="/" className="portal-login__home-link">
-                홈으로 돌아가기
+              <Link href="/portal" className="portal-login__home-link">
+                관리자 대시보드로 돌아가기
               </Link>
             </div>
           </div>
