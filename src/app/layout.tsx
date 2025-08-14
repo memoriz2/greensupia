@@ -3,7 +3,6 @@ import { Geist } from "next/font/google";
 import "@/styles/globals.scss";
 import ConditionalLayout from "@/components/ConditionalLayout";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
-import NaverSearchAdvisor from "@/components/NaverSearchAdvisor";
 import VisitorLogger from "@/components/VisitorLogger";
 
 const geist = Geist({
@@ -76,6 +75,9 @@ export const metadata: Metadata = {
   verification: {
     google: "xEZ76J92M9LwzjzAuyiAbyg39cIZ7ywbgLQm4egg1aw",
   },
+  other: {
+    "naver-site-verification": "a51be3d0afbb84d1c24832ccb255986de60286e9",
+  },
 };
 
 export default function RootLayout({
@@ -95,11 +97,6 @@ export default function RootLayout({
         <GoogleAnalytics
           GA_MEASUREMENT_ID={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || ""}
         />
-
-        {/* 네이버 서치어드바이저 - 임시 비활성화 */}
-        {/* <NaverSearchAdvisor
-          NAVER_CLIENT_ID={process.env.NEXT_PUBLIC_NAVER_CLIENT_ID || ""}
-        /> */}
       </body>
     </html>
   );
