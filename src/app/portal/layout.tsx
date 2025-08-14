@@ -18,6 +18,13 @@ export default function AdminLayout({
 }) {
   return (
     <div className={`admin-portal ${inter.className}`}>
+      {/* 사이드바 토글 체크박스 (접근성용, CSS 토글) */}
+      <input
+        type="checkbox"
+        id="sidebar-toggle"
+        className="sr-only sidebar-toggle"
+        aria-label="사이드바 열기/닫기"
+      />
       {/* 헤더 */}
       <header>
         <nav>
@@ -28,6 +35,17 @@ export default function AdminLayout({
               </Link>
             </div>
             <div className="header-right">
+              {/* 햄버거 메뉴 (라벨로 체크박스 제어) - 우측 정렬 */}
+              <label
+                htmlFor="sidebar-toggle"
+                className="hamburger-menu"
+                aria-label="메뉴 열기"
+                aria-controls="portal-sidebar"
+              >
+                <span></span>
+                <span></span>
+                <span></span>
+              </label>
               <UserInfo />
             </div>
           </div>
@@ -36,7 +54,7 @@ export default function AdminLayout({
 
       <div className="main-container">
         {/* 사이드바 */}
-        <aside>
+        <aside id="portal-sidebar">
           <nav>
             <ul>
               <li>

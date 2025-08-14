@@ -49,15 +49,11 @@ export default function UserInfo() {
   }, []);
 
   if (loading) {
-    return <span className="user-info">로딩 중...</span>;
+    return null;
   }
 
   return (
     <div className="user-info-container">
-      <span className="user-info">
-        {userType === "admin" ? "관리자" : "게스트"}
-      </span>
-
       {userType === "guest" ? (
         <button
           onClick={() => router.push("/portal/login")}

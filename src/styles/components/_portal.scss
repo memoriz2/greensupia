@@ -127,10 +127,13 @@
 }
 
 .portal-title {
-  font-size: 1.25rem;
+  font-size: clamp(1rem, 2.2vw, 1.25rem);
   cursor: pointer;
   margin: 0;
   padding: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 // 반응형 디자인
@@ -147,5 +150,180 @@
     &__card {
       padding: 1rem;
     }
+  }
+}
+
+/* ===== 관리자 포털: 헤더/햄버거/사이드바 반응형 ===== */
+
+/* 시각적 숨김 (접근성) */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* 헤더 베이스 */
+.admin-portal header {
+  background: var(--background-light, #ffffff);
+  border-bottom: 1px solid var(--border, #e5e7eb);
+  box-shadow: var(--shadow-sm, 0 1px 2px rgba(0, 0, 0, 0.05));
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: 64px;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* 헤더 컨텐트 기본 마진/폭 재정의 (우선순위 높임) */
+.admin-portal header .header-content {
+  margin: 0;
+  max-width: none;
+}
+
+/* 좌측: 로고/타이틀은 줄바꿈 없이 왼쪽 고정 */
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+/* 햄버거 버튼 */
+.hamburger-menu {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 28px;
+  height: 20px;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  margin-right: 12px;
+  position: relative;
+  z-index: 200;
+}
+
+.hamburger-menu span {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background: var(--sidebar-text, #ffffff);
+  border-radius: 1px;
+  transition: background var(--transition-fast, 0.15s ease-in-out);
+}
+
+.hamburger-menu:hover span {
+  background: var(--primary, #f8c300);
+}
+
+/* 메인 영역 배치 */
+.admin-portal .main-container {
+  display: flex;
+  min-height: calc(100vh - 64px);
+}
+
+/* 사이드바 기본(데스크톱) */
+.admin-portal aside {
+  width: var(--portal-sidebar-width, 280px);
+  border-right: 1px solid var(--border, #e5e7eb);
+  background: var(--background-light, #fff);
+}
+
+/* 반응형: 1024px 이하에서 오프캔버스 동작 */
+@media (max-width: 1024px) {
+  .admin-portal header .hamburger-menu {
+    display: flex;
+  }
+
+  /* 모바일에서 햄버거와 로그인 간격 축소 */
+  .admin-portal header nav .header-right {
+    gap: 0rem;
+  }
+
+  .admin-portal .main-container {
+    position: relative;
+  }
+
+  .admin-portal aside {
+    position: fixed;
+    top: 64px;
+    left: 0;
+    height: calc(100vh - 64px);
+    transform: translateX(-100%);
+    transition: transform var(--transition-normal, 0.3s ease-in-out);
+    box-shadow: var(--shadow-md, 0 4px 6px rgba(0, 0, 0, 0.1));
+    z-index: 150;
+    width: 260px;
+  }
+
+  /* 체크박스가 체크되면 사이드바 표시 */
+  .admin-portal .sidebar-toggle:checked ~ .main-container aside {
+    transform: translateX(0);
+  }
+
+  /* 사이드바 활성화 시 햄버거 색상 강조, 비활성화 시 기본(흰색) */
+  .admin-portal .sidebar-toggle:not(:checked) ~ header .hamburger-menu span {
+    background: #ffffff;
+  }
+  .admin-portal .sidebar-toggle:checked ~ header .hamburger-menu span {
+    background: var(--primary, #f8c300);
+  }
+
+  /* 작은 화면에서는 헤더 콘텐츠 좌측 마진 제거 (센터링 방지) */
+  .admin-portal header .header-content {
+    margin: 0;
+  }
+}
+
+/* 더 작은 화면에서 헤더 패딩/타이틀 축소 */
+@media (max-width: 768px) {
+  .header-content {
+    padding: 0.75rem 1rem;
+  }
+  .header-left {
+    gap: 0.75rem;
+  }
+  .portal-title {
+    font-size: clamp(0.95rem, 4.2vw, 1.05rem);
+  }
+}
+
+@media (max-width: 480px) {
+  .header-content {
+    padding: 0.5rem 0.75rem;
+  }
+  .portal-title {
+    font-size: clamp(0.9rem, 4.5vw, 1rem);
+  }
+}
+
+/* 데스크톱에서 헤더 콘텐츠를 사이드바 폭에 맞춰 정렬 */
+@media (min-width: 1025px) {
+  .admin-portal header .header-content {
+    max-width: none;
+    /* 사이드바 기본 폭과 동일하게 좌측 마진 부여 */
+    margin: 0 0 0 var(--portal-sidebar-width, 280px);
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
   }
 }

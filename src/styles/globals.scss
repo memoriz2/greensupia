@@ -210,6 +210,8 @@ body.admin-portal {
   background: var(--background);
   display: flex;
   flex-direction: column;
+  /* 포털 사이드바 폭 상수화: 헤더/메인 정렬에 사용 */
+  --portal-sidebar-width: 280px;
 
   // 헤더 스타일
   header {
@@ -230,8 +232,8 @@ body.admin-portal {
         justify-content: space-between;
         align-items: center;
         height: 100%;
-        padding: 0 var(--spacing-xl) 0 calc(250px + var(--spacing-xl)); // 사이드바 너비만큼 왼쪽 패딩 추가
-        // max-width와 margin 제거하여 메인 콘텐츠와 동일한 정렬
+        /* 좌우 여백만 주고, 좌측 오프셋은 margin-left로 처리 */
+        padding: 0 var(--spacing-xl);
       }
 
       .header-left {
@@ -244,6 +246,11 @@ body.admin-portal {
         align-items: center;
         gap: 1rem;
         margin-left: auto;
+      }
+
+      /* 요청: 햄버거 + 로그인 버튼 간격 0으로 고정 */
+      .header-content .header-right {
+        gap: 0rem;
       }
 
       .text-xl {
@@ -266,13 +273,11 @@ body.admin-portal {
         display: flex;
         align-items: center;
         gap: 0.75rem;
-        margin-right: 5.5rem; // 카드의 오른쪽 패딩만큼 오른쪽 마진 추가
+        margin-right: 0; /* 기본값: 모바일/태블릿에서 우측 마진 제거 */
       }
 
       .user-info {
-        color: var(--sidebar-text);
-        font-size: 0.875rem;
-        font-weight: 500;
+        display: none; /* 텍스트 배지 숨김 */
       }
 
       .login-btn,
@@ -324,12 +329,52 @@ body.admin-portal {
     }
   }
 
+  /* 반응형: 1024px 이하에서는 헤더 좌측 패딩 제거 (풀폭 정렬) */
+  @media (max-width: 1024px) {
+    header nav .header-content {
+      padding: 0 var(--spacing-lg);
+      margin-left: 0;
+    }
+    /* base 규칙(.admin-portal header nav .header-right { gap: 1rem })을 정확히 덮어씀 */
+    .admin-portal header nav .header-right {
+      gap: 0rem;
+    }
+  }
+
+  /* 데스크톱: 좌측은 사이드바 폭에 정확히 맞추고, 우측은 컨테이너 패딩만 유지 */
+  @media (min-width: 1025px) {
+    header nav .header-content {
+      /* 왼쪽은 사이드바 경계에 정확히 맞춤 */
+      margin-left: var(--portal-sidebar-width, 280px);
+      width: auto;
+      /* 오른쪽은 메인 컨텐츠의 우측과 라인 맞춤: 남는 공간의 절반을 패딩으로 사용 */
+      padding-left: var(--spacing-xl);
+      padding-right: calc(
+        var(--spacing-xl) +
+          max((100vw - var(--portal-sidebar-width, 280px) - 1200px) / 2, 0px)
+      );
+      margin-right: 0;
+      transition: margin var(--transition-normal, 0.3s ease-in-out),
+        padding var(--transition-normal, 0.3s ease-in-out);
+    }
+
+    /* 헤더 우측 버튼 박스는 별도 마진 없이 헤더 컨테이너 패딩에 따름 */
+    .admin-portal
+      header
+      nav
+      .header-content
+      .header-right
+      .user-info-container {
+      margin-right: 0;
+    }
+  }
+
   // 사이드바 스타일
   aside {
     background: var(--sidebar-bg);
     border-right: 1px solid var(--border);
     box-shadow: var(--shadow-sm);
-    width: 250px;
+    width: var(--portal-sidebar-width, 280px);
     flex-shrink: 0;
 
     nav {
