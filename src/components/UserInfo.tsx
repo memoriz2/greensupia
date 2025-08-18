@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useSessionManager } from "@/hooks/useSessionManager";
+import AutoLogoutModal from "./AutoLogoutModal";
 
 export default function UserInfo() {
   const [userType, setUserType] = useState<string>("guest");
@@ -37,13 +39,20 @@ export default function UserInfo() {
     }
   };
 
+  // 세션 관리 훅 사용 (관리자일 때만)
+  const { showWarning, countdown, closeWarning } = useSessionManager({
+    onLogout: handleLogout,
+    sessionTimeout: 30 * 60 * 1000, // 30분
+    warningTimeout: 10 * 1000, // 10초
+  });
+
   useEffect(() => {
     fetchUserInfo();
 
-    // 주기적으로 사용자 정보 확인 (5초마다)
+    // 주기적으로 사용자 정보 확인 (1분마다)
     const interval = setInterval(() => {
       fetchUserInfo();
-    }, 5000);
+    }, 60000);
 
     return () => clearInterval(interval);
   }, []);
@@ -53,19 +62,31 @@ export default function UserInfo() {
   }
 
   return (
-    <div className="user-info-container">
-      {userType === "guest" ? (
-        <button
-          onClick={() => router.push("/portal/login")}
-          className="login-btn"
-        >
-          로그인
-        </button>
-      ) : (
-        <button onClick={handleLogout} className="logout-btn">
-          로그아웃
-        </button>
+    <>
+      <div className="user-info-container">
+        {userType === "guest" ? (
+          <button
+            onClick={() => router.push("/portal/login")}
+            className="login-btn"
+          >
+            로그인
+          </button>
+        ) : (
+          <button onClick={handleLogout} className="logout-btn">
+            로그아웃
+          </button>
+        )}
+      </div>
+
+      {/* 자동 로그아웃 모달 */}
+      {userType !== "guest" && (
+        <AutoLogoutModal
+          isOpen={showWarning}
+          onClose={closeWarning}
+          onLogout={handleLogout}
+          countdown={countdown}
+        />
       )}
-    </div>
+    </>
   );
 }

@@ -19,6 +19,7 @@
 @use "components/portal";
 @use "components/dashboard";
 @use "components/admin";
+@use "components/auto-logout-modal";
 // TipTap 에디터 스타일
 @use "components/tiptap-editor";
 // CSS 변수 정의 - 백조 브랜드 컬러 팔레트

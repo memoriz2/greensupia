@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Link from "next/link";
 import UserInfo from "../../components/UserInfo";
+import PortalSessionManager from "../../components/PortalSessionManager";
+import SidebarToggle from "../../components/SidebarToggle";
 import "../../styles/globals.scss";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -100,6 +102,12 @@ export default function AdminLayout({
           <span className="footer-year">© 2024</span>
         </div>
       </footer>
+
+      {/* 세션 관리 컴포넌트 */}
+      <PortalSessionManager />
+
+      {/* 사이드바 토글 기능 컴포넌트 */}
+      <SidebarToggle />
     </div>
   );
 }

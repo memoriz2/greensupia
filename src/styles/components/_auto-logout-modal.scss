@@ -1,0 +1,157 @@
+.auto-logout-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &__overlay {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+  }
+
+  &__content {
+    position: relative;
+    background-color: var(--background-light);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    max-width: 28rem;
+    width: calc(100% - 2rem);
+    margin: 0 1rem;
+    box-shadow: var(--shadow-xl);
+    text-align: center;
+  }
+
+  &__header {
+    margin-bottom: var(--spacing-lg);
+
+    .auto-logout-modal__title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: var(--spacing-md);
+      line-height: 1.4;
+    }
+
+    .auto-logout-modal__description {
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin: 0;
+    }
+  }
+
+  &__progress {
+    margin-bottom: var(--spacing-lg);
+
+    .auto-logout-modal__progress-bar {
+      width: 100%;
+      height: 0.5rem;
+      background-color: var(--border);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .auto-logout-modal__progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--error) 0%, var(--warning) 100%);
+      border-radius: var(--radius-full);
+      transition: width 1s ease-in-out;
+    }
+
+    .auto-logout-modal__countdown {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin: 0;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    gap: var(--spacing-md);
+
+    .auto-logout-modal__btn {
+      flex: 1;
+      padding: var(--spacing-md) var(--spacing-lg);
+      border: none;
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      line-height: 1.4;
+
+      &:hover {
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-md);
+      }
+
+      &:active {
+        transform: translateY(0);
+      }
+
+      &--primary {
+        background: var(--gradient-primary);
+        color: var(--text-primary);
+        font-weight: 600;
+
+        &:hover {
+          background: var(--gradient-secondary);
+        }
+      }
+
+      &--secondary {
+        background-color: var(--muted);
+        color: var(--background-light);
+
+        &:hover {
+          background-color: var(--text-muted);
+        }
+      }
+    }
+  }
+}
+
+// 반응형 디자인
+@media (max-width: 640px) {
+  .auto-logout-modal {
+    &__content {
+      padding: var(--spacing-lg);
+      margin: 0 0.5rem;
+    }
+
+    &__actions {
+      flex-direction: column;
+      gap: var(--spacing-sm);
+
+      .auto-logout-modal__btn {
+        width: 100%;
+      }
+    }
+  }
+}
+
+// 다크 모드 지원
+@media (prefers-color-scheme: dark) {
+  .auto-logout-modal {
+    &__content {
+      background-color: var(--background);
+      border: 1px solid var(--border);
+    }
+
+    &__title {
+      color: var(--foreground);
+    }
+
+    &__description {
+      color: var(--muted-foreground);
+    }
+
+    &__countdown {
+      color: var(--muted-foreground);
+    }
+  }
+}

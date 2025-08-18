@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
         name: "관리자",
       },
       jwtSecret,
-      { expiresIn: "24h" }
+      { expiresIn: "30m" } // 24시간 → 30분으로 변경
     );
 
     const response = NextResponse.json({
@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: 24 * 60 * 60, // 24시간
+      maxAge: 30 * 60, // 30분
       path: "/",
     });
 
