@@ -12,22 +12,31 @@ const geist = Geist({
 
 export const metadata: Metadata = {
   title: {
-    default: "Greensupia - 친환경 비닐 제작업체",
-    template: "%s | Greensupia",
+    default: "그린수피아(Greensupia) - 친환경 비닐 제작업체",
+    template: "%s | 그린수피아(Greensupia)",
   },
   description:
-    "Greensupia는 친환경 비닐 제작업체로, 지속가능한 농업을 위한 혁신적인 솔루션을 제공합니다. 환경을 생각하는 농업인의 선택입니다.",
+    "그린수피아(Greensupia)는 친환경 비닐 제작업체로, 지속가능한 농업을 위한 혁신적인 솔루션을 제공합니다. 환경을 생각하는 농업인의 선택입니다.",
   keywords: [
+    "그린수피아",
+    "Greensupia",
     "친환경 비닐",
     "농업",
     "지속가능",
     "환경보호",
-    "Greensupia",
     "농사용품",
+    "친환경 농자재",
+    "농업용 비닐",
+    "친환경 농업",
+    "지속가능한 농업",
+    "비닐하우스",
+    "농업용품 제조업",
+    "친환경 소재",
+    "농업 솔루션",
   ],
-  authors: [{ name: "Greensupia" }],
-  creator: "Greensupia",
-  publisher: "Greensupia",
+  authors: [{ name: "그린수피아(Greensupia)" }],
+  creator: "그린수피아(Greensupia)",
+  publisher: "그린수피아(Greensupia)",
   formatDetection: {
     email: false,
     address: false,
@@ -36,29 +45,33 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://www.greensupia.com"),
   alternates: {
     canonical: "/",
+    languages: {
+      "ko-KR": "/",
+      "en-US": "/en",
+    },
   },
   openGraph: {
     type: "website",
     locale: "ko_KR",
     url: "https://www.greensupia.com",
-    title: "Greensupia - 친환경 비닐 제작업체",
+    title: "그린수피아(Greensupia) - 친환경 비닐 제작업체",
     description:
-      "Greensupia는 친환경 비닐 제작업체로, 지속가능한 농업을 위한 혁신적인 솔루션을 제공합니다.",
-    siteName: "Greensupia",
+      "그린수피아(Greensupia)는 친환경 비닐 제작업체로, 지속가능한 농업을 위한 혁신적인 솔루션을 제공합니다.",
+    siteName: "그린수피아(Greensupia)",
     images: [
       {
         url: "/greensupia-og.jpg",
         width: 1200,
         height: 630,
-        alt: "Greensupia 친환경 비닐",
+        alt: "그린수피아 친환경 비닐",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Greensupia - 친환경 비닐 제작업체",
+    title: "그린수피아(Greensupia) - 친환경 비닐 제작업체",
     description:
-      "Greensupia는 친환경 비닐 제작업체로, 지속가능한 농업을 위한 혁신적인 솔루션을 제공합니다.",
+      "그린수피아(Greensupia)는 친환경 비닐 제작업체로, 지속가능한 농업을 위한 혁신적인 솔루션을 제공합니다.",
     images: ["/greensupia-og.jpg"],
   },
   robots: {
