@@ -143,7 +143,7 @@
   min-width: 1px;
 
   p {
-    margin: 1em 0;
+    margin: 0.1em 0;
     cursor: text;
     min-width: 1px;
   }
@@ -151,7 +151,7 @@
   h1,
   h2,
   h3 {
-    margin: 1em 0 0.5em 0;
+    margin: 0.1em 0 0.05em 0;
     cursor: text;
     min-width: 1px;
   }
@@ -255,3 +255,52 @@
 }
 
 /* TipTap이 자체적으로 스타일을 처리하므로 추가 스타일 규칙 제거 */
+
+/* 줄바꿈 및 단락 간격 개선 */
+.editor-paragraph {
+  margin: 0 !important; /* 강제로 마진 제거 */
+  line-height: 1.2 !important;
+  
+  &:first-child {
+    margin-top: 0 !important;
+  }
+  
+  &:last-child {
+    margin-bottom: 0 !important;
+  }
+}
+
+/* TipTap 에디터 내부의 모든 p 태그 강제 스타일 */
+.tiptap p {
+  margin: 0 !important;
+  line-height: 1.2 !important;
+}
+
+/* ProseMirror 내부의 모든 p 태그 강제 스타일 */
+:global(.ProseMirror) p {
+  margin: 0 !important;
+  line-height: 1.2 !important;
+}
+
+.line-break {
+  display: inline-block;
+  height: 0.8em; /* 줄바꿈 높이 줄이기 */
+  vertical-align: baseline;
+}
+
+/* 배너 설명에서의 줄바꿈 스타일 */
+.banner-description {
+  .editor-paragraph {
+    margin: 0 !important; /* 강제로 마진 제거 */
+  }
+  
+  .line-break {
+    height: 0.2em !important; /* 매우 작은 줄바꿈 높이 */
+  }
+  
+  /* 배너 설명 내부의 모든 p 태그 강제 스타일 */
+  p {
+    margin: 0 !important;
+    line-height: 1.1 !important;
+  }
+}

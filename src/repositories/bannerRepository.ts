@@ -42,6 +42,7 @@ export class BannerRepository
       return await prisma.banner.create({
         data: {
           title: data.title,
+          description: data.description,
           imageUrl: data.imageUrl,
           linkUrl: data.linkUrl,
           sortOrder: data.sortOrder || 0,
@@ -60,6 +61,7 @@ export class BannerRepository
         where: { id },
         data: {
           ...(data.title !== undefined && { title: data.title }),
+          ...(data.description !== undefined && { description: data.description }),
           ...(data.imageUrl !== undefined && { imageUrl: data.imageUrl }),
           ...(data.linkUrl !== undefined && { linkUrl: data.linkUrl }),
           ...(data.sortOrder !== undefined && { sortOrder: data.sortOrder }),
@@ -218,6 +220,7 @@ export class BannerRepository
     return {
       id: bannerItem.id,
       title: bannerItem.title,
+      description: bannerItem.description || undefined,
       imageUrl: bannerItem.imageUrl,
       linkUrl: bannerItem.linkUrl || undefined,
       sortOrder: bannerItem.sortOrder,

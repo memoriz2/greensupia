@@ -42,6 +42,7 @@ export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const title = formData.get("title") as string;
+    const description = formData.get("description") as string;
     const imageUrl = formData.get("imageUrl") as string;
     const linkUrl = formData.get("linkUrl") as string;
     const sortOrder = formData.get("sortOrder")
@@ -58,6 +59,7 @@ export async function POST(request: NextRequest) {
 
     const banner = await bannerService.createBanner({
       title,
+      description,
       imageUrl,
       linkUrl,
       sortOrder,

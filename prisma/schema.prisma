@@ -16,14 +16,15 @@ model admin {
 }
 
 model banner {
-  id        Int      @id @default(autoincrement())
-  title     String
-  imageUrl  String   @db.Text
-  linkUrl   String?
-  sortOrder Int      @default(0)
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?  @db.Text
+  imageUrl    String   @db.Text
+  linkUrl     String?
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime
 }
 
 model bannernews {

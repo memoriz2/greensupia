@@ -9,6 +9,7 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import ErrorMessage from "@/components/ErrorMessage";
 import Pagination from "@/components/Pagination";
 import { usePagination } from "@/hooks/usePagination";
+import TipTapEditor from "@/components/TipTapEditor";
 
 export default function BannerManagementPage() {
   const [banners, setBanners] = useState<banner[]>([]);
@@ -27,6 +28,7 @@ export default function BannerManagementPage() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
+    description: "",
     imageUrl: "",
     sortOrder: "0",
     isActive: true,
@@ -213,6 +215,7 @@ export default function BannerManagementPage() {
     try {
       const formDataToSend = new FormData();
       formDataToSend.append("title", formData.title);
+      formDataToSend.append("description", formData.description);
       formDataToSend.append("imageUrl", formData.imageUrl);
       formDataToSend.append("sortOrder", formData.sortOrder);
       formDataToSend.append("isActive", formData.isActive.toString());
@@ -229,6 +232,7 @@ export default function BannerManagementPage() {
       setShowAddForm(false);
       setFormData({
         title: "",
+        description: "",
         imageUrl: "",
         sortOrder: "0",
         isActive: true,
@@ -256,6 +260,7 @@ export default function BannerManagementPage() {
     try {
       const formDataToSend = new FormData();
       formDataToSend.append("title", formData.title);
+      formDataToSend.append("description", formData.description);
       formDataToSend.append("imageUrl", formData.imageUrl);
       formDataToSend.append("sortOrder", formData.sortOrder);
       formDataToSend.append("isActive", formData.isActive.toString());
@@ -273,6 +278,7 @@ export default function BannerManagementPage() {
       setEditingBanner(null);
       setFormData({
         title: "",
+        description: "",
         imageUrl: "",
         sortOrder: "0",
         isActive: true,
@@ -319,6 +325,7 @@ export default function BannerManagementPage() {
     setEditingBanner(bannerItem);
     setFormData({
       title: bannerItem.title,
+      description: bannerItem.description || "",
       imageUrl: bannerItem.imageUrl || "",
       sortOrder: bannerItem.sortOrder.toString(),
       isActive: bannerItem.isActive,
@@ -352,7 +359,9 @@ export default function BannerManagementPage() {
   };
 
   // 입력 필드 변경 핸들러
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value, type } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -393,6 +402,7 @@ export default function BannerManagementPage() {
             <thead>
               <tr>
                 <th>제목</th>
+                <th>설명</th>
                 <th>이미지</th>
                 <th>정렬 순서</th>
                 <th>활성화</th>
@@ -405,6 +415,9 @@ export default function BannerManagementPage() {
                 <tr key={banner.id}>
                   <td className="font-medium max-w-xs truncate">
                     {banner.title}
+                  </td>
+                  <td className="max-w-xs truncate">
+                    {banner.description || "-"}
                   </td>
                   <td>
                     {banner.imageUrl ? (
@@ -513,6 +526,17 @@ export default function BannerManagementPage() {
                 onChange={handleInputChange}
                 required
                 placeholder="배너 제목을 입력하세요."
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="description">
+                설명 (HTML 편집 가능)
+              </label>
+              <TipTapEditor
+                value={formData.description || ""}
+                onChange={(value) => setFormData(prev => ({ ...prev, description: value }))}
+                placeholder="배너에 대한 설명을 입력하세요. (선택사항)"
               />
             </div>
 
@@ -646,6 +670,17 @@ export default function BannerManagementPage() {
                 onChange={handleInputChange}
                 required
                 placeholder="배너 제목을 입력하세요."
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="edit-description">
+                설명 (HTML 편집 가능)
+              </label>
+              <TipTapEditor
+                value={formData.description || ""}
+                onChange={(value) => setFormData(prev => ({ ...prev, description: value }))}
+                placeholder="배너에 대한 설명을 입력하세요. (선택사항)"
               />
             </div>
 

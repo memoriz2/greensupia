@@ -1,6 +1,7 @@
 export interface banner {
   id: number;
   title: string;
+  description?: string;
   imageUrl: string;
   linkUrl?: string;
   sortOrder: number;
@@ -11,6 +12,7 @@ export interface banner {
 
 export interface bannerCreateRequest {
   title: string;
+  description?: string;
   imageUrl: string;
   linkUrl?: string;
   sortOrder?: number;
@@ -19,6 +21,7 @@ export interface bannerCreateRequest {
 
 export interface bannerUpdateRequest {
   title?: string;
+  description?: string;
   imageUrl?: string;
   linkUrl?: string;
   sortOrder?: number;
@@ -28,6 +31,7 @@ export interface bannerUpdateRequest {
 export interface bannerResponse {
   id: number;
   title: string;
+  description?: string;
   imageUrl: string;
   linkUrl?: string;
   sortOrder: number;

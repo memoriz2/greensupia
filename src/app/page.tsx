@@ -80,6 +80,7 @@ interface Video {
 interface Banner {
   id: number;
   title: string;
+  description?: string;
   fileName: string;
   filePath: string;
   imageUrl: string;
@@ -516,15 +517,12 @@ export default function GreensupiaHomePage() {
             <div className="greensupia-banner__overlay"></div>
             <div className="greensupia-banner__content">
               <h2>{banner.title}</h2>
-              <p>
-                What is Lorem Ipsum? <br />
-                Lorem Ipsum is simply dummy text of the printing and typesetting
-                industry. <br />
-                Lorem Ipsum has been the industry&apos;s standard dummy text
-                ever since the 1500s, <br />
-                when an unknown printer took a galley of type and scrambled it
-                to make a type specimen book.
-              </p>
+              {banner.description && (
+                <div 
+                  className="banner-description"
+                  dangerouslySetInnerHTML={{ __html: banner.description }}
+                />
+              )}
             </div>
           </div>
         </section>

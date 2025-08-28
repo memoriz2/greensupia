@@ -91,6 +91,17 @@ export default function TipTapEditor({
       StarterKit.configure({
         // StarterKit에서 중복되는 확장들 비활성화
         underline: false,
+        // 줄바꿈 동작 개선
+        hardBreak: {
+          HTMLAttributes: {
+            class: 'line-break',
+          },
+        },
+        paragraph: {
+          HTMLAttributes: {
+            class: 'editor-paragraph',
+          },
+        },
       }),
       Underline,
       Color,

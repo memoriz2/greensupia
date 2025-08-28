@@ -321,6 +321,65 @@
       height: 200px;
     }
   }
+  
+  // 배너 설명 스타일
+  .banner-description {
+    font-size: 1rem;
+    opacity: 0.9;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    line-height: 1.4;
+    
+    @media (max-width: 768px) {
+      font-size: 0.875rem;
+      line-height: 1.3;
+    }
+    
+    @media (min-width: 768px) {
+      font-size: 1.125rem;
+      line-height: 1.5;
+    }
+    
+    // HTML 요소별 스타일
+    h1, h2, h3, h4, h5, h6 {
+      margin: 0.1em 0;
+      font-weight: 600;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+      
+      &:first-child {
+        margin-top: 0;
+      }
+    }
+    
+    p {
+      margin: 0.05em 0;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+      
+      &:first-child {
+        margin-top: 0;
+      }
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+    
+    ul, ol {
+      margin: 0.1em 0;
+      padding-left: 1.5em;
+      
+      li {
+        margin: 0.05em 0;
+      }
+    }
+    
+    strong, b {
+      font-weight: 700;
+    }
+    
+    em, i {
+      font-style: italic;
+    }
+  }
 
   &--medium {
     height: 250px;
