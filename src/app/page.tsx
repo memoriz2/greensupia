@@ -570,26 +570,6 @@ export default function GreensupiaHomePage() {
             )}
           </div>
 
-          {/* 네비게이션 버튼 */}
-          {banners && banners.length > 1 && (
-              <>
-                <button
-                  className="banner-nav-btn banner-nav-prev"
-                  onClick={goToPrevious}
-                  aria-label="이전 배너"
-                >
-                  ‹
-                </button>
-                <button
-                  className="banner-nav-btn banner-nav-next"
-                  onClick={goToNext}
-                  aria-label="다음 배너"
-                >
-                  ›
-                </button>
-              </>
-            )}
-
             {/* 인디케이터 */}
             {banners && banners.length > 1 && (
               <div className="banner-indicators">
@@ -631,6 +611,66 @@ export default function GreensupiaHomePage() {
           </section>
         )}
 
+        {/* 배너뉴스 섹션 */}
+        <section className="greensupia-news greensupia-section">
+          <Image
+            src="/title_blit.jpg"
+            alt=""
+            width={22}
+            height={21}
+            className="greensupia-contact__title-icon"
+          />
+          <h2 className="greensupia-contact__title">그린수피아</h2>
+          <div className="greensupia-news__grid">
+            {bannerNews && bannerNews.length > 0 ? (
+              bannerNews.slice(0, 4).map((news) => (
+                <article key={news.id} className="greensupia-news__item">
+                  {news.imageUrl && (
+                    <div className="greensupia-news__image-container">
+                      <Image
+                        src={news.imageUrl}
+                        alt={news.title}
+                        fill
+                        className="greensupia-news__image"
+                        priority={true}
+                        style={{
+                          objectFit: "cover",
+                          objectPosition: "center",
+                        }}
+                      />
+                    </div>
+                  )}
+                </article>
+              ))
+            ) : (
+              <>
+                {[
+                  "/main_09.jpg",
+                  "/main_11.jpg",
+                  "/main_13.jpg",
+                  "/main_15.jpg",
+                ].map((imageSrc, index) => (
+                  <article key={index} className="greensupia-news__item">
+                    <div className="greensupia-news__image-container">
+                      <Image
+                        src={imageSrc}
+                        alt={`그린수피아 ${index + 1}`}
+                        fill
+                        className="greensupia-news__image"
+                        priority={true}
+                        style={{
+                          objectFit: "cover",
+                          objectPosition: "center",
+                        }}
+                      />
+                    </div>
+                  </article>
+                ))}
+              </>
+            )}
+          </div>
+        </section>
+
         {/* 인사말 섹션 */}
         {greeting && (
           <section className="greensupia-greeting">
@@ -644,58 +684,7 @@ export default function GreensupiaHomePage() {
           </section>
         )}
 
-        {/* 배너뉴스 섹션 */}
-        {bannerNews && bannerNews.length > 0 && (
-          <section className="greensupia-news greensupia-section">
-            <h2 className="greensupia-contact__title">최신 소식</h2>
-            <div className="greensupia-news__grid">
-              {bannerNews.slice(0, 4).map((news) => (
-                <article key={news.id} className="greensupia-news__item">
-                  {news.imageUrl && (
-                    <div className="greensupia-news__image-container">
-                      <Image
-                        src={news.imageUrl}
-                        alt={news.title}
-                        width={400}
-                        height={192}
-                        className="greensupia-news__image"
-                        priority={true}
-                        style={{
-                          height: "192px",
-                          objectFit: "cover",
-                          objectPosition: "center",
-                        }}
-                      />
-                    </div>
-                  )}
-                  <div className="greensupia-news__content">
-                    <h3 className="greensupia-news__title">{news.title}</h3>
-                    <p className="greensupia-news__description">
-                      {news.content}
-                    </p>
-                    <div className="greensupia-news__meta">
-                      <span className="greensupia-news__date">
-                        {news.startDate
-                          ? new Date(news.startDate).toLocaleDateString("ko-KR")
-                          : "날짜 없음"}
-                      </span>
-                      {news.linkUrl && (
-                        <a
-                          href={news.linkUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="greensupia-news__link"
-                        >
-                          자세히 보기 →
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </section>
-        )}
+        
 
         {/* 비디오 섹션 */}
         {/* 디버깅 정보 (개발 환경에서만 표시) */}
