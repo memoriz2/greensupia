@@ -47,9 +47,11 @@ export default function Header() {
   // 메뉴 아이템 메모이제이션
   const menuItems = useMemo(
     () => [
-      { href: "/", label: "홈" },
-      { href: "/notice", label: "공지사항" },
-      { href: "/inquiry", label: "문의하기" },
+      { href: "/greensupia", label: "그린수피아" },
+      { href: "/material-tech", label: "소재·기술" },
+      { href: "/products", label: "제품" },
+      { href: "/solutions", label: "솔루션" },
+      { href: "/support", label: "고객지원" },
     ],
     []
   );
