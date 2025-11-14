@@ -20,12 +20,13 @@
 @use "components/dashboard";
 @use "components/admin";
 @use "components/auto-logout-modal";
+@use "components/banner-slider";
 // TipTap 에디터 스타일
 @use "components/tiptap-editor";
 // CSS 변수 정의 - 백조 브랜드 컬러 팔레트
 :root {
   // 기본 색상
-  --background: #f7f7f7;
+  --background: #ffffff;
   --foreground: #2e2e2e;
   --muted: #aaaaaa;
   --muted-foreground: #aaaaaa;
@@ -136,12 +137,22 @@ body {
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
-    "Oxygen", "Ubuntu", "Cantarell", sans-serif;
+  font-family: var(--font-noto-sans-kr), "Noto Sans KR", -apple-system,
+    BlinkMacSystemFont, "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.6;
-  font-size: 14px;
+  font-size: 14px; // 모바일 기본
+
+  // 태블릿 이상
+  @media (min-width: 768px) {
+    font-size: 15px;
+  }
+
+  // 데스크톱
+  @media (min-width: 1024px) {
+    font-size: 16px;
+  }
 }
 
 // 전역 리셋
@@ -208,7 +219,7 @@ body.admin-portal {
 // 관리자 포털 공통 스타일 - 모던 CMS 디자인
 .admin-portal {
   min-height: 100vh;
-  background: var(--background);
+  background: #ffffff;
   display: flex;
   flex-direction: column;
   /* 포털 사이드바 폭 상수화: 헤더/메인 정렬에 사용 */
@@ -428,7 +439,7 @@ body.admin-portal {
   }
 
   main {
-    background: var(--background);
+    background: #ffffff;
     padding: var(--spacing-xl);
     flex: 1;
     overflow-y: auto;
@@ -576,7 +587,7 @@ body.admin-portal {
 
   // 카드 스타일 시스템
   .card {
-    background: #f7f7f7;
+    background: #ffffff;
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
     padding: var(--spacing-xl);
@@ -1001,7 +1012,7 @@ body.admin-portal {
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
       padding: var(--spacing-md);
-      background-color: #f7f7f7;
+      background-color: #ffffff;
       transition: background-color var(--transition-fast);
 
       &:hover {

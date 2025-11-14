@@ -42,11 +42,156 @@ export default function BannerManagementPage() {
   // 편집 상태
   const [editingBanner, setEditingBanner] = useState<banner | null>(null);
   const [showEditForm, setShowEditForm] = useState(false);
+  
+  // 설명 편집 상태
+  const [description, setDescription] = useState('');
+  const [selectedBanners, setSelectedBanners] = useState<number[]>([]);
+  const [commonDescription, setCommonDescription] = useState('');
 
   // 편집용 파일 업로드 상태
   const [editUploading, setEditUploading] = useState(false);
   const [editUploadError, setEditUploadError] = useState<string | null>(null);
   const editFileInputRef = useRef<HTMLInputElement>(null);
+
+  // 설명 저장 함수 (단일 배너용 - 기존 호환성 유지)
+  const handleSaveDescription = async (bannerId: number) => {
+    try {
+      const formData = new FormData();
+      formData.append("description", description);
+
+      const response = await fetch(`/api/banners/${bannerId}`, {
+        method: 'PUT',
+        body: formData, // Content-Type 자동 설정
+      });
+
+      if (response.ok) {
+        // 배너 목록 새로고침
+        fetchBanners();
+        alert('설명이 저장되었습니다.');
+        setDescription(''); // 에디터 초기화
+      } else {
+        alert('설명 저장에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('설명 저장 오류:', error);
+      alert('설명 저장 중 오류가 발생했습니다.');
+    }
+  };
+
+  // 여러 배너에 설명 일괄 적용 함수
+  const handleSaveDescriptionToMultipleBanners = async () => {
+    if (selectedBanners.length === 0) {
+      alert('설명을 적용할 배너를 선택해주세요.');
+      return;
+    }
+
+    try {
+      // 선택된 모든 배너에 대해 설명 업데이트
+      const updatePromises = selectedBanners.map(bannerId => {
+        const formData = new FormData();
+        formData.append("description", description);
+        
+        return fetch(`/api/banners/${bannerId}`, {
+          method: 'PUT',
+          body: formData,
+        });
+      });
+
+      const responses = await Promise.all(updatePromises);
+      const allSuccessful = responses.every(response => response.ok);
+
+      if (allSuccessful) {
+        fetchBanners();
+        alert(`${selectedBanners.length}개 배너에 설명이 성공적으로 적용되었습니다.`);
+        setDescription('');
+        setSelectedBanners([]);
+      } else {
+        alert('일부 배너에 설명 적용에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('설명 일괄 적용 오류:', error);
+      alert('설명 적용 중 오류가 발생했습니다.');
+    }
+  };
+
+  // 활성 배너들에 공통 설명 적용 함수
+  const handleApplyCommonDescription = async () => {
+    if (!commonDescription.trim()) {
+      alert('공통 설명을 입력해주세요.');
+      return;
+    }
+
+    try {
+      // 활성화된 모든 배너에 공통 설명 적용
+      const activeBanners = banners.filter(banner => banner.isActive);
+      const updatePromises = activeBanners.map(banner => {
+        const formData = new FormData();
+        formData.append("description", commonDescription);
+        
+        return fetch(`/api/banners/${banner.id}`, {
+          method: 'PUT',
+          body: formData,
+        });
+      });
+
+      const responses = await Promise.all(updatePromises);
+      const allSuccessful = responses.every(response => response.ok);
+
+      if (allSuccessful) {
+        fetchBanners();
+        alert(`${activeBanners.length}개 활성 배너에 공통 설명이 적용되었습니다.`);
+        setCommonDescription('');
+      } else {
+        alert('일부 배너에 설명 적용에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('공통 설명 적용 오류:', error);
+      alert('공통 설명 적용 중 오류가 발생했습니다.');
+    }
+  };
+
+  // 새 배너 추가 핸들러
+  const handleAddNewBanner = () => {
+    console.log('새 배너 추가 버튼 클릭됨');
+    
+    // 모든 상태 초기화
+    setShowAddForm(true);
+    setShowEditForm(false);
+    setEditingBanner(null);
+    setFormData({
+      title: "",
+      description: "",
+      imageUrl: "",
+      sortOrder: "0",
+      isActive: true,
+    });
+    
+    console.log('showAddForm:', true, 'showEditForm:', false);
+  };
+
+  // 모달 닫기 시 상태 정리
+  const closeAddModal = () => {
+    setShowAddForm(false);
+    setFormData({
+      title: "",
+      description: "",
+      imageUrl: "",
+      sortOrder: "0",
+      isActive: true,
+    });
+  };
+
+  const closeEditModal = () => {
+    setShowEditForm(false);
+    setEditingBanner(null);
+    setFormData({
+      title: "",
+      description: "",
+      imageUrl: "",
+      sortOrder: "0",
+      isActive: true,
+    });
+  };
 
   // 모달 상태
   const [modal, setModal] = useState<{
@@ -389,7 +534,7 @@ export default function BannerManagementPage() {
         </div>
         <button
           className="btn btn-primary"
-          onClick={() => setShowAddForm(true)}
+          onClick={handleAddNewBanner}
         >
           + 새 배너 추가
         </button>
@@ -499,11 +644,49 @@ export default function BannerManagementPage() {
         </div>
       </div>
 
+      {/* 설명 편집 섹션 */}
+      <div className="description-editor-section">
+        <div className="section-header">
+          <h3>배너 설명 편집</h3>
+          <p className="help-text">
+            활성화된 모든 배너에 동일한 설명을 적용하거나, 개별 배너에 설명을 적용할 수 있습니다.
+          </p>
+        </div>
+        
+        {/* 공통 설명 편집 */}
+        <div className="common-description-section">
+          <h4 className="text-lg font-medium mb-3">활성 배너 공통 설명</h4>
+          <div className="description-editor-container">
+            <TipTapEditor
+              value={commonDescription}
+              onChange={setCommonDescription}
+              placeholder="활성화된 모든 배너에 적용할 공통 설명을 입력하세요. (선택사항)"
+            />
+          </div>
+          
+          <div className="editor-actions mt-4">
+            <div className="active-banners-info">
+              <span className="text-sm text-gray-600">
+                현재 활성화된 배너: {banners.filter(b => b.isActive).length}개
+              </span>
+            </div>
+            
+            <button 
+              className="btn btn-primary"
+              onClick={handleApplyCommonDescription}
+              disabled={!commonDescription.trim() || banners.filter(b => b.isActive).length === 0}
+            >
+              활성 배너들에 공통 설명 적용
+            </button>
+          </div>
+        </div>
+      </div>
+
       {/* 추가 폼 모달 */}
-      {showAddForm && (
+      {showAddForm && !showEditForm && (
         <Modal
           isOpen={showAddForm}
-          onClose={() => setShowAddForm(false)}
+          onClose={closeAddModal}
           title="새 배너 추가"
           size="large"
         >
@@ -529,16 +712,7 @@ export default function BannerManagementPage() {
               />
             </div>
 
-            <div className="form-group">
-              <label htmlFor="description">
-                설명 (HTML 편집 가능)
-              </label>
-              <TipTapEditor
-                value={formData.description || ""}
-                onChange={(value) => setFormData(prev => ({ ...prev, description: value }))}
-                placeholder="배너에 대한 설명을 입력하세요. (선택사항)"
-              />
-            </div>
+            
 
             <div className="form-group">
               <label htmlFor="imageUrl" className="required">
@@ -622,7 +796,7 @@ export default function BannerManagementPage() {
               <button
                 type="button"
                 className="cancel-btn"
-                onClick={() => setShowAddForm(false)}
+                onClick={closeAddModal}
               >
                 취소
               </button>
@@ -644,10 +818,10 @@ export default function BannerManagementPage() {
       )}
 
       {/* 편집 폼 모달 */}
-      {showEditForm && editingBanner && (
+      {showEditForm && !showAddForm && editingBanner && (
         <Modal
           isOpen={showEditForm}
-          onClose={() => setShowEditForm(false)}
+          onClose={closeEditModal}
           title="배너 수정"
           size="large"
         >
@@ -673,16 +847,7 @@ export default function BannerManagementPage() {
               />
             </div>
 
-            <div className="form-group">
-              <label htmlFor="edit-description">
-                설명 (HTML 편집 가능)
-              </label>
-              <TipTapEditor
-                value={formData.description || ""}
-                onChange={(value) => setFormData(prev => ({ ...prev, description: value }))}
-                placeholder="배너에 대한 설명을 입력하세요. (선택사항)"
-              />
-            </div>
+            
 
             <div className="form-group">
               <label htmlFor="edit-imageUrl" className="required">
@@ -766,7 +931,7 @@ export default function BannerManagementPage() {
               <button
                 type="button"
                 className="cancel-btn"
-                onClick={() => setShowEditForm(false)}
+                onClick={closeEditModal}
               >
                 취소
               </button>

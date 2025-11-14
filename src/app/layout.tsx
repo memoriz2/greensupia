@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import { Noto_Sans_KR } from "next/font/google";
 import "@/styles/globals.scss";
 import ConditionalLayout from "@/components/ConditionalLayout";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import VisitorLogger from "@/components/VisitorLogger";
 
-const geist = Geist({
+const notoSansKR = Noto_Sans_KR({
   subsets: ["latin"],
-  variable: "--font-geist",
+  weight: ["400", "500", "700"],
+  variable: "--font-noto-sans-kr",
 });
 
 export const metadata: Metadata = {
@@ -100,7 +101,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
-      <body className={`${geist.variable} greensupia-layout`}>
+      <body className={`${notoSansKR.variable} greensupia-layout`}>
         <ConditionalLayout>{children}</ConditionalLayout>
 
         {/* 방문자 로그 자동 기록 */}

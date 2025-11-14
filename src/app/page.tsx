@@ -124,9 +124,10 @@ export default function GreensupiaHomePage() {
   const [error, setError] = useState<string | null>(null);
   const [greeting, setGreeting] = useState<Greeting | null>(null);
   const [bannerNews, setBannerNews] = useState<bannerNews[] | null>(null);
-  const [organizationChart, setOrganizationChart] =
-    useState<OrganizationChart | null>(null);
+  const [organizationChart, setOrganizationChart] = useState<OrganizationChart | null>(null);
   const [histories, setHistories] = useState<History[]>([]);
+  const [banners, setBanners] = useState<Banner[]>([]);
+  const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
 
   // YouTube URL에서 비디오 ID 추출 함수
   const extractVideoId = (videoUrl: string): string | null => {
@@ -327,36 +328,13 @@ export default function GreensupiaHomePage() {
       setLoading(true);
       setError(null);
 
-      try {
-        // 배너 데이터 가져오기
-        try {
-          const bannerResponse = await fetch("/api/banners?action=active");
-          if (bannerResponse.ok) {
-            const bannerData = await bannerResponse.json();
-            console.log("배너 데이터:", bannerData);
-            // 배열의 첫 번째 항목 사용
-            if (
-              bannerData &&
-              Array.isArray(bannerData) &&
-              bannerData.length > 0
-            ) {
-              const firstBanner = bannerData[0];
-              console.log("첫 번째 배너:", firstBanner);
-              console.log("배너 이미지 URL:", firstBanner.imageUrl);
-
-              // 이미지 URL이 있으면 배너 설정
-              if (firstBanner.imageUrl) {
-                setBanner(firstBanner);
-              } else {
-                console.log("배너 이미지 URL이 없습니다.");
-              }
-            } else {
-              console.log("배너 데이터가 비어있습니다.");
-            }
+              try {
+          // 여러 활성 배너 가져오기
+          const bannersResponse = await fetch("/api/banners?action=active");
+          if (bannersResponse.ok) {
+            const bannersData = await bannersResponse.json();
+            setBanners(bannersData);
           }
-        } catch (bannerError) {
-          console.log("배너 데이터를 불러올 수 없습니다:", bannerError);
-        }
 
         // 비디오 데이터 가져오기
         try {
@@ -466,6 +444,52 @@ export default function GreensupiaHomePage() {
     fetchData();
   }, []);
 
+  // 배너 데이터 디버깅
+  useEffect(() => {
+    if (banners.length > 0) {
+      console.log('배너 데이터:', banners);
+      banners.forEach((banner, index) => {
+        const imageUrl = banner.imageUrl?.trim() || '/main_06.jpg';
+        console.log(`배너 ${index + 1}:`, {
+          id: banner.id,
+          title: banner.title,
+          imageUrl: banner.imageUrl,
+          '사용될 URL': imageUrl
+        });
+      });
+    }
+  }, [banners]);
+
+  // 자동 슬라이드 전환 (5초마다)
+  useEffect(() => {
+    if (banners.length <= 1) return;
+
+    const interval = setInterval(() => {
+      setCurrentBannerIndex((prevIndex) =>
+        (prevIndex + 1) % banners.length
+      );
+    }, 5000); // 5초
+
+    return () => clearInterval(interval);
+  }, [banners.length]);
+
+  // 수동 네비게이션
+  const goToNext = () => {
+    setCurrentBannerIndex((prevIndex) => 
+      (prevIndex + 1) % banners.length
+    );
+  };
+
+  const goToPrevious = () => {
+    setCurrentBannerIndex((prevIndex) => 
+      prevIndex === 0 ? banners.length - 1 : prevIndex - 1
+    );
+  };
+
+  const goToSlide = (index: number) => {
+    setCurrentBannerIndex(index);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -505,28 +529,94 @@ export default function GreensupiaHomePage() {
         }}
       />
 
-      {/* 배너 섹션 - 전체 너비 */}
-      {banner && banner.imageUrl && (
-        <section className="greensupia-banner-full">
-          <div
-            className="greensupia-banner"
-            style={{
-              backgroundImage: `url(${banner.imageUrl})`,
-            }}
-          >
-            <div className="greensupia-banner__overlay"></div>
-            <div className="greensupia-banner__content">
-              <h2>{banner.title}</h2>
-              {banner.description && (
-                <div 
-                  className="banner-description"
-                  dangerouslySetInnerHTML={{ __html: banner.description }}
+      {/* 슬라이드 배너 섹션 */}
+      <section className="greensupia-banner-slider">
+        <div className="banner-slider-container">
+          {/* 배너 슬라이드 */}
+          <div className="banner-slides">
+            {banners && banners.length > 0 ? (
+              banners.map((banner, index) => {
+                const imageUrl = banner.imageUrl?.trim() || '/main_06.jpg';
+                return (
+                  <div
+                    key={banner.id}
+                    className={`banner-slide ${index === currentBannerIndex ? 'active' : ''}`}
+                    style={{
+                      backgroundImage: `url(${imageUrl})`,
+                    }}
+                  >
+                    <div className="banner-slide__overlay"></div>
+                    <div className="banner-slide__content">
+                      {banner.description && (
+                        <div
+                          className="banner-description"
+                          dangerouslySetInnerHTML={{ __html: banner.description }}
+                        />
+                      )}
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              // 배너 데이터가 없을 때 fallback 이미지 표시
+              <div
+                className="banner-slide active"
+                style={{
+                  backgroundImage: 'url(/main_06.jpg)',
+                }}
+              >
+                <div className="banner-slide__overlay"></div>
+              </div>
+            )}
+          </div>
+
+          {/* 네비게이션 버튼 */}
+          {banners && banners.length > 1 && (
+              <>
+                <button
+                  className="banner-nav-btn banner-nav-prev"
+                  onClick={goToPrevious}
+                  aria-label="이전 배너"
+                >
+                  ‹
+                </button>
+                <button
+                  className="banner-nav-btn banner-nav-next"
+                  onClick={goToNext}
+                  aria-label="다음 배너"
+                >
+                  ›
+                </button>
+              </>
+            )}
+
+            {/* 인디케이터 */}
+            {banners && banners.length > 1 && (
+              <div className="banner-indicators">
+                {banners.map((_, index) => (
+                  <button
+                    key={index}
+                    className={`banner-indicator ${index === currentBannerIndex ? 'active' : ''}`}
+                    onClick={() => goToSlide(index)}
+                    aria-label={`${index + 1}번째 배너로 이동`}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* 진행 바 */}
+            {banners && banners.length > 1 && (
+              <div className="banner-progress">
+                <div
+                  className="banner-progress-bar"
+                  style={{
+                    width: `${((currentBannerIndex + 1) / banners.length) * 100}%`
+                  }}
                 />
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </section>
-      )}
 
       <main className="greensupia-home__container">
         {/* 기본 히어로 섹션 (배너가 없을 때) */}
@@ -537,32 +627,6 @@ export default function GreensupiaHomePage() {
               <div className="absolute top-0 left-0 w-72 h-72 bg-green-300 rounded-full mix-blend-multiply filter blur-xl animate-pulse"></div>
               <div className="absolute top-0 right-0 w-72 h-72 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl animate-pulse animation-delay-2000"></div>
               <div className="absolute bottom-0 left-1/2 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl animate-pulse animation-delay-4000"></div>
-            </div>
-
-            <div className="relative z-10 text-center">
-              <h2 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-                혁신적인 웹 개발로
-                <span className="text-green-600"> 비즈니스 성장</span>을
-              </h2>
-              <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
-                최신 기술과 창의적인 디자인으로 귀사의 디지털 전환을
-                이끌어드립니다. 사용자 중심의 웹사이트와 웹 애플리케이션으로
-                비즈니스 가치를 극대화하세요.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link
-                  href="/greensupia/inquiry"
-                  className="bg-green-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-                >
-                  문의하기
-                </Link>
-                <Link
-                  href="/greensupia/projects"
-                  className="border-2 border-green-600 text-green-600 px-8 py-3 rounded-lg font-semibold hover:bg-green-600 hover:text-white transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-                >
-                  프로젝트 보기
-                </Link>
-              </div>
             </div>
           </section>
         )}

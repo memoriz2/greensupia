@@ -1,0 +1,200 @@
+.greensupia-banner-slider {
+  width: 100%;
+  position: relative;
+  margin: 0;
+  padding: 0;
+
+  .banner-slider-container {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+
+    .banner-slides {
+      position: relative;
+      width: 100%;
+      padding-top: 26.3%; // 1905:501 비율 (501/1905 * 100) - 모바일
+
+      .banner-slide {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-size: contain; // 모바일: 이미지 전체 보이기
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-color: #2c5f5f; // 이미지 배경색
+        opacity: 0;
+        transition: opacity 0.5s ease-in-out;
+        
+        &.active {
+          opacity: 1;
+        }
+        
+        &__overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.3);
+          z-index: 1;
+        }
+
+        &__content {
+          position: absolute;
+          bottom: 1rem; // 모바일 기본
+          left: 1rem; // 모바일 기본
+          color: white;
+          z-index: 10;
+          max-width: 600px;
+
+          h2 {
+            font-size: 1.8rem; // 모바일 기본
+            font-weight: bold;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+
+            @media (min-width: 768px) {
+              font-size: 2.5rem;
+            }
+          }
+
+          .banner-description {
+            font-size: 1rem; // 모바일 기본
+            line-height: 1.6;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+
+            @media (min-width: 768px) {
+              font-size: 1.2rem;
+            }
+          }
+
+          @media (min-width: 768px) {
+            bottom: 2rem;
+            left: 2rem;
+          }
+        }
+      }
+    }
+    
+    // 네비게이션 버튼
+    .banner-nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      font-size: 1.5rem; // 모바일 기본
+      width: 40px; // 모바일 기본
+      height: 40px; // 모바일 기본
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      z-index: 20;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-50%) scale(1.1);
+      }
+
+      &.banner-nav-prev {
+        left: 1rem;
+      }
+
+      &.banner-nav-next {
+        right: 1rem;
+      }
+
+      @media (min-width: 768px) {
+        font-size: 2rem;
+        width: 50px;
+        height: 50px;
+      }
+    }
+    
+    // 인디케이터
+    .banner-indicators {
+      position: absolute;
+      bottom: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 0.5rem;
+      z-index: 20;
+      
+      .banner-indicator {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        border: 2px solid white;
+        background: transparent;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        
+        &:hover {
+          background: rgba(255, 255, 255, 0.5);
+        }
+        
+        &.active {
+          background: white;
+        }
+      }
+    }
+    
+    // 진행 바
+    .banner-progress {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.3);
+      z-index: 20;
+      
+      .banner-progress-bar {
+        height: 100%;
+        background: white;
+        transition: width 0.3s ease;
+      }
+    }
+  }
+}
+
+// 반응형 디자인 - 모바일 우선
+@media (min-width: 768px) {
+  .greensupia-banner-slider {
+    .banner-slider-container {
+      .banner-slides {
+        padding-top: 0; // 패딩 제거
+        height: 400px; // 태블릿 고정 높이
+
+        .banner-slide {
+          background-size: cover; // cover로 변경
+          background-color: transparent; // 배경색 제거
+        }
+      }
+    }
+  }
+}
+
+@media (min-width: 1024px) {
+  .greensupia-banner-slider {
+    .banner-slider-container {
+      .banner-slides {
+        height: 500px; // 데스크톱 고정 높이
+      }
+    }
+  }
+}
+
+@media (min-width: 1280px) {
+  .greensupia-banner-slider {
+    .banner-slider-container {
+      .banner-slides {
+        height: 600px; // 큰 데스크톱 고정 높이
+      }
+    }
+  }
+}

@@ -43,10 +43,7 @@ export class BannerService {
   }
 
   async createBanner(data: bannerCreateRequest): Promise<bannerResponse> {
-    // 활성화하려는 경우 기존 활성 배너들을 모두 비활성화
-    if (data.isActive) {
-      await this.bannerRepository.deactivateAll();
-    }
+    // 배너는 여러 개 활성화 가능하도록 자동 비활성화 로직 제거
     const banner = await this.bannerRepository.create(data);
     return this.bannerRepository.toResponse(banner);
   }
@@ -55,10 +52,7 @@ export class BannerService {
     id: number,
     data: bannerUpdateRequest
   ): Promise<bannerResponse> {
-    // 활성화하려는 경우 기존 활성 배너들을 모두 비활성화
-    if (data.isActive) {
-      await this.bannerRepository.deactivateAllExcept(id);
-    }
+    // 배너는 여러 개 활성화 가능하도록 자동 비활성화 로직 제거
     const banner = await this.bannerRepository.update(id, data);
     return this.bannerRepository.toResponse(banner);
   }
@@ -73,11 +67,7 @@ export class BannerService {
       throw new Error("Banner not found");
     }
 
-    // 활성화하려는 경우 기존 활성 배너들을 모두 비활성화
-    if (!banner.isActive) {
-      await this.bannerRepository.deactivateAll();
-    }
-
+    // 배너는 여러 개 활성화 가능하도록 자동 비활성화 로직 제거
     const updatedBanner = await this.bannerRepository.toggleActive(id);
     return this.bannerRepository.toResponse(updatedBanner);
   }
