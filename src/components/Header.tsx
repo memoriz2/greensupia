@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 
 export default function Header() {
@@ -63,8 +64,14 @@ export default function Header() {
         <div className="greensupia-header__content">
           {/* 로고 */}
           <Link href="/" className="greensupia-header__logo">
-            <div className="greensupia-header__logo-icon">G</div>
-            <span className="greensupia-header__logo-text">Greensupia</span>
+            <Image
+              src="/main_03.jpg"
+              alt="Greensupia"
+              width={137}
+              height={41}
+              priority
+              className="greensupia-header__logo-image"
+            />
           </Link>
 
           {/* 데스크톱 네비게이션 */}

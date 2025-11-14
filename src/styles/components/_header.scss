@@ -34,6 +34,17 @@
     flex-shrink: 0;
     z-index: 10;
 
+    &-image {
+      height: auto;
+      max-height: 40px;
+      width: auto;
+      transition: opacity 0.15s ease;
+
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+
     &-text {
       font-size: 1.75rem;
       font-weight: 700;
