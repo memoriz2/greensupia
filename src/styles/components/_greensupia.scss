@@ -589,6 +589,18 @@
 
 // 조직도 섹션
 .greensupia-organization {
+  width: 100vw;
+  max-width: none;
+  padding: 0;
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
+  margin-bottom: 3rem;
+
+  @media (max-width: 767px) {
+    overflow: visible;
+    padding: 2rem 0;
+  }
+
   &__container {
     max-width: 80rem;
     margin: 0 auto;
@@ -607,12 +619,27 @@
   &__image {
     width: 100%;
     height: auto;
-    border-radius: 0.5rem;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease;
+    display: block;
+
+    @media (min-width: 768px) {
+      border-radius: 0;
+      box-shadow: none;
+    }
+
+    @media (max-width: 767px) {
+      transform: scale(1.7);
+      transform-origin: center;
+      border-radius: 0.5rem;
+    }
 
     &:hover {
       transform: scale(1.02);
+
+      @media (max-width: 767px) {
+        transform: scale(1.7);
+      }
     }
   }
 
