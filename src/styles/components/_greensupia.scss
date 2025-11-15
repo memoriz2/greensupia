@@ -629,7 +629,7 @@
     }
 
     @media (max-width: 767px) {
-      transform: scale(1.7);
+      transform: scale(1.5);
       transform-origin: center;
       border-radius: 0.5rem;
     }
@@ -638,7 +638,7 @@
       transform: scale(1.02);
 
       @media (max-width: 767px) {
-        transform: scale(1.7);
+        transform: scale(1.5);
       }
     }
   }
