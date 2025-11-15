@@ -686,9 +686,9 @@ export default function GreensupiaHomePage() {
 
 
         {/* 미션&비전 섹션 */}
-        <section className="greensupia-organization greensupia-section">
-        <Image src="/main_21.jpg" alt="미션비전" width={1905} height={557} 
-           className="greensupia-organization__image" />
+        <section className="greensupia-organization">
+          <Image src="/main_21.jpg" alt="미션비전" width={1905} height={557}
+            className="greensupia-organization__image" />
         </section>
 
 
