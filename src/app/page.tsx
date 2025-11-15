@@ -694,6 +694,14 @@ export default function GreensupiaHomePage() {
 
         {/* CI/BI 섹션 */}
         <section className="greensupia-ci-bi greensupia-section">
+        <Image
+            src="/title_blit.jpg"
+            alt=""
+            width={22}
+            height={21}
+            className="greensupia-contact__title-icon"
+          />
+          <h2 className="greensupia-contact__title">그린수피아 CI / BI</h2>
           <Image src="/main_28.jpg" alt="CI/BI" width={1905} height={557} 
            className="greensupia-ci-bi__image" />
         </section>
