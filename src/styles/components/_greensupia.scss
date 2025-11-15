@@ -650,6 +650,48 @@
   }
 }
 
+// CI/BI 섹션
+.greensupia-ci-bi {
+  width: 100vw;
+  max-width: none;
+  padding: 0;
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
+  margin-bottom: 3rem;
+
+  @media (max-width: 767px) {
+    overflow: visible;
+    padding: 2rem 1rem;
+    width: auto;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  &__image {
+    width: 100%;
+    height: auto;
+    transition: transform 0.3s ease;
+    display: block;
+    border-radius: 0;
+    box-shadow: none;
+
+    @media (max-width: 767px) {
+      transform: scale(1.1);
+      transform-origin: center;
+    }
+
+    &:hover {
+      @media (min-width: 768px) {
+        transform: scale(1.02);
+      }
+
+      @media (max-width: 767px) {
+        transform: scale(1.1);
+      }
+    }
+  }
+}
+
 // 히스토리 섹션
 .greensupia-history {
   &__timeline {
