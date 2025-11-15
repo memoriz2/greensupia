@@ -672,10 +672,67 @@
       }
     }
   }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+
+    @media (min-width: 768px) {
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+  }
+
+  &__content-item {
+    width: 100%;
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      height: auto;
+      display: block;
+
+      @media (min-width: 768px) {
+        max-width: 30%;
+        margin: 0 auto;
+      }
+
+      @media (max-width: 767px) {
+        transform: scale(0.7);
+        transform-origin: center;
+      }
+    }
+
+    p {
+      color: #000000;
+      line-height: 1.6;
+      margin-top: 1rem;
+      text-align: center;
+      font-size: 0.875rem;
+
+      @media (min-width: 768px) {
+        font-size: 0.95rem;
+      }
+    }
+  }
 }
 
 // 히스토리 섹션
 .greensupia-history {
+  img {
+    width: 100%;
+    height: auto;
+    display: block;
+    margin-bottom: 0rem;
+
+    @media (max-width: 767px) {
+      transform: scale(0.85);
+      transform-origin: center;
+    }
+  }
+
   &__timeline {
     position: relative;
     max-width: 80rem; // 최신소식과 동일한 최대 너비
@@ -1421,7 +1478,7 @@
 .greensupia-contact__title-icon {
   display: inline-block;
   vertical-align: middle;
-  width: auto;
-  height: 1.75rem;
+  width: auto !important;
+  height: 1rem !important;
   margin-top: 1rem;
 }

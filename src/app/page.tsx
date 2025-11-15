@@ -704,54 +704,37 @@ export default function GreensupiaHomePage() {
           <h2 className="greensupia-contact__title">그린수피아 CI / BI</h2>
           <Image src="/main_28.jpg" alt="CI/BI" width={1905} height={557} 
            className="greensupia-ci-bi__image" />
+           <div className="greensupia-ci-bi__content">
+            <div className="greensupia-ci-bi__content-item">
+              <Image src="/ci.jpg" alt="CI" width={1905} height={557} />
+              <p>그린수피아의 로고는 <strong>'지속 가능한 미래를 향한 순환과 혁신'</strong>을 상징합니다.
+              <br/>로고의 화살표 형태는 친환경 순환을, 디지털 픽셀은 기술 혁신을 의미하며, 녹색 톤은 <strong>자연과 조화</strong>를 이루는 기업 철학을 담고 있습니다"
+              <br/>그린수피아는 깨끗한 삶의 환경을 위한 솔루션을 제공하는 <strong>지속가능 경영의 파트너</strong>입니다.
+              </p>
+            </div>
+            <div className="greensupia-ci-bi__content-item">
+              <Image src="/bi.jpg" alt="BI" width={1905} height={557} />
+              <p>그린수피아 브랜드는 <strong>'Green + Utopia'</strong>의 결합으로, 인간과 환경이 공존하는 이상적인 세상을 지향합니다.
+              <br/>모든 제품과 서비스에는 친환경 가치와 첨단 기술이 결합되어 있으며, '작은 변화로 큰 미래를 만든다'는 슬로건 아래 지속가능한 혁신을 실천합니다. 
+              </p>
+            </div>
+           </div>
         </section>
 
         {/* 히스토리 섹션 */}
-        {histories.length > 0 && (
-          <section className="greensupia-history greensupia-section">
+        <section className="greensupia-history">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Image
+              src="/title_blit.jpg"
+              alt=""
+              width={22}
+              height={21}
+              className="greensupia-contact__title-icon"
+            />
             <h2 className="greensupia-contact__title">회사 연혁</h2>
-            <div className="bg-white rounded-lg shadow-sm border p-8 text-center">
-              <div className="max-w-4xl mx-auto">
-                <div className="greensupia-history__timeline">
-                  {Object.entries(
-                    histories.reduce((acc, history) => {
-                      if (!acc[history.year]) {
-                        acc[history.year] = [];
-                      }
-                      acc[history.year].push(history);
-                      return acc;
-                    }, {} as Record<string, History[]>)
-                  )
-                    .sort(([a], [b]) => b.localeCompare(a))
-                    .map(([year, yearHistories]) => (
-                      <div
-                        key={year}
-                        className="greensupia-history__year-group"
-                      >
-                        <h3 className="greensupia-history__year-title">
-                          {year}
-                        </h3>
-                        <div className="greensupia-history__year-content">
-                          {yearHistories
-                            .sort((a, b) => a.sortOrder - b.sortOrder)
-                            .map((history) => (
-                              <div
-                                key={history.id}
-                                className="greensupia-history__item"
-                              >
-                                <p className="greensupia-history__description">
-                                  {history.description}
-                                </p>
-                              </div>
-                            ))}
-                        </div>
-                      </div>
-                    ))}
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
+          </div>
+          <Image src="/main_31.jpg" alt="히스토리" width={1905} height={557} />
+        </section>
 
         {/* 오시는길 섹션 */}
         <section className="greensupia-contact">
