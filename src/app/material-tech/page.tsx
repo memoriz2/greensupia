@@ -59,13 +59,13 @@ export default function MaterialTechPage() {
         <section className="greensupia-page__section">
           <div className="greensupia-page__section-header">
             <Image
-              src="/title_blit.jpg"
-              alt=""
-              width={22}
-              height={21}
-              className="greensupia-page__section-icon"
+              src="/tech_faq.png"
+              alt="자주 묻는 질문"
+              width={300}
+              height={75}
+              className="greensupia-page__section-header-image"
+              style={{ maxWidth: '250px', height: 'auto', margin: '0 auto', display: 'block' }}
             />
-            <h2 className="greensupia-page__section-title">자주 묻는 질문</h2>
           </div>
           <div className="greensupia-faq">
             <div className="greensupia-faq__grid">
