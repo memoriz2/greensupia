@@ -735,69 +735,6 @@ export default function GreensupiaHomePage() {
           </div>
           <Image src="/main_31.jpg" alt="히스토리" width={1905} height={557} />
         </section>
-
-        {/* 오시는길 섹션 */}
-        <section className="greensupia-contact">
-          <h2 className="greensupia-contact__title">오시는 길</h2>
-          <div className="greensupia-contact__container">
-            <div className="greensupia-contact__content">
-              {/* 주소 정보 카드 */}
-              <div className="greensupia-contact__info">
-                <div className="greensupia-contact__card">
-                  <h3 className="greensupia-contact__company">Greensupia</h3>
-                  <div className="greensupia-contact__details">
-                    <div className="greensupia-contact__item">
-                      <strong>도로명</strong>
-                      <p>서울특별시 강남구 테헤란로 123</p>
-                    </div>
-                    <div className="greensupia-contact__item">
-                      <strong>지번</strong>
-                      <p>서울특별시 강남구 역삼동 123-45</p>
-                    </div>
-                    <div className="greensupia-contact__item">
-                      <strong>우편번호</strong>
-                      <p>06123</p>
-                    </div>
-                    <div className="greensupia-contact__item">
-                      <strong>전화</strong>
-                      <p>02-1234-5678</p>
-                    </div>
-                    <div className="greensupia-contact__item">
-                      <strong>이메일</strong>
-                      <p>info@greensupia.com</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* 지도 카드 */}
-              <div className="greensupia-contact__map">
-                <div className="greensupia-contact__card">
-                  <h3 className="greensupia-contact__location">위치</h3>
-                  <div className="greensupia-map__container">
-                    <div id="map" className="greensupia-map__element">
-                      <div className="greensupia-map__placeholder">
-                        <div className="placeholder-content">
-                          <svg fill="currentColor" viewBox="0 0 20 20">
-                            <path
-                              fillRule="evenodd"
-                              d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                          <p className="placeholder-title">지도 로드 중...</p>
-                          <p className="placeholder-subtitle">
-                            잠시만 기다려주세요
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
       </main>
     </div>
   );
