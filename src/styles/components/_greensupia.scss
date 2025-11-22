@@ -1523,7 +1523,34 @@
     }
 
     &--full {
+      position: relative;
       height: auto;
+      overflow: hidden;
+      padding-top: 40%; // 모바일 배너 확대 (메인 페이지와 동일)
+
+      @media (min-width: 768px) {
+        padding-top: 0;
+        height: auto;
+      }
+
+      .greensupia-page__banner-image {
+        @media (max-width: 767px) {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: auto;
+          height: 100%;
+          max-width: none;
+        }
+
+        @media (min-width: 768px) {
+          position: relative;
+          width: 100%;
+          height: auto;
+          transform: none;
+        }
+      }
     }
   }
 
@@ -1531,6 +1558,12 @@
     width: 100%;
     height: auto;
     display: block;
+    transform: scale(1.5);
+    transform-origin: center;
+
+    @media (min-width: 768px) {
+      transform: scale(1);
+    }
   }
 
   &__banner-overlay {
@@ -1624,6 +1657,13 @@
     &--base {
       position: relative;
       z-index: 1;
+
+      @media (max-width: 767px) {
+        width: 180%;
+        max-width: 180%;
+        margin-left: auto;
+        margin-right: 80%;
+      }
     }
 
     &--overlay {
@@ -1643,6 +1683,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow: hidden;
   }
 
   &__overlay-content {

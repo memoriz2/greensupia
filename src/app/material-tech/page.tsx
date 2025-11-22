@@ -14,6 +14,7 @@ export default function MaterialTechPage() {
           height={400}
           priority
           className="greensupia-page__banner-image"
+          style={{ height: 'auto' }}
         />
       </section>
 
