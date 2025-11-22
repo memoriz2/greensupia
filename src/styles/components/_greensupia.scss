@@ -1669,11 +1669,16 @@
     &--overlay {
       position: absolute;
       top: 50%;
-      left: 15%;
+      left: 4%;
       transform: translateY(-50%);
       z-index: 2;
-      width: 23%;
+      width: 38%;
       height: auto;
+
+      @media (min-width: 768px) {
+        left: 15%;
+        width: 23%;
+      }
     }
   }
 
@@ -1689,9 +1694,9 @@
   &__overlay-content {
     position: absolute;
     top: 1.5rem;
-    left: 2rem;
+    left: 0rem;
     z-index: 3;
-    font-size: 1.25rem;
+    font-size: 0.6rem;
     color: #111827;
     padding-left: 1rem;
 
@@ -1708,15 +1713,17 @@
 
   &__overlay-text {
     position: absolute;
-    top: 7rem;
-    left: 35%;
+    top: 2.5rem;
+    left: 44%;
     z-index: 3;
     max-width: 55%;
+    margin-right: 16px;
 
     @media (min-width: 768px) {
       top: 7rem;
       left: 40%;
       max-width: 50%;
+      margin-right: 0;
     }
   }
 
@@ -1724,24 +1731,27 @@
     margin-bottom: 1rem;
 
     h3 {
-      font-size: 1rem;
+      font-size: 0.45rem;
       font-weight: 700;
       color: #111827;
-      margin-bottom: 0.25rem;
+      margin-bottom: 0.1rem;
 
       @media (min-width: 768px) {
         font-size: 1.125rem;
+        margin-bottom: 0.25rem;
       }
     }
 
     p {
-      font-size: 0.8125rem;
+      font-size: 0.38rem;
       color: #374151;
-      line-height: 1.5;
-      margin-bottom: 0.25rem;
+      line-height: 1.2;
+      margin-bottom: 0.1rem;
 
       @media (min-width: 768px) {
         font-size: 0.875rem;
+        line-height: 1.5;
+        margin-bottom: 0.25rem;
       }
     }
   }
