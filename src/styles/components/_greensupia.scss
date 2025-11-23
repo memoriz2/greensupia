@@ -1607,10 +1607,10 @@
   }
 
   &__section {
-    margin-bottom: 3rem;
+    /* margin-bottom: 3rem; */
 
     @media (min-width: 768px) {
-      margin-bottom: 4rem;
+      /* margin-bottom: 4rem; */
     }
 
     &--bg {
@@ -1836,6 +1836,113 @@
     @media (min-width: 768px) {
       font-size: 0.95rem;
     }
+  }
+}
+
+// 제품 그리드 스타일
+.greensupia-products {
+  padding: 1rem;
+  max-width: 1000px;
+  margin: 0 auto;
+
+  &__info-image {
+    max-width: 40%;
+    height: auto;
+    margin: 0 auto;
+    display: block;
+
+    @media (min-width: 768px) {
+      max-width: 10%;
+    }
+  }
+
+  @media (min-width: 768px) {
+    padding: 2rem;
+  }
+
+  &__layout {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+
+    @media (min-width: 1024px) {
+      display: grid;
+      grid-template-columns: 45% 1fr;
+      gap: 1.5rem;
+    }
+  }
+
+  &__hero {
+    @media (min-width: 1024px) {
+      display: flex;
+      padding-right: 2rem;
+      border-right: 1px solid #e0e0e0;
+    }
+  }
+
+  &__hero-image {
+    width: 100%;
+    height: auto;
+    border-radius: 1rem;
+    display: block;
+    object-fit: cover;
+  }
+
+  &__cards {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    @media (min-width: 1024px) {
+      display: grid;
+      grid-template-rows: repeat(3, 1fr);
+      gap: 1rem;
+    }
+  }
+
+  &__card-img {
+    width: 100%;
+    height: auto;
+    border-radius: 0.75rem;
+    display: block;
+    object-fit: cover;
+
+    @media (min-width: 1024px) {
+      height: 100%;
+    }
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+
+    @media (min-width: 768px) {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+    }
+
+    @media (min-width: 1024px) {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2rem;
+    }
+  }
+
+  &__item {
+    border-radius: 0.5rem;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+  }
+
+  &__image {
+    width: 100%;
+    height: auto;
+    display: block;
   }
 }
 
