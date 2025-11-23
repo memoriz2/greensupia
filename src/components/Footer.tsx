@@ -45,7 +45,7 @@ export default function Footer() {
               </div>
               <div className="greensupia-map__container">
                 <iframe
-                  src={`https://www.google.com/maps?q=제주특별자치도+제주시+태성로3길+32&z=15&output=embed`}
+                  src="https://maps.google.com/maps?q=33.4996,126.5226&t=&z=15&ie=UTF8&iwloc=&output=embed"
                   width="100%"
                   height="300"
                   style={{ border: 0 }}

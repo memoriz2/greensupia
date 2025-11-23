@@ -74,7 +74,7 @@ export default function MaterialTechPage() {
                   <Image src="/method-tech02.jpg" alt="" width={60} height={60} />
                 </div>
                 <div className="greensupia-faq__content">
-                  <h3 className="greensupia-faq__question">'생분해'와 '퇴비화 가능'은 같은가요?</h3>
+                  <h3 className="greensupia-faq__question">&apos;생분해&apos;와 &apos;퇴비화 가능&apos;은 같은가요?</h3>
                   <p className="greensupia-faq__answer">
                     다릅니다. 퇴비화 가능(Compostable)은 표준이 정한 산업용 컴포스트 조건에서 분해·생분해·유해성 기준을 통과했음을 뜻합니다. 가정용/해양 분해는 포함되지 않습니다.
                   </p>
