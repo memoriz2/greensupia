@@ -658,6 +658,10 @@
 
 // CI/BI 섹션
 .greensupia-ci-bi {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1rem;
+
   &__image {
     width: 100%;
     height: auto;
@@ -721,6 +725,10 @@
 
 // 히스토리 섹션
 .greensupia-history {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1rem;
+
   img {
     width: 100%;
     height: auto;
@@ -1699,9 +1707,7 @@
   &__overlay-container {
     position: relative;
     width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    display: block;
     overflow: hidden;
   }
 
@@ -1715,9 +1721,10 @@
     padding-left: 1rem;
 
     @media (min-width: 768px) {
-      font-size: 1.5rem;
-      top: 3rem;
-      left: 15rem;
+      top: 3%;
+      left: 12%;
+      font-size: clamp(1rem, 1.5vw, 1.5rem);
+      padding-left: 1%;
     }
 
     strong {
@@ -1736,8 +1743,9 @@
     @media (min-width: 768px) {
       top: 26%;
       left: 40%;
-      max-width: 50%;
-      margin-right: 0;
+      max-width: 58%;
+      margin-right: 1%;
+      padding-right: 1%;
     }
   }
 
@@ -1751,8 +1759,8 @@
       margin-bottom: 0.1rem;
 
       @media (min-width: 768px) {
-        font-size: 1.125rem;
-        margin-bottom: 0.25rem;
+        font-size: clamp(0.8rem, 1.2vw, 1.125rem);
+        margin-bottom: clamp(0.1rem, 0.3vw, 0.25rem);
       }
     }
 
@@ -1763,9 +1771,9 @@
       margin-bottom: 0.1rem;
 
       @media (min-width: 768px) {
-        font-size: 0.875rem;
+        font-size: clamp(0.7rem, 1vw, 0.875rem);
         line-height: 1.5;
-        margin-bottom: 0.25rem;
+        margin-bottom: clamp(0.1rem, 0.3vw, 0.25rem);
       }
     }
   }

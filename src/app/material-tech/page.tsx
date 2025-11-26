@@ -29,27 +29,29 @@ export default function MaterialTechPage() {
               height={800}
               className="greensupia-page__image greensupia-page__image--base"
             />
-            <p className="greensupia-page__overlay-content"><strong>왜 생분해인가</strong>(문제/대안/LCA 개요)</p>
-            <div>
-            <Image
-              src="/method-tech01.jpg"
-              alt="핵심 소재"
-              width={1905}
-              height={800}
-              className="greensupia-page__image greensupia-page__image--overlay"
-            />
-            <div className="greensupia-page__overlay-text">
-              <div className="greensupia-page__overlay-block">
-                <h3>&apos;생분해&apos;</h3>
-                <p>아무 데서나 사라짐이 아닙니다. 표준이 정하는 조건(온도·산소·수분·시간) 하에서 검증된 속도와 안전성으로 분해됨을 뜻합니다.</p>
-                <p className="greensupia-page__overlay-sub">· 생분해 현수막 및 배너, 생분해 멀칭필름은 55°C 이상 온도조건에서 6개월 내 90% 이상 분해가 됩니다.</p>
-              </div>
-              <div className="greensupia-page__overlay-block">
-                <h3>왜 &quot;제주형 순환&quot;과 잘 맞나요?</h3>
-                <p className="greensupia-page__overlay-sub">· 회수-처리-성과보고까지 한 흐름으로 묶여 행사 종료 후 폐기 부담을 줄이고, 
-                  <br/>&nbsp;&nbsp;회수율·CO₂절감 등 측정 가능한 성과로 전환할 수 있습니다.</p>
-                <p className="greensupia-page__overlay-sub">· 정책·조례 정합성이 요구되는 공공영역에서 표준(EN/ASTM/ISO) 기반 문서화가 용이합니다.</p>
-              </div>
+            <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 1rem' }}>
+              <p className="greensupia-page__overlay-content"><strong>왜 생분해인가</strong>(문제/대안/LCA 개요)</p>
+              <div>
+              <Image
+                src="/method-tech01.jpg"
+                alt="핵심 소재"
+                width={1905}
+                height={800}
+                className="greensupia-page__image greensupia-page__image--overlay"
+              />
+              <div className="greensupia-page__overlay-text">
+                <div className="greensupia-page__overlay-block">
+                  <h3>&apos;생분해&apos;</h3>
+                  <p>아무 데서나 사라짐이 아닙니다. 표준이 정하는 조건(온도·산소·수분·시간) 하에서 검증된 속도와 안전성으로 분해됨을 뜻합니다.</p>
+                  <p className="greensupia-page__overlay-sub">· 생분해 현수막 및 배너, 생분해 멀칭필름은 55°C 이상 온도조건에서 6개월 내 90% 이상 분해가 됩니다.</p>
+                </div>
+                <div className="greensupia-page__overlay-block">
+                  <h3>왜 &quot;제주형 순환&quot;과 잘 맞나요?</h3>
+                  <p className="greensupia-page__overlay-sub">· 회수-처리-성과보고까지 한 흐름으로 묶여 행사 종료 후 폐기 부담을 줄이고,
+                    <br/>&nbsp;&nbsp;회수율·CO₂절감 등 측정 가능한 성과로 전환할 수 있습니다.</p>
+                  <p className="greensupia-page__overlay-sub">· 정책·조례 정합성이 요구되는 공공영역에서 표준(EN/ASTM/ISO) 기반 문서화가 용이합니다.</p>
+                </div>
+                </div>
               </div>
             </div>
           </div>
